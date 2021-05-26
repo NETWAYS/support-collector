@@ -1,7 +1,6 @@
 package collection
 
 import (
-	"bytes"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
@@ -16,8 +15,7 @@ func TestCollection_WriteZIP(t *testing.T) {
 
 	c := &Collection{}
 
-	assert.NoError(t, c.AddFile("test.txt", bytes.NewBufferString("content")))
-	assert.NoError(t, c.AddFile("path/test2.txt", bytes.NewBufferString("content2")))
+	assert.NoError(t, c.AddFiles("test", "testdata/"))
 
 	assert.NoError(t, c.WriteZIP(tmp))
 

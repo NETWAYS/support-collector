@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
@@ -10,7 +9,7 @@ import (
 func main() {
 	c := collection.Collection{}
 
-	err := c.AddFile("test.txt", bytes.NewBufferString("test"))
+	err := c.AddFiles("test", "pkg/collection/testdata")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

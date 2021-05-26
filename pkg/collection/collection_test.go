@@ -6,10 +6,18 @@ import (
 	"testing"
 )
 
-func TestCollection_AddFile(t *testing.T) {
+func TestCollection_AddFileFromReader(t *testing.T) {
 	c := &Collection{}
 
-	err := c.AddFile("test.txt", bytes.NewBufferString("content"))
+	err := c.AddFileFromReader("test.txt", bytes.NewBufferString("content"))
 	assert.NoError(t, err)
 	assert.Len(t, c.Files, 1)
+}
+
+func TestCollection_AddFiles(t *testing.T) {
+	c := &Collection{}
+
+	err := c.AddFiles("test", "testdata/")
+	assert.NoError(t, err)
+	assert.Len(t, c.Files, 2)
 }
