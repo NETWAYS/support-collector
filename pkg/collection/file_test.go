@@ -5,6 +5,20 @@ import (
 	"testing"
 )
 
+func TestLoadFiles(t *testing.T) {
+	files, err := LoadFiles("test", "testdata/example.txt")
+	assert.NoError(t, err)
+	assert.Len(t, files, 1)
+
+	files, err = LoadFiles("test", "testdata")
+	assert.NoError(t, err)
+	assert.Len(t, files, 2)
+
+	files, err = LoadFiles("test", "testdata/*.txt")
+	assert.NoError(t, err)
+	assert.Len(t, files, 1)
+}
+
 func TestFile_Write(t *testing.T) {
 	f := NewFile("test.txt")
 
