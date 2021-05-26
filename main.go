@@ -3,11 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/util"
+	"github.com/mattn/go-colorable"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
 func main() {
-	c := collection.Collection{}
+	c := collection.New()
+
+	// Add console log output via logrus.Hook
+	c.Log.AddHook(&util.ExtraLogHook{
+		Formatter: &logrus.TextFormatter{ForceColors: true},
+		Writer:    colorable.NewColorableStdout(),
+	})
+
+	c.Log.Info("Starting NETWAYS support collector")
 
 	err := c.AddFiles("test", "pkg/collection/testdata")
 	if err != nil {

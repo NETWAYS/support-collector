@@ -13,7 +13,7 @@ func TestCollection_WriteZIP(t *testing.T) {
 
 	defer os.Remove(tmp.Name())
 
-	c := &Collection{}
+	c := New()
 
 	assert.NoError(t, c.AddFiles("test", "testdata/"))
 

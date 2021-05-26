@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"time"
 )
 
 func (c Collection) WriteZIP(w io.Writer) error {
@@ -29,15 +30,23 @@ func (c Collection) WriteZIP(w io.Writer) error {
 		}
 	}
 
-	if len(c.Log) > 0 {
-		log, err := z.Create("support-collector.log")
-		if err != nil {
-			return fmt.Errorf("could not add file to zip: %w", err)
+	if c.LogData != nil {
+		fh := &zip.FileHeader{
+			Name:     "support-collector.log",
+			Modified: time.Now(),
 		}
+		logBuffer := bytes.NewBuffer(c.LogData.Bytes())
 
-		_, err = io.Copy(log, bytes.NewReader(c.Log))
-		if err != nil {
-			return fmt.Errorf("could not write file to zip: %w", err)
+		if logBuffer.Len() != 0 {
+			log, err := z.CreateHeader(fh)
+			if err != nil {
+				return fmt.Errorf("could not add file to zip: %w", err)
+			}
+
+			_, err = io.Copy(log, logBuffer)
+			if err != nil {
+				return fmt.Errorf("could not write file to zip: %w", err)
+			}
 		}
 	}
 

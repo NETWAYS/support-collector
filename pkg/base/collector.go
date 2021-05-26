@@ -8,6 +8,8 @@ import (
 )
 
 func Collect(c *collection.Collection) {
+	c.Log.Info("Collecting base system information")
+
 	CollectKernelInfo(c)
 }
 

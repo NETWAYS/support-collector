@@ -1,13 +1,27 @@
 package collection
 
 import (
+	"bytes"
+	"github.com/sirupsen/logrus"
 	"io"
 	"time"
 )
 
 type Collection struct {
-	Files []*File
-	Log   []byte
+	Files   []*File
+	Log     *logrus.Logger
+	LogData *bytes.Buffer
+}
+
+func New() (c *Collection) {
+	c = &Collection{}
+	c.LogData = &bytes.Buffer{}
+	c.Log = logrus.New()
+	c.Log.Out = c.LogData
+
+	c.Log.Info("Initializing new collection")
+
+	return
 }
 
 func (c *Collection) AddFileFromReader(name string, r io.Reader) (err error) {

@@ -7,7 +7,7 @@ import (
 )
 
 func TestCollection_AddFileFromReader(t *testing.T) {
-	c := &Collection{}
+	c := New()
 
 	err := c.AddFileFromReader("test.txt", bytes.NewBufferString("content"))
 	assert.NoError(t, err)
@@ -15,7 +15,7 @@ func TestCollection_AddFileFromReader(t *testing.T) {
 }
 
 func TestCollection_AddFiles(t *testing.T) {
-	c := &Collection{}
+	c := New()
 
 	err := c.AddFiles("test", "testdata/")
 	assert.NoError(t, err)
