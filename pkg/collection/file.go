@@ -3,7 +3,6 @@ package collection
 import (
 	"fmt"
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -102,7 +101,7 @@ func LoadFilesFromGlob(prefix, source string) (files []*File, err error) {
 }
 
 func LoadFilesFromDirectory(prefix, source string) (files []*File, err error) {
-	err = filepath.Walk(source, func(path string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("could not walk path %s: %w", path, err)
 		}
