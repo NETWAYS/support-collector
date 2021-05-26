@@ -15,6 +15,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = c.AddCommandOutput("test/output.txt", "sh", "-c", "echo testoutput")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	file, err := os.Create("support-collector.zip")
 	if err != nil {
 		fmt.Println(err)
