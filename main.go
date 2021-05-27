@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
+	"os/user"
 )
 
 const Product = "NETWAYS support collector"
@@ -65,6 +66,16 @@ func handleArguments(c *collection.Collection) {
 	}
 }
 
+func isPrivilegedUser() bool {
+	u, err := user.Current()
+	if err != nil {
+		return false
+	}
+
+	// TODO: only works on *NIX systems
+	return u.Uid == "0"
+}
+
 func main() {
 	c := collection.New()
 
@@ -80,6 +91,10 @@ func main() {
 	_ = os.Setenv("LANG", "C")
 
 	c.Log.Infof("Starting %s", Product) // TODO: add version
+
+	if !isPrivilegedUser() {
+		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
+	}
 
 	// Call all enabled modules
 	for name, call := range modules {
