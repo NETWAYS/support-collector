@@ -36,8 +36,11 @@ func Collect(c *collection.Collection) {
 	}
 
 	// Check if we can detect SELinux enforcing
-	if _, err := exec.LookPath("getenforce"); err == nil {
-		c.AddCommandOutput(ModuleName+"selinux-status.txt", "getenforce")
+	for _, cmd := range []string{"sestatus", "getenforce"} {
+		if _, err := exec.LookPath(cmd); err == nil {
+			c.AddCommandOutput(ModuleName+"selinux-status.txt", cmd)
+			break
+		}
 	}
 
 	for _, file := range files {
