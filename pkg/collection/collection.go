@@ -63,3 +63,29 @@ func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.D
 func (c *Collection) AddCommandOutput(fileName, command string, arguments ...string) (err error) {
 	return c.AddCommandOutputWithTimeout(fileName, DefaultTimeout, command, arguments...)
 }
+
+func (c *Collection) AddInstalledPackagesRaw(fileName, pattern string) {
+	c.Log.Debug("Collecting installed packages for pattern ", pattern)
+
+	packages, err := ListInstalledPackagesRaw(pattern)
+	if err != nil {
+		c.Log.Error(err)
+	}
+
+	c.AddFileData(fileName, packages)
+
+	return
+}
+
+func (c *Collection) AddServiceStatusRaw(fileName, name string) {
+	c.Log.Debug("Collecting service status for ", name)
+
+	output, err := GetServiceStatusRaw(name)
+	if err != nil {
+		c.Log.Error(err)
+	}
+
+	c.AddFileData(fileName, output)
+
+	return
+}
