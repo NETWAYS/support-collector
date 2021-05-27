@@ -76,6 +76,9 @@ func main() {
 		Writer:    colorable.NewColorableStdout(),
 	})
 
+	// set locale to C, to avoid translations in command output
+	_ = os.Setenv("LANG", "C")
+
 	c.Log.Infof("Starting %s", Product) // TODO: add version
 
 	// Call all enabled modules

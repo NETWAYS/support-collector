@@ -7,7 +7,7 @@ import (
 )
 
 func TestCollect(t *testing.T) {
-	c := &collection.Collection{}
+	c := collection.New()
 
 	Collect(c)
 
