@@ -19,8 +19,6 @@ func New() (c *Collection) {
 	c.Log = logrus.New()
 	c.Log.Out = c.LogData
 
-	c.Log.Info("Initializing new collection")
-
 	return
 }
 
