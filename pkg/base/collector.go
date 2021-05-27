@@ -30,22 +30,12 @@ func Collect(c *collection.Collection) {
 	CollectKernelInfo(c)
 
 	for _, file := range files {
-		c.Log.Debug("Collecting file ", file)
-
-		err := c.AddFiles(ModuleName, file)
-		if err != nil {
-			c.Log.Error(err)
-		}
+		c.AddFiles(ModuleName, file)
 	}
 
 	for _, cmd := range commands {
-		c.Log.Debug("Collecting command output: ", cmd)
-
 		name := ModuleName + "/" + cmd[0] + ".txt"
-		err := c.AddCommandOutput(name, cmd[0], cmd[1:]...)
-		if err != nil {
-			c.Log.Error(err)
-		}
+		c.AddCommandOutput(name, cmd[0], cmd[1:]...)
 	}
 }
 

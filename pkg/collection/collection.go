@@ -40,28 +40,32 @@ func (c *Collection) AddFileData(fileName string, data []byte) {
 	c.Files = append(c.Files, file)
 }
 
-func (c *Collection) AddFiles(prefix, source string) (err error) {
+func (c *Collection) AddFiles(prefix, source string) {
+	c.Log.Debug("Collecting files from ", source)
+
 	files, err := LoadFiles(prefix, source)
 	if err != nil {
-		return
+		c.Log.Error(err)
 	}
 
 	c.Files = append(c.Files, files...)
-
-	return
 }
 
-func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.Duration, command string, arguments ...string) (err error) {
+func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.Duration, command string, arguments ...string) {
+	c.Log.Debug("Collecting command output: ", command, arguments)
+
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
-	// err is returned, but we add the file anyway
+	if err != nil {
+		c.Log.Error(err)
+	}
 
 	c.AddFileData(fileName, output)
 
 	return
 }
 
-func (c *Collection) AddCommandOutput(fileName, command string, arguments ...string) (err error) {
-	return c.AddCommandOutputWithTimeout(fileName, DefaultTimeout, command, arguments...)
+func (c *Collection) AddCommandOutput(fileName, command string, arguments ...string) {
+	c.AddCommandOutputWithTimeout(fileName, DefaultTimeout, command, arguments...)
 }
 
 func (c *Collection) AddInstalledPackagesRaw(fileName, pattern string) {
@@ -69,7 +73,7 @@ func (c *Collection) AddInstalledPackagesRaw(fileName, pattern string) {
 
 	packages, err := ListInstalledPackagesRaw(pattern)
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Warn(err)
 	}
 
 	c.AddFileData(fileName, packages)
@@ -82,7 +86,7 @@ func (c *Collection) AddServiceStatusRaw(fileName, name string) {
 
 	output, err := GetServiceStatusRaw(name)
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Warn(err)
 	}
 
 	c.AddFileData(fileName, output)

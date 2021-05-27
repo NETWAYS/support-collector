@@ -41,20 +41,10 @@ func Collect(c *collection.Collection) {
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")
 
 	for _, file := range files {
-		c.Log.Debug("Collecting file ", file)
-
-		err := c.AddFiles(ModuleName, file)
-		if err != nil {
-			c.Log.Error(err)
-		}
+		c.AddFiles(ModuleName, file)
 	}
 
 	for name, cmd := range commands {
-		c.Log.Debug("Collecting command output: ", cmd)
-
-		err := c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
-		if err != nil {
-			c.Log.Error(err)
-		}
+		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
 	}
 }
