@@ -22,6 +22,7 @@ var modules = map[string]func(*collection.Collection){
 }
 
 var (
+	outputFile                      string
 	enabledModules, disabledModules []string
 	debug, version                  bool
 )
@@ -33,7 +34,8 @@ func init() {
 	}
 }
 
-func handleArguments(c *collection.Collection) {
+func handleArguments() {
+	flag.StringVarP(&outputFile, "output", "o", "support-collector.zip", "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", enabledModules, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.BoolVarP(&debug, "debug", "d", false, "Enable debug logging")
@@ -56,10 +58,6 @@ func handleArguments(c *collection.Collection) {
 		os.Exit(0)
 	}
 
-	if debug {
-		c.Log.SetLevel(logrus.DebugLevel)
-	}
-
 	// Verify enabled modules
 	for _, name := range enabledModules {
 		if _, ok := modules[name]; !ok {
@@ -80,9 +78,26 @@ func isPrivilegedUser() bool {
 }
 
 func main() {
-	c := collection.New()
+	handleArguments()
 
-	handleArguments(c)
+	// Prepare output
+	file, err := os.Create(outputFile)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	c := collection.New(file)
+
+	if debug {
+		c.Log.SetLevel(logrus.DebugLevel)
+	}
+
+	defer func() {
+		_ = c.AddLogToOutput()
+		_ = c.Close()
+		_ = file.Close()
+	}()
 
 	// Add console log output via logrus.Hook
 	c.Log.AddHook(&util.ExtraLogHook{
@@ -115,21 +130,6 @@ func main() {
 
 	duration := time.Now().Sub(startTime)
 	c.Log.Infof("Collection complete, took us %.3f seconds", duration.Seconds())
-
-	// Write out the ZIP file
-	file, err := os.Create("support-collector.zip")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	err = c.WriteZIP(file)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	file.Close()
 }
 
 func stringInSlice(a string, list []string) bool {

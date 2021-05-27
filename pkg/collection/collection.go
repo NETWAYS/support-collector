@@ -1,23 +1,78 @@
 package collection
 
 import (
+	"archive/zip"
 	"bytes"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
 	"time"
 )
 
 type Collection struct {
-	Files   []*File
+	Output  *zip.Writer
 	Log     *logrus.Logger
 	LogData *bytes.Buffer
 }
 
-func New() (c *Collection) {
+func New(w io.Writer) (c *Collection) {
 	c = &Collection{}
 	c.LogData = &bytes.Buffer{}
 	c.Log = logrus.New()
 	c.Log.Out = c.LogData
+
+	c.Output = zip.NewWriter(w)
+
+	return
+}
+
+func (c *Collection) Close() error {
+	return c.Output.Close()
+}
+
+func (c *Collection) AddFileToOutput(file *File) (err error) {
+	fh := &zip.FileHeader{
+		Name:     file.Name,
+		Modified: file.Modified,
+	}
+
+	// Create file header
+	fileWriter, err := c.Output.CreateHeader(fh)
+	if err != nil {
+		return fmt.Errorf("could not add file to zip: %w", err)
+	}
+
+	// Write data to ZIP
+	_, err = io.Copy(fileWriter, bytes.NewReader(file.Data))
+	if err != nil {
+		return fmt.Errorf("could not write file to zip: %w", err)
+	}
+
+	return
+}
+
+func (c *Collection) AddLogToOutput() (err error) {
+	if c.LogData == nil {
+		return
+	}
+
+	fh := &zip.FileHeader{
+		Name:     "support-collector.log",
+		Modified: time.Now(),
+	}
+	logBuffer := bytes.NewBuffer(c.LogData.Bytes())
+
+	if logBuffer.Len() != 0 {
+		log, err := c.Output.CreateHeader(fh)
+		if err != nil {
+			return fmt.Errorf("could not add file to zip: %w", err)
+		}
+
+		_, err = io.Copy(log, logBuffer)
+		if err != nil {
+			return fmt.Errorf("could not write file to zip: %w", err)
+		}
+	}
 
 	return
 }
@@ -28,16 +83,14 @@ func (c *Collection) AddFileFromReader(name string, r io.Reader) (err error) {
 		return
 	}
 
-	c.Files = append(c.Files, f)
-
-	return
+	return c.AddFileToOutput(f)
 }
 
 func (c *Collection) AddFileData(fileName string, data []byte) {
 	file := NewFile(fileName)
 	file.Data = data
 
-	c.Files = append(c.Files, file)
+	_ = c.AddFileToOutput(file)
 }
 
 func (c *Collection) AddFiles(prefix, source string) {
@@ -48,7 +101,9 @@ func (c *Collection) AddFiles(prefix, source string) {
 		c.Log.Error(err)
 	}
 
-	c.Files = append(c.Files, files...)
+	for _, file := range files {
+		_ = c.AddFileToOutput(file)
+	}
 }
 
 func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.Duration, command string, arguments ...string) {
