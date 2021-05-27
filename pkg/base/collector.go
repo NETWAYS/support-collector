@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"gopkg.in/yaml.v3"
+	"os/exec"
 )
 
 const ModuleName = "base"
@@ -21,13 +22,23 @@ var commands = [][]string{
 	{"lsusb"},
 	{"dmidecode"},
 	{"df", "-T"},
-	{"ps", "-ef"}, // TODO: anonymize
+	{"top", "-b", "-n1"},
 }
 
 func Collect(c *collection.Collection) {
 	c.Log.Info("Collecting base system information")
 
 	CollectKernelInfo(c)
+
+	// Check if apparmor is installed and get status
+	if _, err := exec.LookPath("apparmor_status"); err == nil {
+		c.AddCommandOutput(ModuleName+"apparmor-status.txt", "apparmor_status")
+	}
+
+	// Check if we can detect SELinux enforcing
+	if _, err := exec.LookPath("getenforce"); err == nil {
+		c.AddCommandOutput(ModuleName+"selinux-status.txt", "getenforce")
+	}
 
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
