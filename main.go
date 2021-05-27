@@ -4,18 +4,21 @@ import (
 	"fmt"
 	"github.com/NETWAYS/support-collector/pkg/base"
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/icinga2"
 	"github.com/NETWAYS/support-collector/pkg/util"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
 	"os/user"
+	"time"
 )
 
 const Product = "NETWAYS support collector"
 
 var modules = map[string]func(*collection.Collection){
-	"base": base.Collect,
+	"base":    base.Collect,
+	"icinga2": icinga2.Collect,
 }
 
 var (
@@ -32,7 +35,7 @@ func init() {
 
 func handleArguments(c *collection.Collection) {
 	flag.StringSliceVar(&enabledModules, "enable", enabledModules, "List of enabled module")
-	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of enabled module")
+	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.BoolVarP(&debug, "debug", "d", false, "Enable debug logging")
 	flag.BoolVarP(&version, "version", "V", false, "Print version and exit")
 	flag.CommandLine.SortFlags = false
@@ -96,6 +99,8 @@ func main() {
 		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
 	}
 
+	startTime := time.Now()
+
 	// Call all enabled modules
 	for name, call := range modules {
 		if stringInSlice(name, disabledModules) {
@@ -103,10 +108,13 @@ func main() {
 		} else if !stringInSlice(name, enabledModules) {
 			c.Log.Infof("Module %s is not enabled", name)
 		} else {
-			c.Log.Infof("Calling module %s", name)
+			c.Log.Debugf("Calling module %s", name)
 			call(c)
 		}
 	}
+
+	duration := time.Now().Sub(startTime)
+	c.Log.Infof("Collection complete, took us %.3f seconds", duration.Seconds())
 
 	// Write out the ZIP file
 	file, err := os.Create("support-collector.zip")
