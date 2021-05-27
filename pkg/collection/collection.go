@@ -52,7 +52,7 @@ func (c *Collection) AddFiles(prefix, source string) {
 }
 
 func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.Duration, command string, arguments ...string) {
-	c.Log.Debug("Collecting command output: ", command, arguments)
+	c.Log.Debugf("Collecting command output: %s %v", command, arguments)
 
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
 	if err != nil {
