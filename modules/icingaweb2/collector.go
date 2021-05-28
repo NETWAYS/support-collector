@@ -2,10 +2,15 @@ package icingaweb2
 
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
-const ModuleName = "icingaweb2"
+const (
+	ModuleName  = "icingaweb2"
+	ModulesPath = "/usr/share/icingaweb2/modules"
+)
 
 // Possible locations to indicate Icinga Web 2 is installed.
 var relevantPaths = []string{
@@ -46,7 +51,7 @@ func Collect(c *collection.Collection) {
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icingaweb2*", "*icingacli*")
 
-	// TODO: more infos on modules, GIT details
+	CollectModuleInfo(c)
 
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
@@ -67,4 +72,28 @@ func Collect(c *collection.Collection) {
 
 	// Detect webserver packages
 	c.AddInstalledPackagesRaw(ModuleName+"/packages-webserver.txt", "*apache*", "*httpd*")
+}
+
+func CollectModuleInfo(c *collection.Collection) {
+	if !collection.DetectGitInstalled() {
+		c.Log.Warnf("we need git to inspect modules closer")
+	}
+
+	modulesFiles, err := ioutil.ReadDir(ModulesPath)
+	if err != nil {
+		c.Log.Warnf("Could not list modules in %s - %s", ModulesPath, err)
+		return
+	}
+
+	for _, file := range modulesFiles {
+		if !file.IsDir() {
+			return
+		}
+
+		path := filepath.Join(ModulesPath, file.Name())
+
+		if _, ok := collection.IsGitRepository(path); ok {
+			c.AddGitRepoInfo(filepath.Join(ModuleName, "modules", file.Name()+".yml"), path)
+		}
+	}
 }
