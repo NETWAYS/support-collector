@@ -40,6 +40,10 @@ func Collect(c *collection.Collection) {
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icinga2*")
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")
 
+	if collection.DetectServiceManager() == "systemd" {
+		c.AddCommandOutput(ModuleName+"/systemd-icinga2.service", "systemctl", "cat", "icinga2.service")
+	}
+
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
 	}
