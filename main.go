@@ -25,6 +25,13 @@ var modules = map[string]func(*collection.Collection){
 	"icinga-director": icingadirector.Collect,
 }
 
+var moduleOrder = []string{
+	"base",
+	"icinga2",
+	"icingaweb2",
+	"icinga-director",
+}
+
 var (
 	outputFile                      string
 	enabledModules, disabledModules []string
@@ -32,14 +39,8 @@ var (
 )
 
 func handleArguments() {
-	// Build default list of enabled modules
-	enabledModules = make([]string, 0, len(modules))
-	for k := range modules {
-		enabledModules = append(enabledModules, k)
-	}
-
 	flag.StringVarP(&outputFile, "output", "o", "support-collector.zip", "Output file for the ZIP content")
-	flag.StringSliceVar(&enabledModules, "enable", enabledModules, "List of enabled module")
+	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.BoolVarP(&debug, "debug", "d", false, "Enable debug logging")
 	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
@@ -111,7 +112,7 @@ func main() {
 	startTime := time.Now()
 
 	// Call all enabled modules
-	for name, call := range modules {
+	for _, name := range moduleOrder {
 		switch {
 		case stringInSlice(name, disabledModules):
 			c.Log.Infof("Module %s is disabled", name)
@@ -119,7 +120,7 @@ func main() {
 			c.Log.Infof("Module %s is not enabled", name)
 		default:
 			c.Log.Debugf("Calling module %s", name)
-			call(c)
+			modules[name](c)
 		}
 	}
 
