@@ -122,6 +122,29 @@ func (c *Collection) AddFiles(prefix, source string) {
 	}
 }
 
+func (c *Collection) AddFilesAtLeastOne(prefix string, sources ...string) {
+	var foundFiles int
+
+	for _, source := range sources {
+		files, _ := LoadFiles(prefix, source)
+		if len(files) == 0 {
+			return
+		}
+
+		c.Log.Debug("Collecting files from ", source)
+
+		for _, file := range files {
+			foundFiles++
+
+			_ = c.AddFileToOutput(file)
+		}
+	}
+
+	if foundFiles == 0 {
+		c.Log.Warnf("Found no files under: %s", strings.Join(sources, " "))
+	}
+}
+
 func (c *Collection) AddCommandOutputWithTimeout(file string,
 	timeout time.Duration, command string, arguments ...string) {
 	c.Log.Debugf("Collecting command output: %s %s", command, strings.Join(arguments, " "))

@@ -6,6 +6,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
+	"github.com/NETWAYS/support-collector/modules/mysql"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/util"
 	"github.com/mattn/go-colorable"
@@ -23,6 +24,7 @@ var modules = map[string]func(*collection.Collection){
 	"icinga2":         icinga2.Collect,
 	"icingaweb2":      icingaweb2.Collect,
 	"icinga-director": icingadirector.Collect,
+	"mysql":           mysql.Collect,
 }
 
 var moduleOrder = []string{
@@ -30,6 +32,7 @@ var moduleOrder = []string{
 	"icinga2",
 	"icingaweb2",
 	"icinga-director",
+	"mysql",
 }
 
 var (
