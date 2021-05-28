@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 	"io"
 	"strings"
 	"time"
@@ -94,6 +95,20 @@ func (c *Collection) AddFileData(fileName string, data []byte) {
 	_ = c.AddFileToOutput(file)
 }
 
+func (c *Collection) AddFileYAML(fileName string, data interface{}) {
+	var buf bytes.Buffer
+
+	err := yaml.NewEncoder(&buf).Encode(&data)
+	if err != nil {
+		c.Log.Warnf("could not encode YAML data for '%s': %s", fileName, err)
+	}
+
+	file := NewFile(fileName)
+	file.Data = buf.Bytes()
+
+	_ = c.AddFileToOutput(file)
+}
+
 func (c *Collection) AddFiles(prefix, source string) {
 	c.Log.Debug("Collecting files from ", source)
 
@@ -143,4 +158,15 @@ func (c *Collection) AddServiceStatusRaw(fileName, name string) {
 	}
 
 	c.AddFileData(fileName, output)
+}
+
+func (c *Collection) AddGitRepoInfo(fileName, path string) {
+	c.Log.Debug("Collecting GIT repository details for ", path)
+
+	info, err := LoadGitRepoInfo(path)
+	if err != nil {
+		c.Log.Warn(err)
+	}
+
+	c.AddFileYAML(fileName, info)
 }
