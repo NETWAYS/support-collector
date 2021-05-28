@@ -38,6 +38,37 @@ var (
 	debug, printVersion             bool
 )
 
+func main() {
+	handleArguments()
+
+	// set locale to C, to avoid translations in command output
+	_ = os.Setenv("LANG", "C")
+
+	c, cleanup := NewCollection(outputFile)
+	defer cleanup()
+
+	if !isPrivilegedUser() {
+		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
+	}
+
+	startTime := time.Now()
+
+	// Call all enabled modules
+	for _, name := range moduleOrder {
+		switch {
+		case stringInSlice(name, disabledModules):
+			c.Log.Infof("Module %s is disabled", name)
+		case !stringInSlice(name, enabledModules):
+			c.Log.Infof("Module %s is not enabled", name)
+		default:
+			c.Log.Debugf("Calling module %s", name)
+			modules[name](c)
+		}
+	}
+
+	c.Log.Infof("Collection complete, took us %.3f seconds", time.Since(startTime).Seconds())
+}
+
 func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", "support-collector.zip", "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
@@ -79,10 +110,7 @@ func isPrivilegedUser() bool {
 	return u.Uid == "0"
 }
 
-func main() {
-	handleArguments()
-
-	// Prepare output
+func NewCollection(outputFile string) (*collection.Collection, func()) {
 	file, err := os.Create(outputFile)
 	if err != nil {
 		logrus.Fatal(err)
@@ -100,45 +128,22 @@ func main() {
 		Writer:    colorable.NewColorableStdout(),
 	})
 
-	// set locale to C, to avoid translations in command output
-	_ = os.Setenv("LANG", "C")
+	versionString := buildVersion()
+	c.Log.Infof("Starting %s version %s", Product, versionString)
+	c.AddFileData("version", []byte(versionString+"\n"))
 
-	c.Log.Infof("Starting %s", Product) // TODO: add version
-
-	if !isPrivilegedUser() {
-		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
-	}
-
-	startTime := time.Now()
-
-	// Call all enabled modules
-	for _, name := range moduleOrder {
-		switch {
-		case stringInSlice(name, disabledModules):
-			c.Log.Infof("Module %s is disabled", name)
-		case !stringInSlice(name, enabledModules):
-			c.Log.Infof("Module %s is not enabled", name)
-		default:
-			c.Log.Debugf("Calling module %s", name)
-			modules[name](c)
+	return c, func() {
+		// Close all open outputs in order, but only log errors
+		for _, call := range []func() error{
+			c.AddLogToOutput,
+			c.Close,
+			file.Close,
+		} {
+			err = call()
+			if err != nil {
+				logrus.Error(err)
+			}
 		}
-	}
-
-	c.Log.Infof("Collection complete, took us %.3f seconds", time.Since(startTime).Seconds())
-
-	err = c.AddLogToOutput()
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	err = c.Close()
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	err = file.Close()
-	if err != nil {
-		logrus.Error(err)
 	}
 }
 
