@@ -29,8 +29,7 @@ func NewFile(name string) *File {
 
 func LoadFiles(prefix, source string) (files []*File, err error) {
 	// Is it a globbing pattern?
-	// TODO: support '?'
-	if strings.ContainsRune(source, '*') {
+	if strings.ContainsAny(source, "*?") {
 		return LoadFilesFromGlob(prefix, source)
 	}
 
@@ -39,23 +38,23 @@ func LoadFiles(prefix, source string) (files []*File, err error) {
 		if os.IsNotExist(err) {
 			err = fmt.Errorf("file does not exist '%s': %w", source, err)
 			return
-		} else {
-			err = fmt.Errorf("could not stat file '%s': %w", source, err)
-			return
 		}
+
+		err = fmt.Errorf("could not stat file '%s': %w", source, err)
+
+		return
 	}
 
 	if stat.IsDir() {
 		return LoadFilesFromDirectory(prefix, source)
-	} else {
-		var file *File
-		file, err = loadFile(prefix, source, stat)
-		if err != nil {
-			return
-		}
-
-		files = append(files, file)
 	}
+
+	file, err := loadFile(prefix, source, stat)
+	if err != nil {
+		return
+	}
+
+	files = append(files, file)
 
 	return
 }
@@ -78,17 +77,19 @@ func loadFile(prefix, source string, stat os.FileInfo) (file *File, err error) {
 
 func LoadFilesFromGlob(prefix, source string) (files []*File, err error) {
 	var matches []string
+
 	matches, err = filepath.Glob(source)
 	if err != nil {
 		err = fmt.Errorf("could not glob '%s': %w", source, err)
 		return
 	} else if len(matches) == 0 {
-		err = fmt.Errorf("no files found for glob: '%s'", source)
+		err = fmt.Errorf("no files found for glob: '%s'", source) // nolint:goerr113
 		return
 	}
 
 	for _, match := range matches {
 		var globFiles []*File
+
 		globFiles, err = LoadFiles(prefix, match)
 		if err != nil {
 			return

@@ -13,7 +13,8 @@ func LoadCommandOutput(command string, arguments ...string) (output []byte, err 
 	return LoadCommandOutputWithTimeout(DefaultTimeout, command, arguments...)
 }
 
-func LoadCommandOutputWithTimeout(timeout time.Duration, command string, arguments ...string) (output []byte, err error) {
+func LoadCommandOutputWithTimeout(timeout time.Duration, command string, arguments ...string) (
+	output []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -31,6 +32,7 @@ func LoadCommandOutputWithTimeout(timeout time.Duration, command string, argumen
 		}
 
 		err = fmt.Errorf("command not successful: '%s': %w", cmd.String(), err)
+
 		return
 	}
 

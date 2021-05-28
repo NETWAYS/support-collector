@@ -1,15 +1,20 @@
 package base
 
 import (
+	"bytes"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestCollect(t *testing.T) {
-	c := collection.New()
+	buf := &bytes.Buffer{}
+	c := collection.New(buf)
 
 	Collect(c)
 
-	assert.NotEmpty(t, c.Files)
+	err := c.Close()
+	assert.NoError(t, err)
+
+	assert.NotEmpty(t, buf.Len())
 }

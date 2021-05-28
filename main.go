@@ -27,14 +27,13 @@ var (
 	debug, version                  bool
 )
 
-func init() {
+func handleArguments() {
+	// Build default list of enabled modules
 	enabledModules = make([]string, 0, len(modules))
 	for k := range modules {
 		enabledModules = append(enabledModules, k)
 	}
-}
 
-func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", "support-collector.zip", "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", enabledModules, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
@@ -54,15 +53,14 @@ func handleArguments() {
 
 	if version {
 		// TODO: print version
-		fmt.Println(Product)
+		fmt.Println(Product) // nolint:forbidigo
 		os.Exit(0)
 	}
 
 	// Verify enabled modules
 	for _, name := range enabledModules {
 		if _, ok := modules[name]; !ok {
-			fmt.Println("Unknown module to enable:", name)
-			os.Exit(1)
+			logrus.Fatal("Unknown module to enable: ", name)
 		}
 	}
 }
@@ -83,8 +81,7 @@ func main() {
 	// Prepare output
 	file, err := os.Create(outputFile)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		logrus.Fatal(err)
 	}
 
 	c := collection.New(file)
@@ -92,12 +89,6 @@ func main() {
 	if debug {
 		c.Log.SetLevel(logrus.DebugLevel)
 	}
-
-	defer func() {
-		_ = c.AddLogToOutput()
-		_ = c.Close()
-		_ = file.Close()
-	}()
 
 	// Add console log output via logrus.Hook
 	c.Log.AddHook(&util.ExtraLogHook{
@@ -118,18 +109,33 @@ func main() {
 
 	// Call all enabled modules
 	for name, call := range modules {
-		if stringInSlice(name, disabledModules) {
+		switch {
+		case stringInSlice(name, disabledModules):
 			c.Log.Infof("Module %s is disabled", name)
-		} else if !stringInSlice(name, enabledModules) {
+		case !stringInSlice(name, enabledModules):
 			c.Log.Infof("Module %s is not enabled", name)
-		} else {
+		default:
 			c.Log.Debugf("Calling module %s", name)
 			call(c)
 		}
 	}
 
-	duration := time.Now().Sub(startTime)
-	c.Log.Infof("Collection complete, took us %.3f seconds", duration.Seconds())
+	c.Log.Infof("Collection complete, took us %.3f seconds", time.Since(startTime).Seconds())
+
+	err = c.AddLogToOutput()
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	err = c.Close()
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	err = file.Close()
+	if err != nil {
+		logrus.Error(err)
+	}
 }
 
 func stringInSlice(a string, list []string) bool {
@@ -138,5 +144,6 @@ func stringInSlice(a string, list []string) bool {
 			return true
 		}
 	}
+
 	return false
 }

@@ -1,7 +1,7 @@
 package collection
 
 import (
-	"fmt"
+	"errors"
 	"os/exec"
 )
 
@@ -10,6 +10,10 @@ const (
 	ServiceManagerSysV    = "sysv"
 )
 
+// ErrNoServiceManager is returned when we could not detect one.
+var ErrNoServiceManager = errors.New("could not detect a supported service manager")
+
+// FoundServiceManager remembers the current service manager found.
 var FoundServiceManager string
 
 func DetectServiceManager() string {
@@ -39,6 +43,6 @@ func GetServiceStatusRaw(name string) ([]byte, error) {
 	case ServiceManagerSysV:
 		return LoadCommandOutput("service", name, "status")
 	default:
-		return []byte{}, fmt.Errorf("could not detect a supported service manager")
+		return []byte{}, ErrNoServiceManager
 	}
 }

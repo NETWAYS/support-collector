@@ -106,7 +106,8 @@ func (c *Collection) AddFiles(prefix, source string) {
 	}
 }
 
-func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.Duration, command string, arguments ...string) {
+func (c *Collection) AddCommandOutputWithTimeout(file string,
+	timeout time.Duration, command string, arguments ...string) {
 	c.Log.Debugf("Collecting command output: %s %v", command, arguments)
 
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
@@ -114,13 +115,11 @@ func (c *Collection) AddCommandOutputWithTimeout(fileName string, timeout time.D
 		c.Log.Error(err)
 	}
 
-	c.AddFileData(fileName, output)
-
-	return
+	c.AddFileData(file, output)
 }
 
-func (c *Collection) AddCommandOutput(fileName, command string, arguments ...string) {
-	c.AddCommandOutputWithTimeout(fileName, DefaultTimeout, command, arguments...)
+func (c *Collection) AddCommandOutput(file, command string, arguments ...string) {
+	c.AddCommandOutputWithTimeout(file, DefaultTimeout, command, arguments...)
 }
 
 func (c *Collection) AddInstalledPackagesRaw(fileName, pattern string) {
@@ -132,8 +131,6 @@ func (c *Collection) AddInstalledPackagesRaw(fileName, pattern string) {
 	}
 
 	c.AddFileData(fileName, packages)
-
-	return
 }
 
 func (c *Collection) AddServiceStatusRaw(fileName, name string) {
@@ -145,6 +142,4 @@ func (c *Collection) AddServiceStatusRaw(fileName, name string) {
 	}
 
 	c.AddFileData(fileName, output)
-
-	return
 }

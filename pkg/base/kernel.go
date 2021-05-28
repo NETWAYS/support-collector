@@ -20,6 +20,7 @@ type KernelInfo struct {
 
 func GetKernelInfo() (i KernelInfo, err error) {
 	var uname syscall.Utsname
+
 	err = syscall.Uname(&uname)
 	if err != nil {
 		err = fmt.Errorf("could not load uname: %w", err)
@@ -51,6 +52,7 @@ func CharsToString(chars []int8) string {
 		if chars[i] == 0 {
 			break
 		}
+
 		s[i] = uint8(chars[i])
 	}
 

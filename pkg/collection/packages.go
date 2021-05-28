@@ -1,7 +1,7 @@
 package collection
 
 import (
-	"fmt"
+	"errors"
 	"os/exec"
 )
 
@@ -9,6 +9,9 @@ const (
 	PackageManagerRPM    = "rpm"
 	PackageManagerDebian = "dpkg"
 )
+
+// ErrNoPackageManager is returned when we could not detect one.
+var ErrNoPackageManager = errors.New("could not detect a supported package manager")
 
 var FoundPackageManager string
 
@@ -36,6 +39,6 @@ func ListInstalledPackagesRaw(pattern string) ([]byte, error) {
 	case PackageManagerDebian:
 		return LoadCommandOutput("dpkg-query", "-f", "${Package} ${Version} ${Architecture} ${Status}\\n", "-W", pattern)
 	default:
-		return []byte{}, fmt.Errorf("could not detect a supported package manager")
+		return []byte{}, ErrNoPackageManager
 	}
 }

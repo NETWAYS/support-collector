@@ -1,0 +1,18 @@
+linters:
+  disable-all: false
+  enable:
+    - funlen
+  disable:
+    - gochecknoglobals  # we use these here
+    - exhaustivestruct  # too strict
+    - nlreturn  # too strict for error returns
+    - paralleltest  # not needed
+    - testpackage  # not needed
+    - wrapcheck  # not needed
+    - godox  # we still have a lot of TODOs left
+    - revive  # doc is still pending
+  presets:
+    - bugs
+    - unused
+    - style
+  fast: false

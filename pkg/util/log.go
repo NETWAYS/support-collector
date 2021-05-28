@@ -21,5 +21,6 @@ func (h ExtraLogHook) Fire(entry *logrus.Entry) error {
 	}
 
 	_, err = h.Writer.Write(line)
+
 	return err
 }
