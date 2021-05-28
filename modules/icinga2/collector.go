@@ -2,6 +2,7 @@ package icinga2
 
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"os"
 	"os/exec"
 )
 
@@ -10,6 +11,9 @@ const ModuleName = "icinga2"
 var files = []string{
 	"/etc/icinga2",
 	"/var/log/icinga2/icinga2.log",
+}
+
+var optionalFiles = []string{
 	"/var/log/icinga2/error.log",
 	"/var/log/icinga2/crash",
 	"/var/log/icinga2/debug.log",
@@ -45,6 +49,14 @@ func Collect(c *collection.Collection) {
 	}
 
 	for _, file := range files {
+		c.AddFiles(ModuleName, file)
+	}
+
+	for _, file := range optionalFiles {
+		if _, err := os.Stat(file); err != nil {
+			continue
+		}
+
 		c.AddFiles(ModuleName, file)
 	}
 
