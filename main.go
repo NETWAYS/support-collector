@@ -35,7 +35,7 @@ var moduleOrder = []string{
 var (
 	outputFile                      string
 	enabledModules, disabledModules []string
-	debug, printVersion             bool
+	verbose, printVersion           bool
 )
 
 func main() {
@@ -84,8 +84,11 @@ func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", "support-collector.zip", "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
-	flag.BoolVarP(&debug, "debug", "d", false, "Enable debug logging")
+	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	flag.BoolVarP(&verbose, "debug", "d", false, "Enable debug logging (use verbose)")
 	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
+
+	_ = flag.CommandLine.MarkHidden("debug")
 	flag.CommandLine.SortFlags = false
 
 	// TODO: Add usage with some documentation
@@ -128,15 +131,18 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 	}
 
 	c := collection.New(file)
+	c.Log.SetLevel(logrus.DebugLevel)
 
-	if debug {
-		c.Log.SetLevel(logrus.DebugLevel)
+	consoleLevel := logrus.InfoLevel
+	if verbose {
+		consoleLevel = logrus.DebugLevel
 	}
 
 	// Add console log output via logrus.Hook
 	c.Log.AddHook(&util.ExtraLogHook{
 		Formatter: &logrus.TextFormatter{ForceColors: true},
 		Writer:    colorable.NewColorableStdout(),
+		Level:     consoleLevel,
 	})
 
 	versionString := buildVersion()
