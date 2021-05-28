@@ -32,13 +32,13 @@ func Collect(c *collection.Collection) {
 
 	// Check if apparmor is installed and get status
 	if _, err := exec.LookPath("apparmor_status"); err == nil {
-		c.AddCommandOutput(ModuleName+"apparmor-status.txt", "apparmor_status")
+		c.AddCommandOutput(ModuleName+"/apparmor-status.txt", "apparmor_status")
 	}
 
 	// Check if we can detect SELinux enforcing
 	for _, cmd := range []string{"sestatus", "getenforce"} {
 		if _, err := exec.LookPath(cmd); err == nil {
-			c.AddCommandOutput(ModuleName+"selinux-status.txt", cmd)
+			c.AddCommandOutput(ModuleName+"/selinux-status.txt", cmd)
 			break
 		}
 	}
@@ -69,7 +69,7 @@ func CollectKernelInfo(c *collection.Collection) {
 		return
 	}
 
-	err = c.AddFileFromReader("kernel.yml", &buf)
+	err = c.AddFileFromReader(ModuleName+"/kernel.yml", &buf)
 	if err != nil {
 		c.Log.Error(err)
 	}
