@@ -51,7 +51,10 @@ func main() {
 		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
 	}
 
-	startTime := time.Now()
+	var (
+		startTime = time.Now()
+		timings   = map[string]time.Duration{}
+	)
 
 	// Call all enabled modules
 	for _, name := range moduleOrder {
@@ -61,12 +64,20 @@ func main() {
 		case !stringInSlice(name, enabledModules):
 			c.Log.Infof("Module %s is not enabled", name)
 		default:
+			moduleStart := time.Now()
+
 			c.Log.Debugf("Calling module %s", name)
 			modules[name](c)
+
+			timings[name] = time.Since(moduleStart)
+			c.Log.Debugf("Finished with module %s in %.3f seconds", name, timings[name].Seconds())
 		}
 	}
 
-	c.Log.Infof("Collection complete, took us %.3f seconds", time.Since(startTime).Seconds())
+	timings["total"] = time.Since(startTime)
+	c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
+
+	c.AddFileYAML("timing.yml", timings)
 }
 
 func handleArguments() {
