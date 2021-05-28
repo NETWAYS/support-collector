@@ -3,7 +3,9 @@ before:
   hooks:
     - go mod download
 builds:
-  - env:
+  - id: netways-support-collector
+    binary: netways-support-collector
+    env:
       - CGO_ENABLED=0
     goarch:
       - amd64
@@ -16,8 +18,6 @@ builds:
         -X main.date={{.CommitDate}}
 release:
   github:
-  extra_files:
-    - glob: icinga2.conf
 archives:
   - format: binary
     replacements:
@@ -33,3 +33,5 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+      - '^ci:'
+      - '^goreleaser:'
