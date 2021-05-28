@@ -38,6 +38,8 @@ Most modules check if the component is installed before trying to collect data.
 
 ### Base
 
+Module: `base`
+
 Will collect basic information about your system:
 
 * Kernel and Operating system versions
@@ -45,7 +47,11 @@ Will collect basic information about your system:
 * Current process and load status
 * Status of AppArmor and SELinux
 
+See [modules/base/collector.go](modules/base/collector.go) for details.
+
 ### Icinga 2
+
+Module: `icinga2`
 
 * Configuration from `/etc/icinga2`
 * Package information
@@ -55,7 +61,11 @@ Will collect basic information about your system:
 * Object list for `Zone` and `Endpoint`
 * Variables like `NodeName` and `ZoneName`
 
+See [modules/icinga2/collector.go](modules/icinga2/collector.go) for details.
+
 ### Icinga Web 2
+
+Module: `icingaweb2`
 
 * Configuration from `/etc/icingaweb2`
 * Package information
@@ -64,19 +74,29 @@ Will collect basic information about your system:
 * Installed PHP packages and php-fpm service status
 * Installed webserver packages
 
+See [modules/icingaweb2/collector.go](modules/icingaweb2/collector.go) for details.
+
 ### Icinga Director
+
+Module: `icinga-director`
 
 * Package or Git version information
 * Service status
 * Health status
 
+See [modules/icingadirector/collector.go](modules/icingadirector/collector.go) for details.
+
 ### MySQL
+
+Module: `mysql`
 
 Is looking for standard MySQL or MariaDB installations.
 
 * Package versions
 * Service status
 * Configuration files from `/etc/my*` (depending on the known paths)
+
+See [modules/mysql/collector.go](modules/mysql/collector.go) for details.
 
 ## Supported systems
 
