@@ -114,7 +114,7 @@ func (c *Collection) AddFiles(prefix, source string) {
 
 	files, err := LoadFiles(prefix, source)
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Warn(err)
 	}
 
 	for _, file := range files {
@@ -124,11 +124,11 @@ func (c *Collection) AddFiles(prefix, source string) {
 
 func (c *Collection) AddCommandOutputWithTimeout(file string,
 	timeout time.Duration, command string, arguments ...string) {
-	c.Log.Debugf("Collecting command output: %s %v", command, arguments)
+	c.Log.Debugf("Collecting command output: %s %s", command, strings.Join(arguments, " "))
 
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Warn(err)
 	}
 
 	c.AddFileData(file, output)
