@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -19,6 +20,8 @@ type File struct {
 
 	io.Writer
 }
+
+var reIgnoreFiles = regexp.MustCompile(`(^\.|~$)`)
 
 func NewFile(name string) *File {
 	return &File{
@@ -101,21 +104,34 @@ func LoadFilesFromGlob(prefix, source string) (files []*File, err error) {
 	return
 }
 
+// nolint:nakedret
 func LoadFilesFromDirectory(prefix, source string) (files []*File, err error) {
 	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return fmt.Errorf("could not walk path %s: %w", path, err)
 		}
 
-		if info.IsDir() {
+		// ignore directories or files matching the ignore pattern
+		if info.IsDir() || reIgnoreFiles.MatchString(info.Name()) {
 			return nil
 		}
 
-		// TODO: excludes? hidden files and dirs?
+		var file *File
 
-		file, err := loadFile(prefix, path, info)
-		if err != nil {
-			return err
+		// Document symlinks as text files
+		if IsSymlink(info) {
+			link, err := os.Readlink(path)
+			if err != nil {
+				return fmt.Errorf("could not read link: %w", err)
+			}
+
+			file = NewFile(path + "-symlink.txt")
+			file.Data = []byte(link)
+		} else {
+			file, err = loadFile(prefix, path, info)
+			if err != nil {
+				return err
+			}
 		}
 
 		files = append(files, file)
@@ -128,6 +144,10 @@ func LoadFilesFromDirectory(prefix, source string) (files []*File, err error) {
 	}
 
 	return
+}
+
+func IsSymlink(info os.FileInfo) bool {
+	return info.Mode()&os.ModeSymlink == os.ModeSymlink
 }
 
 func NewFileFromReader(name string, r io.Reader) (*File, error) {

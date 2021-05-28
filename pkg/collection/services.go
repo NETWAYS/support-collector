@@ -80,7 +80,7 @@ func FindServicesSystemd(pattern string) (map[string]string, error) {
 
 		for _, file := range files {
 			// Skip the file if it is a symlink
-			if stat, err := os.Lstat(file); err != nil || (stat.Mode()&os.ModeSymlink) == os.ModeSymlink {
+			if stat, err := os.Lstat(file); err != nil || IsSymlink(stat) {
 				continue
 			}
 
