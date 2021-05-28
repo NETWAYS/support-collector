@@ -24,7 +24,7 @@ var modules = map[string]func(*collection.Collection){
 var (
 	outputFile                      string
 	enabledModules, disabledModules []string
-	debug, version                  bool
+	debug, printVersion             bool
 )
 
 func handleArguments() {
@@ -38,7 +38,7 @@ func handleArguments() {
 	flag.StringSliceVar(&enabledModules, "enable", enabledModules, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.BoolVarP(&debug, "debug", "d", false, "Enable debug logging")
-	flag.BoolVarP(&version, "version", "V", false, "Print version and exit")
+	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
 	flag.CommandLine.SortFlags = false
 
 	// TODO: Add usage with some documentation
@@ -51,9 +51,8 @@ func handleArguments() {
 
 	flag.Parse()
 
-	if version {
-		// TODO: print version
-		fmt.Println(Product) // nolint:forbidigo
+	if printVersion {
+		fmt.Println(Product, " version ", buildVersion()) // nolint:forbidigo
 		os.Exit(0)
 	}
 
