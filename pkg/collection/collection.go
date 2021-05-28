@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -122,10 +123,10 @@ func (c *Collection) AddCommandOutput(file, command string, arguments ...string)
 	c.AddCommandOutputWithTimeout(file, DefaultTimeout, command, arguments...)
 }
 
-func (c *Collection) AddInstalledPackagesRaw(fileName, pattern string) {
-	c.Log.Debug("Collecting installed packages for pattern ", pattern)
+func (c *Collection) AddInstalledPackagesRaw(fileName string, pattern ...string) {
+	c.Log.Debug("Collecting installed packages for pattern ", strings.Join(pattern, " "))
 
-	packages, err := ListInstalledPackagesRaw(pattern)
+	packages, err := ListInstalledPackagesRaw(pattern...)
 	if err != nil {
 		c.Log.Warn(err)
 	}

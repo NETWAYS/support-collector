@@ -10,6 +10,11 @@ const (
 	PackageManagerDebian = "dpkg"
 )
 
+const (
+	rpmQueryFormat  = `%{NAME} %{VERSION}-%{RELEASE}\n`
+	dpkgQueryFormat = `${Package} ${Version} ${Architecture} ${Status}\n`
+)
+
 // ErrNoPackageManager is returned when we could not detect one.
 var ErrNoPackageManager = errors.New("could not detect a supported package manager")
 
@@ -32,12 +37,18 @@ func DetectPackageManager() string {
 	return ""
 }
 
-func ListInstalledPackagesRaw(pattern string) ([]byte, error) {
+func ListInstalledPackagesRaw(pattern ...string) ([]byte, error) {
 	switch DetectPackageManager() {
 	case PackageManagerRPM:
-		return LoadCommandOutput("rpm", "-qa", pattern)
+		arguments := []string{"-qa", "--queryformat", rpmQueryFormat}
+		arguments = append(arguments, pattern...)
+
+		return LoadCommandOutput("rpm", arguments...)
 	case PackageManagerDebian:
-		return LoadCommandOutput("dpkg-query", "-f", "${Package} ${Version} ${Architecture} ${Status}\\n", "-W", pattern)
+		arguments := []string{"-W", "-f", dpkgQueryFormat}
+		arguments = append(arguments, pattern...)
+
+		return LoadCommandOutput("dpkg-query", arguments...)
 	default:
 		return []byte{}, ErrNoPackageManager
 	}
