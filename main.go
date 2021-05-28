@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/NETWAYS/support-collector/pkg/base"
+	"github.com/NETWAYS/support-collector/modules/base"
+	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/icinga2"
 	"github.com/NETWAYS/support-collector/pkg/util"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
