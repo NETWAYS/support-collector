@@ -51,6 +51,10 @@ func Collect(c *collection.Collection) {
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icingaweb2*", "*icingacli*")
 
+	if _, ok := collection.IsGitRepository("/usr/share/icingaweb2"); ok {
+		c.AddGitRepoInfo(ModuleName+"/git.yml", "/usr/share/icingaweb2")
+	}
+
 	CollectModuleInfo(c)
 
 	for _, file := range files {
