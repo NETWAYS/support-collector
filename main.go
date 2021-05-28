@@ -14,10 +14,27 @@ import (
 	flag "github.com/spf13/pflag"
 	"os"
 	"os/user"
+	"strings"
 	"time"
 )
 
 const Product = "NETWAYS support collector"
+const DefaultOutput = "netways-support.zip"
+
+const Readme = `
+The support collector allows our customers to collect relevant information from
+their servers. A resulting ZIP file can then be provided to our support team
+for further inspection.
+
+Find more information and releases at:
+    https://github.com/NETWAYS/support-collector
+
+If you are a customer, contact us at:
+    support@netways.de  /  https://netways.de/contact
+
+WARNING: DO NOT transfer the generated file over insecure connections or by
+email, it contains potential sensitive information!
+`
 
 var modules = map[string]func(*collection.Collection){
 	"base":            base.Collect,
@@ -84,7 +101,7 @@ func main() {
 }
 
 func handleArguments() {
-	flag.StringVarP(&outputFile, "output", "o", "support-collector.zip", "Output file for the ZIP content")
+	flag.StringVarP(&outputFile, "output", "o", DefaultOutput, "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
@@ -94,18 +111,19 @@ func handleArguments() {
 	_ = flag.CommandLine.MarkHidden("debug")
 	flag.CommandLine.SortFlags = false
 
-	// TODO: Add usage with some documentation
-	/*
-		flag.Usage = func() {
-			fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-			flag.PrintDefaults()
-		}
-	*/
+	// Output a proper help message with details
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n%s\n\n", Product, strings.Trim(Readme, "\n"))
+
+		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
 
 	if printVersion {
-		fmt.Println(Product, " version ", buildVersion()) // nolint:forbidigo
+		fmt.Println(Product, "version", buildVersion()) // nolint:forbidigo
 		os.Exit(0)
 	}
 
