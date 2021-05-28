@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/icinga2"
+	"github.com/NETWAYS/support-collector/modules/icingaweb2"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/util"
 	"github.com/mattn/go-colorable"
@@ -17,8 +18,9 @@ import (
 const Product = "NETWAYS support collector"
 
 var modules = map[string]func(*collection.Collection){
-	"base":    base.Collect,
-	"icinga2": icinga2.Collect,
+	"base":       base.Collect,
+	"icinga2":    icinga2.Collect,
+	"icingaweb2": icingaweb2.Collect,
 }
 
 var (
