@@ -12,18 +12,21 @@ import (
 )
 
 type Collection struct {
-	Output  *zip.Writer
-	Log     *logrus.Logger
-	LogData *bytes.Buffer
+	Output      *zip.Writer
+	Log         *logrus.Logger
+	LogData     *bytes.Buffer
+	ExecTimeout time.Duration
 }
 
 func New(w io.Writer) (c *Collection) {
-	c = &Collection{}
-	c.LogData = &bytes.Buffer{}
-	c.Log = logrus.New()
-	c.Log.Out = c.LogData
+	c = &Collection{
+		Output:      zip.NewWriter(w),
+		Log:         logrus.New(),
+		LogData:     &bytes.Buffer{},
+		ExecTimeout: DefaultTimeout,
+	}
 
-	c.Output = zip.NewWriter(w)
+	c.Log.Out = c.LogData
 
 	return
 }
@@ -158,7 +161,7 @@ func (c *Collection) AddCommandOutputWithTimeout(file string,
 }
 
 func (c *Collection) AddCommandOutput(file, command string, arguments ...string) {
-	c.AddCommandOutputWithTimeout(file, DefaultTimeout, command, arguments...)
+	c.AddCommandOutputWithTimeout(file, c.ExecTimeout, command, arguments...)
 }
 
 func (c *Collection) AddInstalledPackagesRaw(fileName string, pattern ...string) {

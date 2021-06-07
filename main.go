@@ -52,6 +52,7 @@ var moduleOrder = []string{
 }
 
 var (
+	commandTimeout                  = 60 * time.Second
 	outputFile                      string
 	enabledModules, disabledModules []string
 	verbose, printVersion           bool
@@ -103,6 +104,7 @@ func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", DefaultOutput, "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
+	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	flag.BoolVarP(&verbose, "debug", "d", false, "Enable debug logging (use verbose)")
 	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
