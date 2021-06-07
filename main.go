@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
-	"os/user"
 	"strings"
 	"time"
 )
@@ -67,7 +66,7 @@ func main() {
 	c, cleanup := NewCollection(outputFile)
 	defer cleanup()
 
-	if !isPrivilegedUser() {
+	if !util.IsPrivilegedUser() {
 		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
 	}
 
@@ -79,9 +78,9 @@ func main() {
 	// Call all enabled modules
 	for _, name := range moduleOrder {
 		switch {
-		case stringInSlice(name, disabledModules):
+		case util.StringInSlice(name, disabledModules):
 			c.Log.Infof("Module %s is disabled", name)
-		case !stringInSlice(name, enabledModules):
+		case !util.StringInSlice(name, enabledModules):
 			c.Log.Infof("Module %s is not enabled", name)
 		default:
 			moduleStart := time.Now()
@@ -135,16 +134,6 @@ func handleArguments() {
 	}
 }
 
-func isPrivilegedUser() bool {
-	u, err := user.Current()
-	if err != nil {
-		return false
-	}
-
-	// TODO: only works on *NIX systems
-	return u.Uid == "0"
-}
-
 func NewCollection(outputFile string) (*collection.Collection, func()) {
 	file, err := os.Create(outputFile)
 	if err != nil {
@@ -183,14 +172,4 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 			}
 		}
 	}
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-
-	return false
 }
