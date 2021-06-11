@@ -238,11 +238,17 @@ func (c *Collection) ClearObfuscators() {
 func (c *Collection) callObfuscators(kind obfuscate.Kind, name string, data []byte) (out []byte, err error) {
 	out = data
 
+	var count uint
+
 	for _, o := range c.Obfuscators {
 		if o.IsAccepting(kind, name) {
-			out, err = o.Process(data)
+			count, out, err = o.Process(data)
 			if err != nil {
 				return
+			}
+
+			if count > 0 {
+				c.Log.Debugf("Obfuscation replaced %d token in %s", count, name)
 			}
 		}
 	}

@@ -23,21 +23,25 @@ func ExampleObfuscator() {
 	content := []byte(`password = "secret"`)
 
 	if o.IsAccepting(KindFile, "test.ini") {
-		data, err := o.Process(content)
+		count, data, err := o.Process(content)
 		fmt.Println(err)
+		fmt.Println(count)
 		fmt.Println(string(data))
 	}
 
 	// Output: <nil>
+	// 1
 	// password = <HIDDEN>
 }
 
 func TestReplacePattern(t *testing.T) {
-	assert.Equal(t, `password = <HIDDEN>`,
-		ReplacePattern(`password = "XXX"`, regexp.MustCompile(`password\s*=\s*(.*)`)))
+	replacement, count := ReplacePattern(`password = "XXX"`, regexp.MustCompile(`password\s*=\s*(.*)`))
+	assert.Equal(t, uint(1), count)
+	assert.Equal(t, `password = <HIDDEN>`, replacement)
 
-	assert.Equal(t, `<HIDDEN>`,
-		ReplacePattern(`password = "XXX"`, regexp.MustCompile(`password\s*=.*`)))
+	replacement, count = ReplacePattern(`password = "XXX"`, regexp.MustCompile(`password\s*=.*`))
+	assert.Equal(t, uint(1), count)
+	assert.Equal(t, `<HIDDEN>`, replacement)
 }
 
 func TestObfuscator_IsAccepting(t *testing.T) {
@@ -64,11 +68,13 @@ func TestObfuscator_Process(t *testing.T) {
 		},
 	}
 
-	out, err := o.Process([]byte("default content\r\n"))
+	count, out, err := o.Process([]byte("default content\r\n"))
 	assert.NoError(t, err)
+	assert.Equal(t, uint(0), count)
 	assert.Equal(t, "default content\r\n", string(out))
 
-	out, err = o.Process([]byte(iniExample))
+	count, out, err = o.Process([]byte(iniExample))
 	assert.NoError(t, err)
+	assert.Equal(t, uint(1), count)
 	assert.Equal(t, iniResult, string(out))
 }

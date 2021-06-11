@@ -94,6 +94,20 @@ func main() {
 		}
 	}
 
+	// Collect obfuscation info
+	var files, count uint
+
+	for _, o := range c.Obfuscators {
+		files += o.Files
+
+		count += o.Replaced
+	}
+
+	if files > 0 {
+		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, files, len(c.Obfuscators))
+	}
+
+	// Save timings
 	timings["total"] = time.Since(startTime)
 	c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
 
@@ -147,6 +161,7 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 
 	consoleLevel := logrus.InfoLevel
 	if verbose {
+		// logrus.StandardLogger().SetLevel(logrus.DebugLevel)
 		consoleLevel = logrus.DebugLevel
 	}
 

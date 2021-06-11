@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"regexp"
 	"strings"
@@ -35,6 +36,8 @@ type Obfuscator struct {
 	Kind
 	Affecting    []*regexp.Regexp
 	Replacements []*regexp.Regexp
+	Files        uint
+	Replaced     uint
 }
 
 // New returns a basic Obfuscator with provided regexp.Regexp.
@@ -94,21 +97,24 @@ func (o Obfuscator) IsAccepting(kind Kind, name string) bool {
 }
 
 // Process takes data and returns it obfuscated.
-func (o Obfuscator) Process(data []byte) ([]byte, error) {
-	out, err := o.ProcessReader(bytes.NewReader(data))
+func (o *Obfuscator) Process(data []byte) (uint, []byte, error) {
+	count, out, err := o.ProcessReader(bytes.NewReader(data))
 
 	//goland:noinspection GoNilness
-	return out.Bytes(), err
+	return count, out.Bytes(), err
 }
 
 // ProcessReader takes an io.Reader and returns a new one obfuscated.
-func (o Obfuscator) ProcessReader(r io.Reader) (out bytes.Buffer, err error) {
+func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, err error) {
 	rd := bufio.NewReader(r)
 
 	var (
 		line    string
 		reading = true
+		c       uint
 	)
+
+	o.Files++
 
 	for reading {
 		line, err = rd.ReadString('\n')
@@ -122,42 +128,58 @@ func (o Obfuscator) ProcessReader(r io.Reader) (out bytes.Buffer, err error) {
 					break
 				}
 			} else {
-				return out, fmt.Errorf("could not read from reader: %w", err)
+				return count, out, fmt.Errorf("could not read from reader: %w", err)
 			}
 		}
 
-		line = ReplacePatterns(line, o.Replacements)
+		line, c = ReplacePatterns(line, o.Replacements)
+
+		if c > 0 {
+			count += c
+			o.Replaced += c
+		}
 
 		_, _ = out.WriteString(line)
 	}
 
-	return out, err
+	return count, out, err
 }
 
 // ReplacePatterns replaces all the patterns matches in a line.
-func ReplacePatterns(line string, patterns []*regexp.Regexp) string {
+func ReplacePatterns(line string, patterns []*regexp.Regexp) (s string, count uint) {
 	for _, pattern := range patterns {
-		line = ReplacePattern(line, pattern)
+		var c uint
+
+		line, c = ReplacePattern(line, pattern)
+		count += c
 	}
 
-	return line
+	return line, count
 }
 
 // ReplacePattern replaces all matches in a line.
-func ReplacePattern(line string, pattern *regexp.Regexp) string {
+func ReplacePattern(line string, pattern *regexp.Regexp) (s string, count uint) {
 	return pattern.ReplaceAllStringFunc(line, func(s string) string {
 		parts := pattern.FindStringSubmatch(s)
 
 		if len(parts) > 1 {
 			for _, match := range parts[1:] {
 				if match != "" {
+					count++
+
 					s = strings.ReplaceAll(s, match, Replacement)
+
+					log.Debugf("replaced token for %s", pattern.String())
 				}
 			}
 
 			return s
 		}
 
+		count++
+
+		log.Debugf("replaced token for %s", pattern.String())
+
 		return Replacement
-	})
+	}), count
 }
