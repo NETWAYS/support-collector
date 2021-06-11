@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"fmt"
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"io"
@@ -16,6 +17,7 @@ type Collection struct {
 	Log         *logrus.Logger
 	LogData     *bytes.Buffer
 	ExecTimeout time.Duration
+	Obfuscators []*obfuscate.Obfuscator
 }
 
 func New(w io.Writer) (c *Collection) {
@@ -35,7 +37,25 @@ func (c *Collection) Close() error {
 	return c.Output.Close()
 }
 
+// AddFileToOutput adds a single file while calling any obfuscator.
 func (c *Collection) AddFileToOutput(file *File) (err error) {
+	file.Data, err = c.callObfuscators(obfuscate.KindFile, file.Name, file.Data)
+	if err != nil {
+		c.Log.Warn(err)
+	}
+
+	err = c.AddFileToOutputRaw(file)
+	if err != nil {
+		c.Log.Warn(err)
+	}
+
+	return
+}
+
+// AddFileToOutputRaw adds the file directly to ZIP output.
+//
+// No obfuscation is applied.
+func (c *Collection) AddFileToOutputRaw(file *File) (err error) {
 	fh := &zip.FileHeader{
 		Name:     file.Name,
 		Modified: file.Modified,
@@ -82,20 +102,23 @@ func (c *Collection) AddLogToOutput() (err error) {
 	return
 }
 
-func (c *Collection) AddFileFromReader(name string, r io.Reader) (err error) {
+func (c *Collection) AddFileFromReaderRaw(name string, r io.Reader) (err error) {
 	f, err := NewFileFromReader(name, r)
 	if err != nil {
 		return
 	}
 
-	return c.AddFileToOutput(f)
+	return c.AddFileToOutputRaw(f)
 }
 
-func (c *Collection) AddFileData(fileName string, data []byte) {
+func (c *Collection) AddFileDataRaw(fileName string, data []byte) {
 	file := NewFile(fileName)
 	file.Data = data
 
-	_ = c.AddFileToOutput(file)
+	err := c.AddFileToOutputRaw(file)
+	if err != nil {
+		c.Log.Warn(err)
+	}
 }
 
 func (c *Collection) AddFileYAML(fileName string, data interface{}) {
@@ -157,7 +180,13 @@ func (c *Collection) AddCommandOutputWithTimeout(file string,
 		c.Log.Warn(err)
 	}
 
-	c.AddFileData(file, output)
+	// obfuscate
+	output, err = c.callObfuscators(obfuscate.KindOutput, obfuscate.JoinCommand(command, arguments...), output)
+	if err != nil {
+		c.Log.Warn(err)
+	}
+
+	c.AddFileDataRaw(file, output)
 }
 
 func (c *Collection) AddCommandOutput(file, command string, arguments ...string) {
@@ -172,7 +201,7 @@ func (c *Collection) AddInstalledPackagesRaw(fileName string, pattern ...string)
 		c.Log.Warn(err)
 	}
 
-	c.AddFileData(fileName, packages)
+	c.AddFileDataRaw(fileName, packages)
 }
 
 func (c *Collection) AddServiceStatusRaw(fileName, name string) {
@@ -183,7 +212,7 @@ func (c *Collection) AddServiceStatusRaw(fileName, name string) {
 		c.Log.Warn(err)
 	}
 
-	c.AddFileData(fileName, output)
+	c.AddFileDataRaw(fileName, output)
 }
 
 func (c *Collection) AddGitRepoInfo(fileName, path string) {
@@ -195,4 +224,28 @@ func (c *Collection) AddGitRepoInfo(fileName, path string) {
 	}
 
 	c.AddFileYAML(fileName, info)
+}
+
+func (c *Collection) RegisterObfuscator(o *obfuscate.Obfuscator) {
+	c.Obfuscators = append(c.Obfuscators, o)
+}
+
+func (c *Collection) ClearObfuscators() {
+	c.Obfuscators = c.Obfuscators[:0]
+}
+
+// callObfuscators iterates all obfuscators and call them when matching.
+func (c *Collection) callObfuscators(kind obfuscate.Kind, name string, data []byte) (out []byte, err error) {
+	out = data
+
+	for _, o := range c.Obfuscators {
+		if o.IsAccepting(kind, name) {
+			out, err = o.Process(data)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return
 }

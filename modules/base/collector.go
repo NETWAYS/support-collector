@@ -69,7 +69,7 @@ func CollectKernelInfo(c *collection.Collection) {
 		return
 	}
 
-	err = c.AddFileFromReader(ModuleName+"/kernel.yml", &buf)
+	err = c.AddFileFromReaderRaw(ModuleName+"/kernel.yml", &buf)
 	if err != nil {
 		c.Log.Error(err)
 	}

@@ -159,7 +159,7 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 
 	versionString := buildVersion()
 	c.Log.Infof("Starting %s version %s", Product, versionString)
-	c.AddFileData("version", []byte(versionString+"\n"))
+	c.AddFileDataRaw("version", []byte(versionString+"\n"))
 
 	return c, func() {
 		// Close all open outputs in order, but only log errors
