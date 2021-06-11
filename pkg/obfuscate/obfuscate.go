@@ -114,8 +114,6 @@ func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, e
 		c       uint
 	)
 
-	o.Files++
-
 	for reading {
 		line, err = rd.ReadString('\n')
 		// TODO: '\r'
@@ -140,6 +138,10 @@ func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, e
 		}
 
 		_, _ = out.WriteString(line)
+	}
+
+	if count > 0 {
+		o.Files++
 	}
 
 	return count, out, err
