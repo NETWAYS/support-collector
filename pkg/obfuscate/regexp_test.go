@@ -17,3 +17,15 @@ func TestNewRegexpKeyValue(t *testing.T) {
 	assert.False(t, re.MatchString(`user = "test"`))
 	assert.False(t, re.MatchString(`password`))
 }
+
+func TestNewExtensionMatch(t *testing.T) {
+	re := NewExtensionMatch("ini")
+
+	assert.True(t, re.MatchString(`test.ini`))
+	assert.True(t, re.MatchString(`/etc/bla/test.ini`))
+	assert.False(t, re.MatchString(`test.txt`))
+}
+
+func TestNewCommandMatch(t *testing.T) {
+	assert.True(t, NewCommandMatch("icinga2", "daemon").MatchString("icinga2 daemon"))
+}
