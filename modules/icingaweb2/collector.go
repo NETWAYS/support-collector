@@ -2,6 +2,7 @@ package icingaweb2
 
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -48,6 +49,8 @@ func Collect(c *collection.Collection) {
 	}
 
 	c.Log.Info("Collecting Icinga Web 2 information")
+
+	c.RegisterObfuscator(obfuscate.NewFile(`(?i)(?:password|token)\s*=\s*(.*)`, `ini`))
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icingaweb2*", "*icingacli*")
 
