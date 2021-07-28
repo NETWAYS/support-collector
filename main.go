@@ -103,6 +103,7 @@ func main() {
 	if err != nil {
 		c.Log.Debug(err)
 	}
+
 	c.Log.Infof("Generated ZIP file located at %s/%s", path, DefaultOutput)
 }
 
