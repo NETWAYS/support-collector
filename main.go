@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -99,12 +100,12 @@ func main() {
 
 	c.AddFileYAML("timing.yml", timings)
 
-	path, err := os.Getwd()
+	path, err := filepath.Abs(outputFile)
 	if err != nil {
 		c.Log.Debug(err)
 	}
 
-	c.Log.Infof("Generated ZIP file located at %s/%s", path, DefaultOutput)
+	c.Log.Infof("Generated ZIP file located at %s", path)
 }
 
 func handleArguments() {
