@@ -98,6 +98,12 @@ func main() {
 	c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
 
 	c.AddFileYAML("timing.yml", timings)
+
+	path, err := os.Getwd()
+	if err != nil {
+		c.Log.Debug(err)
+	}
+	c.Log.Infof("Generated ZIP file located at %s/%s", path, DefaultOutput)
 }
 
 func handleArguments() {
