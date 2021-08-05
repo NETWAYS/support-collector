@@ -77,6 +77,9 @@ func main() {
 		timings   = map[string]time.Duration{}
 	)
 
+	// Set command Timeout from argument
+	c.ExecTimeout = commandTimeout
+
 	// Call all enabled modules
 	for _, name := range moduleOrder {
 		switch {
