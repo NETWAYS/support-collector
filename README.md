@@ -23,7 +23,7 @@ If you want to see what is collected, add `--verbose`.
 
 ```
 Usage of ./support-collector:
-  -o, --output string     Output file for the ZIP content (default "netways-support.zip")
+  -o, --output string     Output file for the ZIP content (default "netways-support-20211029-1733.zip")
       --enable strings    List of enabled module (default [base,icinga2,icingaweb2,icinga-director,mysql])
       --disable strings   List of disabled module
   -v, --verbose           Enable verbose logging

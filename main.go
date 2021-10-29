@@ -19,7 +19,9 @@ import (
 )
 
 const Product = "NETWAYS support collector"
-const DefaultOutput = "netways-support.zip"
+
+// FilePrefix for the outfile file.
+const FilePrefix = "netways-support"
 
 const Readme = `
 The support collector allows our customers to collect relevant information from
@@ -126,7 +128,7 @@ func main() {
 }
 
 func handleArguments() {
-	flag.StringVarP(&outputFile, "output", "o", DefaultOutput, "Output file for the ZIP content")
+	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
@@ -159,6 +161,11 @@ func handleArguments() {
 			logrus.Fatal("Unknown module to enable: ", name)
 		}
 	}
+}
+
+// buildFileName returns a filename to store the output of support collector.
+func buildFileName() string {
+	return FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
 }
 
 func NewCollection(outputFile string) (*collection.Collection, func()) {
