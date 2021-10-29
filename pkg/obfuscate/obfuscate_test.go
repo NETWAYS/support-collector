@@ -78,3 +78,20 @@ func TestObfuscator_Process(t *testing.T) {
 	assert.Equal(t, uint(1), count)
 	assert.Equal(t, iniResult, string(out))
 }
+
+func TestNewFile(t *testing.T) {
+	o := NewFile(`^password\s*=\s*(.*)`, "conf")
+	assert.Equal(t, KindFile, o.Kind)
+	assert.Len(t, o.Affecting, 1)
+	assert.Len(t, o.Replacements, 1)
+}
+
+func TestNewOutput(t *testing.T) {
+	o := NewOutput(`^password\s*=\s*(.*)`, "icinga2", "daemon", "-C")
+	assert.Equal(t, KindOutput, o.Kind)
+	assert.Len(t, o.Affecting, 1)
+	assert.Len(t, o.Replacements, 1)
+
+	assert.True(t, o.IsAccepting(KindOutput, "icinga2 daemon -C"))
+	assert.False(t, o.IsAccepting(KindOutput, "icinga2 daemon"))
+}
