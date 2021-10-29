@@ -28,6 +28,12 @@ var commands = map[string][]string{
 	"variables.txt":         {"icinga2", "variable", "list"},
 }
 
+var obfuscators = []*obfuscate.Obfuscator{
+	obfuscate.NewOutput(`(?i)(?:password|salt|token)\s*=\s*(.*)`, "icinga2", "variable"),
+	obfuscate.NewFile(`(?i)(?:password|salt|token)\s*=\s*(.*)`, `conf`),
+	obfuscate.NewFile(`(?i)(?:password|community)(.*)`, `log`),
+}
+
 func DetectIcinga() bool {
 	_, err := exec.LookPath("icinga2")
 	return err == nil
@@ -41,9 +47,7 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting Icinga 2 information")
 
-	c.RegisterObfuscator(obfuscate.NewOutput(`(?i)(?:password|salt|token)\s*=\s*(.*)`, "icinga2", "variable"))
-	c.RegisterObfuscator(obfuscate.NewFile(`(?i)(?:password|salt|token)\s*=\s*(.*)`, `conf`))
-	c.RegisterObfuscator(obfuscate.NewFile(`(?i)(?:password|community)(.*)`, `log`))
+	c.RegisterObfuscators(obfuscators...)
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icinga2*")
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")

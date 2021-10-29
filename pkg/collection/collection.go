@@ -230,6 +230,12 @@ func (c *Collection) RegisterObfuscator(o *obfuscate.Obfuscator) {
 	c.Obfuscators = append(c.Obfuscators, o)
 }
 
+func (c *Collection) RegisterObfuscators(list ...*obfuscate.Obfuscator) {
+	for _, o := range list {
+		c.RegisterObfuscator(o)
+	}
+}
+
 func (c *Collection) ClearObfuscators() {
 	c.Obfuscators = c.Obfuscators[:0]
 }
