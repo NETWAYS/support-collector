@@ -10,7 +10,7 @@ func TestCollection_AddFileFromReader(t *testing.T) {
 	buf := &bytes.Buffer{}
 	c := New(buf)
 
-	err := c.AddFileFromReader("test.txt", bytes.NewBufferString("content"))
+	err := c.AddFileFromReaderRaw("test.txt", bytes.NewBufferString("content"))
 	assert.NoError(t, err)
 
 	err = c.Close()

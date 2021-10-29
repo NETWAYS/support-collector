@@ -8,14 +8,14 @@ A resulting ZIP file can then be provided to our support team for further inspec
 If you are a customer, you can contact us at [support@netways.de](mailto:support@netways.de) or
 [netways.de/contact](https://www.netways.de/contact).
 
-**WARNING:** DO NOT transfer the generated file over insecure connections or by
+> **WARNING:** DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
 
 Inspired by [icinga2-diagnostics](https://github.com/Icinga/icinga2-diagnostics).
 
 ## Usage
 
-**Warning:** Currently no anonymization is implemented, so be careful.
+> **WARNING:** Some passwords or secrets are automatically removed, but this no guarantee, so be careful what you share.
 
 By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.
 

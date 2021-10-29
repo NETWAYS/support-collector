@@ -2,6 +2,7 @@ package icinga2
 
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
 	"os/exec"
 )
@@ -24,8 +25,13 @@ var commands = map[string][]string{
 	"config-check.txt":      {"icinga2", "daemon", "-C"},
 	"objects-zones.txt":     {"icinga2", "object", "list", "--type", "Zone"},
 	"objects-endpoints.txt": {"icinga2", "object", "list", "--type", "Endpoint"},
-	"NodeName.txt":          {"icinga2", "variable", "get", "NodeName"},
-	"ZoneName.txt":          {"icinga2", "variable", "get", "ZoneName"},
+	"variables.txt":         {"icinga2", "variable", "list"},
+}
+
+var obfuscators = []*obfuscate.Obfuscator{
+	obfuscate.NewOutput(`(?i)(?:password|salt|token)\s*=\s*(.*)`, "icinga2", "variable"),
+	obfuscate.NewFile(`(?i)(?:password|salt|token)\s*=\s*(.*)`, `conf`),
+	obfuscate.NewFile(`(?i)(?:password|community)(.*)`, `log`),
 }
 
 func DetectIcinga() bool {
@@ -40,6 +46,8 @@ func Collect(c *collection.Collection) {
 	}
 
 	c.Log.Info("Collecting Icinga 2 information")
+
+	c.RegisterObfuscators(obfuscators...)
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icinga2*")
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")

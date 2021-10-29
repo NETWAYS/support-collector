@@ -1,7 +1,5 @@
 linters:
   disable-all: false
-  enable:
-    - funlen
   disable:
     - gochecknoglobals  # we use these here
     - exhaustivestruct  # too strict
@@ -11,6 +9,7 @@ linters:
     - wrapcheck  # not needed
     - godox  # we still have a lot of TODOs left
     - revive  # doc is still pending
+    - funlen # strange counting for main()
   presets:
     - bugs
     - unused
