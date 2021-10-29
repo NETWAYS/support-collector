@@ -110,13 +110,13 @@ func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, e
 
 	var (
 		line    string
+		ending  string
 		reading = true
 		c       uint
 	)
 
 	for reading {
 		line, err = rd.ReadString('\n')
-		// TODO: '\r'
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				err = nil
@@ -130,7 +130,23 @@ func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, e
 			}
 		}
 
-		line, c = ReplacePatterns(line, o.Replacements)
+		// Pop any line ending before replacing
+		ending = ""
+		line = strings.TrimRightFunc(line, func(r rune) bool {
+			if r == '\r' || r == '\n' {
+				ending = string(r) + ending
+				return true
+			}
+			return false
+		})
+
+		// Replace any matches, but skip empty lines
+		if strings.TrimSpace(line) != "" {
+			line, c = ReplacePatterns(line, o.Replacements)
+		}
+
+		// Add line ending back after replacement
+		line += ending
 
 		if c > 0 {
 			count += c
