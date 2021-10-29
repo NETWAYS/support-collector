@@ -28,4 +28,5 @@ func TestNewExtensionMatch(t *testing.T) {
 
 func TestNewCommandMatch(t *testing.T) {
 	assert.True(t, NewCommandMatch("icinga2", "daemon").MatchString("icinga2 daemon"))
+	assert.True(t, NewCommandMatch("icinga2").MatchString("icinga2"))
 }

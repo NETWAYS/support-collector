@@ -20,6 +20,11 @@ func NewCommandMatch(command string, arguments ...string) *regexp.Regexp {
 	return regexp.MustCompile(`^` + regexp.QuoteMeta(JoinCommand(command, arguments...)))
 }
 
-func JoinCommand(command string, arguments ...string) string {
-	return command + " " + strings.Join(arguments, " ")
+func JoinCommand(command string, arguments ...string) (s string) {
+	s = command
+	if len(arguments) > 0 {
+		s += " " + strings.Join(arguments, " ")
+	}
+
+	return
 }
