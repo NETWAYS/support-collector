@@ -1,0 +1,15 @@
+[icingaweb_db]
+type = "db"
+db = "mysql"
+host = "mysql"
+dbname = "icingaweb2"
+username = "icinga"
+password = <HIDDEN>
+
+[icinga_db]
+type = "db"
+db = "mysql"
+host = "mysql"
+dbname = "icinga"
+username = "icinga"
+password = <HIDDEN>

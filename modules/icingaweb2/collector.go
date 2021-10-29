@@ -29,6 +29,10 @@ var commands = map[string][]string{
 	"modules.txt": {"icingacli", "module", "list"},
 }
 
+var obfuscators = []*obfuscate.Obfuscator{
+	obfuscate.NewFile(`(?i)(?:password|token)\s*=\s*(.*)`, `ini`),
+}
+
 // Detect if icingaweb2 is installed on the system.
 func Detect() bool {
 	for _, path := range relevantPaths {
@@ -50,7 +54,7 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting Icinga Web 2 information")
 
-	c.RegisterObfuscator(obfuscate.NewFile(`(?i)(?:password|token)\s*=\s*(.*)`, `ini`))
+	c.RegisterObfuscators(obfuscators...)
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icingaweb2*", "*icingacli*")
 
