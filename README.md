@@ -115,7 +115,7 @@ Module `puppet`
 * Package Versions
 * Puppet module list
 
-See [modules/ansible/collector.go](modules/puppet/collector.go) for details.
+See [modules/puppet/collector.go](modules/puppet/collector.go) for details.
 
 ## Supported systems
 
