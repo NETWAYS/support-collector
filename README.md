@@ -98,13 +98,32 @@ Is looking for standard MySQL or MariaDB installations.
 
 See [modules/mysql/collector.go](modules/mysql/collector.go) for details.
 
+### Ansible
+
+Module: `ansible`
+
+* Configuration from `/etc/ansible` 
+* Package versions
+
+See [modules/ansible/collector.go](modules/ansible/collector.go) for details.
+
+### Puppet
+
+Module `puppet`
+
+* Configuration from `/etc/puppetlabs`
+* Package Versions
+* Puppet module list
+
+See [modules/ansible/collector.go](modules/puppet/collector.go) for details.
+
 ## Supported systems
 
 **Note:** Currently, only Linux is supported by the collector.
 
-Distribution    | Supported | Tested | Comment
-----------------|-----------|--------|--------
-CentOS / EL     | ✅️ | CentOS 7️ | Should work on all similar enterprise platforms
+Distribution    | Supported | Tested      | Comment
+----------------|-----------|-------------|--------
+CentOS / EL     | ✅️ | CentOS 7/8️ | Should work on all similar enterprise platforms
 Debian          | ✅ |
 Ubuntu          | ✅ |
 SLES / OpenSUSE | ✅ |
