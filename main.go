@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
 	"github.com/NETWAYS/support-collector/modules/mysql"
+	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/util"
 	"github.com/mattn/go-colorable"
@@ -44,6 +46,8 @@ var modules = map[string]func(*collection.Collection){
 	"icingaweb2":      icingaweb2.Collect,
 	"icinga-director": icingadirector.Collect,
 	"mysql":           mysql.Collect,
+	"ansible":         ansible.Collect,
+	"puppet":          puppet.Collect,
 }
 
 var moduleOrder = []string{
@@ -52,6 +56,8 @@ var moduleOrder = []string{
 	"icingaweb2",
 	"icinga-director",
 	"mysql",
+	"ansible",
+	"puppet",
 }
 
 var (
