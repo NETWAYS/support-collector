@@ -40,7 +40,7 @@ func Detect() bool {
 
 func Collect(c *collection.Collection) {
 	if !Detect() {
-		c.Log.Info("Could not find ansible")
+		c.Log.Info("Could not find puppet")
 		return
 	}
 
