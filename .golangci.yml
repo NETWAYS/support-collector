@@ -10,6 +10,7 @@ linters:
     - godox  # we still have a lot of TODOs left
     - revive  # doc is still pending
     - funlen # strange counting for main()
+    - varnamelen # we use these here
   presets:
     - bugs
     - unused
