@@ -14,6 +14,10 @@ var files = []string{
 	"/proc/cpuinfo",
 	"/proc/meminfo",
 	"/proc/loadavg",
+	"/etc/apt/sources.list",
+	"/etc/apt/sources.list.d/",
+	"/etc/yum.repos.d/",
+	"/etc/zypp/repos.d/",
 }
 
 var commands = [][]string{
