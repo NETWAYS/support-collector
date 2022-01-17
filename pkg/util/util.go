@@ -1,6 +1,9 @@
 package util
 
-import "os/user"
+import (
+	"os/exec"
+	"os/user"
+)
 
 // StringInSlice matches if a string is contained in a slice.
 func StringInSlice(a string, list []string) bool {
@@ -22,4 +25,10 @@ func IsPrivilegedUser() bool {
 
 	// TODO: only works on *NIX systems
 	return u.Uid == "0"
+}
+
+// CommandExists returns true if command exists.
+func CommandExists(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
 }

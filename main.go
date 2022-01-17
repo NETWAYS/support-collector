@@ -5,6 +5,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/grafana"
+	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
@@ -54,6 +55,7 @@ var modules = map[string]func(*collection.Collection){
 	"ansible":         ansible.Collect,
 	"puppet":          puppet.Collect,
 	"grafana":         grafana.Collect,
+	"graphite":        graphite.Collect,
 }
 
 var moduleOrder = []string{
@@ -67,6 +69,7 @@ var moduleOrder = []string{
 	"ansible",
 	"puppet",
 	"grafana",
+	"graphite",
 }
 
 var (
