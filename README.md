@@ -6,7 +6,7 @@ The support collector allows our customers to collect relevant information from 
 A resulting ZIP file can then be provided to our support team for further inspection.
 
 If you are a customer, you can contact us at [support@netways.de](mailto:support@netways.de) or
-[netways.de/contact](https://www.netways.de/contact).
+[netways.de/en/contact/](https://www.netways.de/en/contact/).
 
 > **WARNING:** DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
@@ -116,6 +116,18 @@ Module `puppet`
 * Puppet module list
 
 See [modules/puppet/collector.go](modules/puppet/collector.go) for details.
+
+### Grafana
+
+Module `grafana`
+
+* Configuration files from`/etc/grafana` and `/usr/share/grafana`
+* Package Versions
+* Service status
+* grafana-cli version
+* grafana-cli plugins list
+
+See [modules/grafana/collector.go](modules/grafana/collector.go) for details.
 
 ## Supported systems
 
