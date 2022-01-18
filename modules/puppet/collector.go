@@ -57,6 +57,6 @@ func Collect(c *collection.Collection) {
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*puppet*")
 
 	for _, service := range possibleServices {
-		c.AddServiceStatusRaw(ModuleName+"service-"+service+".txt", service)
+		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
 	}
 }
