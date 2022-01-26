@@ -14,6 +14,9 @@ var files = []string{
 	"/proc/cpuinfo",
 	"/proc/meminfo",
 	"/proc/loadavg",
+}
+
+var repositoryFiles = []string{
 	"/etc/apt/sources.list",
 	"/etc/apt/sources.list.d/",
 	"/etc/yum.repos.d/",
@@ -50,6 +53,9 @@ func Collect(c *collection.Collection) {
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
 	}
+
+	// Add repository settings, at least one of the locations should be found
+	c.AddFilesAtLeastOne(ModuleName, repositoryFiles...)
 
 	for _, cmd := range commands {
 		name := ModuleName + "/" + cmd[0] + ".txt"
