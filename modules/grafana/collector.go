@@ -23,7 +23,10 @@ var commands = map[string][]string{
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
-	obfuscate.NewFile(`(?i)(?:password|token)\s*=\s*(.*)`, `ini`),
+	// grafana.ini
+	obfuscate.NewFile(`(?i)(?:password|token|key|secret).*\s*=\s*(.*)`, `ini`),
+	// e.g. ldap.toml
+	obfuscate.NewFile(`(?i)(?:password|token|key|secret).*\s*=\s*(.*)`, `toml`),
 }
 
 func Detect() bool {
