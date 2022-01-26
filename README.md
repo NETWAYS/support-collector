@@ -46,6 +46,7 @@ Will collect basic information about your system:
 * CPU, memory, disk and other hardware and vendor information
 * Current process and load status
 * Status of AppArmor and SELinux
+* Repositories
 
 See [modules/base/collector.go](modules/base/collector.go) for details.
 
