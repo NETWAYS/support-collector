@@ -99,6 +99,16 @@ Is looking for standard MySQL or MariaDB installations.
 
 See [modules/mysql/collector.go](modules/mysql/collector.go) for details.
 
+### PostgreSQL
+
+Module: `postgresql`
+
+* Package versions
+* Service status
+* Configuration files from `/etc/postgresql` and `/var/lib/pgsql` (depending on OS)
+
+See [modules/postgresql/collector.go](modules/postgresql/collector.go) for details.
+
 ### Ansible
 
 Module: `ansible`
