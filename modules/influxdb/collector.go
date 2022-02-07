@@ -13,7 +13,7 @@ var relevantPaths = []string{
 }
 
 var files = []string{
-	"/etc/influxdb/config.*",
+	"/etc/influxdb",
 }
 
 func Detect() bool {
