@@ -8,6 +8,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
+	"github.com/NETWAYS/support-collector/modules/influxdb"
 	"github.com/NETWAYS/support-collector/modules/mysql"
 	"github.com/NETWAYS/support-collector/modules/postgresql"
 	"github.com/NETWAYS/support-collector/modules/puppet"
@@ -48,6 +49,7 @@ var modules = map[string]func(*collection.Collection){
 	"icingaweb2":      icingaweb2.Collect,
 	"icinga-director": icingadirector.Collect,
 	"mysql":           mysql.Collect,
+	"influxdb":        influxdb.Collect,
 	"postgresql":      postgresql.Collect,
 	"ansible":         ansible.Collect,
 	"puppet":          puppet.Collect,
@@ -60,6 +62,7 @@ var moduleOrder = []string{
 	"icingaweb2",
 	"icinga-director",
 	"mysql",
+	"influxdb",
 	"postgresql",
 	"ansible",
 	"puppet",
