@@ -33,7 +33,7 @@ func Collect(c *collection.Collection) {
 		return
 	}
 
-	c.Log.Info("Collecting InfluxDb information")
+	c.Log.Info("Collecting InfluxDB information")
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*influx*")
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "influxdb")
