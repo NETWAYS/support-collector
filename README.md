@@ -118,6 +118,16 @@ Module `puppet`
 
 See [modules/puppet/collector.go](modules/puppet/collector.go) for details.
 
+### InfluxDB
+
+Module: `influxdb`
+
+* Configuration file from `/etc/influxdb/config.*`
+* Package versions
+* Service status
+
+See [modules/influxdb/collector.go](modules/influxdb/collector.go) for details.
+
 ### Grafana
 
 Module `grafana`
