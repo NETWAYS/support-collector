@@ -120,7 +120,7 @@ See [modules/ansible/collector.go](modules/ansible/collector.go) for details.
 
 ### Puppet
 
-Module `puppet`
+Module: `puppet`
 
 * Configuration from `/etc/puppetlabs`
 * Package Versions
@@ -149,6 +149,21 @@ Module `grafana`
 * grafana-cli plugins list
 
 See [modules/grafana/collector.go](modules/grafana/collector.go) for details.
+
+### Graphite
+
+Module: `graphite`
+
+* Configuration from:
+  * `/opt/graphite/conf`,
+  * `/opt/graphite/webapp/graphite/local_settings.py`,
+  * `/etc/carbon`
+  * `/etc/graphite-api*`
+* Package versions
+* Python and pip version & list
+* Process list for `*graphite*` and `*carbon*`
+
+See [modules/graphite/collector.go](modules/graphite/collector.go) for details.
 
 ## Supported systems
 
