@@ -159,6 +159,7 @@ Module: `graphite`
   * `/opt/graphite/webapp/graphite/local_settings.py`,
   * `/etc/carbon`
   * `/etc/graphite-api*`
+  * `/etc/graphite-web*`
 * Package versions
 * Python and pip version & list
 * Process list for `*graphite*` and `*carbon*`

@@ -100,5 +100,5 @@ func Collect(c *collection.Collection) {
 
 	c.AddFileDataRaw(ModuleName+"/processlist.txt", []byte(processes))
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages-graphite.txt", "*graphite*")
+	c.AddInstalledPackagesRaw(ModuleName+"/packages-graphite.txt", "*graphite*", "*carbon*")
 }
