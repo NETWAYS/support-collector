@@ -12,6 +12,7 @@ const ModuleName = "icinga2"
 var files = []string{
 	"/etc/icinga2",
 	"/var/log/icinga2/icinga2.log",
+	"/usr/lib64/nagios/plugins",
 }
 
 var optionalFiles = []string{
@@ -49,7 +50,12 @@ func Collect(c *collection.Collection) {
 
 	c.RegisterObfuscators(obfuscators...)
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icinga2*")
+	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt",
+		"*icinga2*",
+		"netways-plugin*",
+		"monitoring-plugin*",
+		"nagios-plugin*")
+
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")
 
 	if collection.DetectServiceManager() == "systemd" {
