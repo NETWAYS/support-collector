@@ -14,6 +14,11 @@ var files = []string{
 	"/var/log/icinga2/icinga2.log",
 }
 
+var pluginFiles = []string{
+	"/usr/lib64/nagios/plugins",
+	"/usr/lib/nagios/plugins",
+}
+
 var optionalFiles = []string{
 	"/var/log/icinga2/error.log",
 	"/var/log/icinga2/crash",
@@ -49,7 +54,12 @@ func Collect(c *collection.Collection) {
 
 	c.RegisterObfuscators(obfuscators...)
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icinga2*")
+	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt",
+		"*icinga2*",
+		"netways-plugin*",
+		"monitoring-plugin*",
+		"nagios-plugin*")
+
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")
 
 	if collection.DetectServiceManager() == "systemd" {
@@ -59,6 +69,8 @@ func Collect(c *collection.Collection) {
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
 	}
+
+	c.AddFilesAtLeastOne(ModuleName, pluginFiles...)
 
 	for _, file := range optionalFiles {
 		if _, err := os.Stat(file); err != nil {
