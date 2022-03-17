@@ -12,7 +12,11 @@ const ModuleName = "icinga2"
 var files = []string{
 	"/etc/icinga2",
 	"/var/log/icinga2/icinga2.log",
+}
+
+var pluginFiles = []string{
 	"/usr/lib64/nagios/plugins",
+	"/usr/lib/nagios/plugins",
 }
 
 var optionalFiles = []string{
@@ -65,6 +69,8 @@ func Collect(c *collection.Collection) {
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
 	}
+
+	c.AddFilesAtLeastOne(ModuleName, pluginFiles...)
 
 	for _, file := range optionalFiles {
 		if _, err := os.Stat(file); err != nil {

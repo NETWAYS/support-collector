@@ -55,7 +55,7 @@ See [modules/base/collector.go](modules/base/collector.go) for details.
 Module: `icinga2`
 
 * Configuration from `/etc/icinga2`
-* Files in `/usr/lib64/nagios/plugins`
+* Files in PluginDir
 * Package information
 * Service status
 * Config check result
