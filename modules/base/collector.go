@@ -55,7 +55,7 @@ func Collect(c *collection.Collection) {
 	}
 
 	// Add repository settings, at least one of the locations should be found
-	c.AddFilesAtLeastOne(ModuleName, repositoryFiles...)
+	c.AddFilesIfFound(ModuleName, repositoryFiles...)
 
 	for _, cmd := range commands {
 		name := ModuleName + "/" + cmd[0] + ".txt"

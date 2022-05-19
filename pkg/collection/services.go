@@ -15,6 +15,10 @@ const (
 
 const sysVInitD = "/etc/init.d"
 
+type JournalElement struct {
+	Service string
+}
+
 // ErrNoServiceManager is returned when we could not detect one.
 var ErrNoServiceManager = errors.New("could not detect a supported service manager")
 

@@ -41,7 +41,7 @@ func Collect(c *collection.Collection) {
 	c.Log.Info("Collecting PostgreSQL information")
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*postgresql*", "*pgsql*")
-	c.AddFilesAtLeastOne(ModuleName, files...)
+	c.AddFilesIfFound(ModuleName, files...)
 
 	for _, service := range possibleServices {
 		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)

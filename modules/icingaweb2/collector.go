@@ -24,9 +24,34 @@ var files = []string{
 	"/var/log/icingaweb2",
 }
 
+var possibleDaemons = []string{
+	"/usr/lib/systemd/system/icinga-vspheredb.service",
+	"/etc/systemd/system/icinga-vspheredb.service",
+	"/etc/systemd/system/icinga-vspheredb.service.d/",
+	"/usr/lib/systemd/system/icinga-reporting.service",
+	"/etc/systemd/system/icinga-reporting.service",
+	"/etc/systemd/system/icinga-reporting.service.d",
+	"/usr/lib/systemd/system/icinga-x509.service",
+	"/etc/systemd/system/icinga-x509.service",
+	"/etc/systemd/system/icinga-x509.service.d",
+}
+
+var tmpFiles = []string{
+	"/usr/lib/tmpfiles.d/icinga-vspheredb.conf",
+	"/etc/tmpfiles.d/icinga-vspheredb.conf",
+}
+
 var commands = map[string][]string{
-	"version.txt": {"icingacli", "version"},
-	"modules.txt": {"icingacli", "module", "list"},
+	"version.txt":              {"icingacli", "version"},
+	"modules.txt":              {"icingacli", "module", "list"},
+	"vpsheredb-socket.txt":     {"ls", "-la", "/run/icinga-vspheredb/"},
+	"user-icingavspheredb.txt": {"id", "icingavspheredb"},
+}
+
+var journalctlLogs = map[string]collection.JournalElement{
+	"journalctl-vspheredb.txt": {Service: "icinga-vspheredb.service"},
+	"journalctl-reporting.txt": {Service: "icinga-reporting.service"},
+	"journalctl-x509.txt":      {Service: "icinga-x509.service"},
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
@@ -72,12 +97,26 @@ func Collect(c *collection.Collection) {
 		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
 	}
 
+	for _, file := range possibleDaemons {
+		c.AddFilesIfFound(ModuleName, file)
+	}
+
+	for _, file := range tmpFiles {
+		c.AddFilesIfFound(ModuleName, file)
+	}
+
 	// Detect PHP related packages and services
 	c.AddInstalledPackagesRaw(ModuleName+"/packages-php.txt", "*php*")
 
 	if services, err := collection.FindServices("*php*-fpm"); err == nil && len(services) > 0 {
 		for _, name := range services {
 			c.AddServiceStatusRaw(ModuleName+"/service-"+name+".txt", name)
+		}
+	}
+
+	for name, element := range journalctlLogs {
+		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service)
 		}
 	}
 
