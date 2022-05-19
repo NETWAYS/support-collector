@@ -11,6 +11,8 @@ linters:
     - revive  # doc is still pending
     - funlen # strange counting for main()
     - varnamelen # we use these here
+    - nonamedreturns
+    - exhaustruct
   presets:
     - bugs
     - unused
