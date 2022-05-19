@@ -70,7 +70,7 @@ func Collect(c *collection.Collection) {
 		c.AddFiles(ModuleName, file)
 	}
 
-	c.AddFilesAtLeastOne(ModuleName, pluginFiles...)
+	c.AddFilesIfFound(ModuleName, pluginFiles...)
 
 	for _, file := range optionalFiles {
 		if _, err := os.Stat(file); err != nil {

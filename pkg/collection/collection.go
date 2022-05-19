@@ -148,7 +148,7 @@ func (c *Collection) AddFiles(prefix, source string) {
 	}
 }
 
-func (c *Collection) AddFilesAtLeastOne(prefix string, sources ...string) {
+func (c *Collection) AddFilesIfFound(prefix string, sources ...string) {
 	var foundFiles int
 
 	for _, source := range sources {
@@ -167,7 +167,7 @@ func (c *Collection) AddFilesAtLeastOne(prefix string, sources ...string) {
 	}
 
 	if foundFiles == 0 {
-		c.Log.Warnf("Found no files under: %s", strings.Join(sources, " "))
+		c.Log.Debugf("Found no files under: %s", strings.Join(sources, " "))
 	}
 }
 

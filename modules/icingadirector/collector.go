@@ -11,7 +11,18 @@ const (
 )
 
 var commands = map[string][]string{
-	"health.txt": {"icingacli", "director", "health"},
+	"health.txt":              {"icingacli", "director", "health"},
+	"user-icingadirector.txt": {"id", "icingadirector"},
+}
+
+var possibleDaemons = []string{
+	"/usr/lib/systemd/system/icinga-director.service",
+	"/etc/systemd/system/icinga-director.service",
+	"/etc/systemd/system/icinga-director.service.d",
+}
+
+var journalctlLogs = map[string]collection.JournalElement{
+	"journalctl-director.txt": {Service: "icinga-director.service"},
 }
 
 // Detect if Icinga Director is installed on the system.
@@ -36,6 +47,16 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+	}
+
+	for _, file := range possibleDaemons {
+		c.AddFilesIfFound(ModuleName, file)
+	}
+
+	for name, element := range journalctlLogs {
+		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service)
+		}
 	}
 
 	// Get GIT Repository details

@@ -46,5 +46,5 @@ func Collect(c *collection.Collection) {
 
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*mysql*", "*mariadb*")
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", service)
-	c.AddFilesAtLeastOne(ModuleName, possibleConfigPaths...)
+	c.AddFilesIfFound(ModuleName, possibleConfigPaths...)
 }
