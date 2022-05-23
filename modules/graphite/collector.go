@@ -105,9 +105,11 @@ func Collect(c *collection.Collection) {
 		processes = processes + process.Executable() + "\n"
 	}
 
+	timestamp := "7 days ago"
+
 	for name, element := range journalctlLogs {
 		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since \"7 days ago\"")
+			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since", timestamp)
 		}
 	}
 
