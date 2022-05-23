@@ -183,7 +183,21 @@ func handleArguments() {
 
 // buildFileName returns a filename to store the output of support collector.
 func buildFileName() string {
-	return FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
+	return GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
+}
+
+func GetHostnameWithoutDomain() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	result, _, found := strings.Cut(hostname, ".")
+	if !found {
+		return hostname
+	}
+
+	return result
 }
 
 func NewCollection(outputFile string) (*collection.Collection, func()) {
