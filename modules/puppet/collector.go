@@ -19,6 +19,7 @@ var possibleServices = []string{
 
 var files = []string{
 	"/etc/puppetlabs",
+	"/opt/puppetlabs/puppet/cache",
 }
 
 var commands = map[string][]string{
