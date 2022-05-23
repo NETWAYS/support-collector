@@ -191,10 +191,12 @@ func GetHostnameWithoutDomain() string {
 	if err != nil {
 		logrus.Error(err)
 	}
+
 	result, _, found := strings.Cut(hostname, ".")
 	if found != true {
 		return hostname
 	}
+
 	return result
 }
 
