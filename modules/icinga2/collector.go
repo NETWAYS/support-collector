@@ -32,6 +32,7 @@ var commands = map[string][]string{
 	"objects-endpoints.txt": {"icinga2", "object", "list", "--type", "Endpoint"},
 	"variables.txt":         {"icinga2", "variable", "list"},
 	"user-icinga.txt":       {"id", "icinga"},
+	"user-nagios.txt":       {"id", "nagios"},
 }
 
 var possibleDaemons = []string{
