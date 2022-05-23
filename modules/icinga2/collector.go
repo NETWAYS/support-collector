@@ -31,6 +31,13 @@ var commands = map[string][]string{
 	"objects-zones.txt":     {"icinga2", "object", "list", "--type", "Zone"},
 	"objects-endpoints.txt": {"icinga2", "object", "list", "--type", "Endpoint"},
 	"variables.txt":         {"icinga2", "variable", "list"},
+	"user-icinga.txt":       {"id", "icinga"},
+}
+
+var possibleDaemons = []string{
+	"/usr/lib/systemd/system/icinga2.service",
+	"/etc/systemd/system/icinga2.service",
+	"/etc/systemd/system/icinga2.service.d",
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
@@ -82,5 +89,9 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+	}
+
+	for _, file := range possibleDaemons {
+		c.AddFilesIfFound(ModuleName, file)
 	}
 }
