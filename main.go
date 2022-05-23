@@ -193,7 +193,7 @@ func GetHostnameWithoutDomain() string {
 	}
 
 	result, _, found := strings.Cut(hostname, ".")
-	if found != true {
+	if !found {
 		return hostname
 	}
 
