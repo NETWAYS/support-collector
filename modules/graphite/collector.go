@@ -12,6 +12,7 @@ const ModuleName = "graphite"
 var relevantPaths = []string{
 	"/opt/graphite",
 	"/etc/graphite-web",
+	"/etc/carbon",
 }
 
 var files = []string{
@@ -20,6 +21,12 @@ var files = []string{
 	"/etc/carbon",
 	"/etc/graphite-api*",
 	"/etc/graphite-web*",
+	"/etc/sysconfig/graphite-api",
+	"/var/log/carbon",
+}
+
+var journalctlLogs = map[string]collection.JournalElement{
+	"journalctl-graphite-api.txt": {Service: "graphite-api.service"},
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
@@ -96,6 +103,12 @@ func Collect(c *collection.Collection) {
 
 	for _, process := range processList {
 		processes = processes + process.Executable() + "\n"
+	}
+
+	for name, element := range journalctlLogs {
+		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since \"7 days ago\"")
+		}
 	}
 
 	c.AddFileDataRaw(ModuleName+"/processlist.txt", []byte(processes))
