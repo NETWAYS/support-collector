@@ -22,12 +22,13 @@ By default, we collect all we can find. You can control this by only enabling ce
 If you want to see what is collected, add `--verbose`.
 
 ```
-Usage of ./support-collector:
-  -o, --output string     Output file for the ZIP content (default "netways-support-<timestamp>.zip")
-      --enable strings    List of enabled module (default [base,icinga2,icingaweb2,icinga-director,mysql,postgresql,ansible,puppet,influxdb,grafana,graphite])
-      --disable strings   List of disabled module
-  -v, --verbose           Enable verbose logging
-  -V, --version           Print version and exit
+Usage of support-collector:
+  -o, --output string              Output file for the ZIP content (default "netways-support-20220523-0929.zip")
+      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
+      --disable strings            List of disabled module
+      --command-timeout duration   Timeout for command execution in modules (default 1m0s)
+  -v, --verbose                    Enable verbose logging
+  -V, --version                    Print version and exit
 ```
 
 ## Modules
