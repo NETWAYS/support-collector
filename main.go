@@ -7,6 +7,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/icinga2"
+	"github.com/NETWAYS/support-collector/modules/icingadb"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
 	"github.com/NETWAYS/support-collector/modules/influxdb"
@@ -56,21 +57,25 @@ var modules = map[string]func(*collection.Collection){
 	"puppet":          puppet.Collect,
 	"grafana":         grafana.Collect,
 	"graphite":        graphite.Collect,
+	"icingadb":        icingadb.Collect,
 }
 
-var moduleOrder = []string{
-	"base",
-	"icinga2",
-	"icingaweb2",
-	"icinga-director",
-	"mysql",
-	"influxdb",
-	"postgresql",
-	"ansible",
-	"puppet",
-	"grafana",
-	"graphite",
-}
+var (
+	moduleOrder = []string{
+		"base",
+		"icinga2",
+		"icingaweb2",
+		"icinga-director",
+		"icingadb",
+		"mysql",
+		"influxdb",
+		"postgresql",
+		"ansible",
+		"puppet",
+		"grafana",
+		"graphite",
+	}
+)
 
 var (
 	commandTimeout                  = 60 * time.Second

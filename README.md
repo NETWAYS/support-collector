@@ -79,6 +79,15 @@ Module: `icingaweb2`
 
 See [modules/icingaweb2/collector.go](modules/icingaweb2/collector.go) for details.
 
+### IcingaDB
+
+Module: `icingadb`
+
+* Configuration from `/etc/icingadb`, `/etc/icingadb-redis` and `/etc/icinga2/features-enabled/icingadb.conf`
+* Service status from `icingadb`, `icingadb-redis` and `icingadb-redis-server`
+* Package information
+* Journal logs from `icingadb`, `icingadb-redis` and `icingadb-redis-server`
+
 ### Icinga Director
 
 Module: `icinga-director`
