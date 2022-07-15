@@ -24,7 +24,7 @@ If you want to see what is collected, add `--verbose`.
 ```
 Usage of support-collector:
   -o, --output string              Output file for the ZIP content (default "netways-support-20220523-0929.zip")
-      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
+      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
       --disable strings            List of disabled module
       --command-timeout duration   Timeout for command execution in modules (default 1m0s)
   -v, --verbose                    Enable verbose logging
@@ -78,6 +78,15 @@ Module: `icingaweb2`
 * Installed webserver packages
 
 See [modules/icingaweb2/collector.go](modules/icingaweb2/collector.go) for details.
+
+### IcingaDB
+
+Module: `icingadb`
+
+* Configuration from `/etc/icingadb`, `/etc/icingadb-redis` and `/etc/icinga2/features-enabled/icingadb.conf`
+* Service status from `icingadb`, `icingadb-redis` and `icingadb-redis-server`
+* Package information
+* Journal logs from `icingadb`, `icingadb-redis` and `icingadb-redis-server`
 
 ### Icinga Director
 
