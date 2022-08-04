@@ -23,9 +23,8 @@ var files = []string{
 }
 
 var commands = map[string][]string{
-	"version-puppet.txt":       {"puppet", "--version"},
-	"version-puppetserver.txt": {"puppetserver", "--version"},
-	"puppet-module-list.txt":   {"puppet", "module", "list"},
+	"facter.txt":             {"facter"},
+	"puppet-module-list.txt": {"puppet", "module", "list"},
 }
 
 func Detect() bool {
