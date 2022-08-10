@@ -8,11 +8,17 @@ linters:
     - testpackage  # not needed
     - wrapcheck  # not needed
     - godox  # we still have a lot of TODOs left
-    - revive  # doc is still pending
     - funlen # strange counting for main()
     - varnamelen # we use these here
     - nonamedreturns
     - exhaustruct
+    - scopelint
+    - golint
+    - interfacer # deprecated since v1.38.0
+    - ifshort # v1.48.0
+  enable:
+    - exportloopref
+    - revive
   presets:
     - bugs
     - unused
