@@ -3,7 +3,6 @@ package collection
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -69,7 +68,7 @@ func loadFile(prefix, source string, stat os.FileInfo) (file *File, err error) {
 		Source:   source,
 	}
 
-	file.Data, err = ioutil.ReadFile(source)
+	file.Data, err = os.ReadFile(source)
 	if err != nil {
 		err = fmt.Errorf("could not read file '%s': %w", source, err)
 		return
