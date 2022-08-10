@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// nolint: gochecknoglobals
+//nolint:gochecknoglobals
 var (
 	version = "0.6.1"
 	commit  = ""

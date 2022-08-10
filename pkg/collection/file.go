@@ -85,7 +85,7 @@ func LoadFilesFromGlob(prefix, source string) (files []*File, err error) {
 		err = fmt.Errorf("could not glob '%s': %w", source, err)
 		return
 	} else if len(matches) == 0 {
-		err = fmt.Errorf("no files found for glob: '%s'", source) // nolint:goerr113
+		err = fmt.Errorf("no files found for glob: '%s'", source) //nolint:goerr113
 		return
 	}
 
@@ -103,7 +103,7 @@ func LoadFilesFromGlob(prefix, source string) (files []*File, err error) {
 	return
 }
 
-// nolint:nakedret
+//nolint:nakedret
 func LoadFilesFromDirectory(prefix, source string) (files []*File, err error) {
 	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
