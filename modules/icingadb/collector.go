@@ -34,6 +34,7 @@ var journalctlLogs = map[string]collection.JournalElement{
 
 var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:password)\s*=\s*(.*)`, `conf`),
+	obfuscate.NewFile(`(?i)(?:password)\s*=\s*(.*)`, `yml`),
 }
 
 func Detect() bool {
