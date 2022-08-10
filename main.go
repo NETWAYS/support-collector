@@ -174,7 +174,7 @@ func handleArguments() {
 	flag.Parse()
 
 	if printVersion {
-		fmt.Println(Product, "version", buildVersion()) // nolint:forbidigo
+		fmt.Println(Product, "version", buildVersion()) //nolint:forbidigo
 		os.Exit(0)
 	}
 

@@ -3,7 +3,6 @@ package icingaweb2
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -131,7 +130,7 @@ func CollectModuleInfo(c *collection.Collection) {
 		c.Log.Warnf("we need git to inspect modules closer")
 	}
 
-	modulesFiles, err := ioutil.ReadDir(ModulesPath)
+	modulesFiles, err := os.ReadDir(ModulesPath)
 	if err != nil {
 		c.Log.Warnf("Could not list modules in %s - %s", ModulesPath, err)
 		return

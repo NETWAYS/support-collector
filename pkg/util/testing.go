@@ -3,7 +3,7 @@ package util
 import (
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -82,7 +82,7 @@ func AssertAllObfuscatorsTested(t *testing.T, obfuscators []*obfuscate.Obfuscato
 func LoadTestdata(t *testing.T, name string) string {
 	t.Helper()
 
-	content, err := ioutil.ReadFile("testdata/" + name)
+	content, err := os.ReadFile("testdata/" + name)
 	if err != nil {
 		t.Errorf("could not load testdata file: %s - %s", name, err)
 		return ""
