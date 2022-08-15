@@ -22,6 +22,10 @@ var possibleConfigPaths = []string{
 	"/etc/mariadb*",
 }
 
+var commands = map[string][]string{
+	"mysql-version.txt": {"mysql", "-V"},
+}
+
 // Detect if a MySQL or MariaDB daemon appears to be running.
 func Detect() string {
 	for _, name := range possibleServices {
@@ -47,4 +51,8 @@ func Collect(c *collection.Collection) {
 	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*mysql*", "*mariadb*")
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", service)
 	c.AddFilesIfFound(ModuleName, possibleConfigPaths...)
+
+	for name, cmd := range commands {
+		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+	}
 }
