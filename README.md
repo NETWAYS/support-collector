@@ -114,6 +114,7 @@ See [modules/mysql/collector.go](modules/mysql/collector.go) for details.
 
 Module: `postgresql`
 
+* PostgreSQL version
 * Package versions
 * Service status
 * Configuration files from `/etc/postgresql` and `/var/lib/pgsql` (depending on OS)
