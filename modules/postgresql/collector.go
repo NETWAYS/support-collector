@@ -17,6 +17,10 @@ var files = []string{
 	"/var/lib/pgsql/data/*.conf", // RedHat based systems, where the configuration is found
 }
 
+var commands = map[string][]string{
+	"version.txt": {"psql", "-V"},
+}
+
 var possibleServices = []string{
 	"postgresql",
 }
@@ -45,5 +49,9 @@ func Collect(c *collection.Collection) {
 
 	for _, service := range possibleServices {
 		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
+	}
+
+	for name, cmd := range commands {
+		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
 	}
 }
