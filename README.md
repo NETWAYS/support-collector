@@ -104,6 +104,7 @@ Module: `mysql`
 
 Is looking for standard MySQL or MariaDB installations.
 
+* Mysql version
 * Package versions
 * Service status
 * Configuration files from `/etc/my*` (depending on the known paths)
