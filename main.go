@@ -10,6 +10,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/icingadb"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
+	"github.com/NETWAYS/support-collector/modules/keepalived"
 	"github.com/NETWAYS/support-collector/modules/influxdb"
 	"github.com/NETWAYS/support-collector/modules/mysql"
 	"github.com/NETWAYS/support-collector/modules/postgresql"
@@ -50,6 +51,7 @@ var modules = map[string]func(*collection.Collection){
 	"icinga2":         icinga2.Collect,
 	"icingaweb2":      icingaweb2.Collect,
 	"icinga-director": icingadirector.Collect,
+	"keepalived":      keepalived.Collect,
 	"mysql":           mysql.Collect,
 	"influxdb":        influxdb.Collect,
 	"postgresql":      postgresql.Collect,
@@ -67,6 +69,7 @@ var (
 		"icingaweb2",
 		"icinga-director",
 		"icingadb",
+		"keepalived",
 		"mysql",
 		"influxdb",
 		"postgresql",
