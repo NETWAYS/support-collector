@@ -45,6 +45,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewOutput(`(?i)(?:password|salt|token)\s*=\s*(.*)`, "icinga2", "variable"),
 	obfuscate.NewFile(`(?i)(?:password|salt|token)\s*=\s*(.*)`, `conf`),
 	obfuscate.NewFile(`(?i)(?:password|community)(.*)`, `log`),
+	obfuscate.NewFile(`(?i)(?:bind_pw)\s*=\s*(.*)`, `ini`),
 }
 
 func DetectIcinga() bool {
