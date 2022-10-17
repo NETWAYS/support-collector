@@ -54,7 +54,7 @@ var journalctlLogs = map[string]collection.JournalElement{
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
-	obfuscate.NewFile(`(?i)(?:password|token)\s*=\s*(.*)`, `ini`),
+	obfuscate.NewFile(`(?i)(?:bind_pw|password|token)\s*=\s*(.*)`, `ini`),
 }
 
 // Detect if icingaweb2 is installed on the system.
