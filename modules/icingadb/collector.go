@@ -20,6 +20,10 @@ var files = []string{
 	"/etc/icinga2/features-enabled/icingadb.conf",
 }
 
+var optionalFiles = []string{
+	"/etc/logrotate.d/icingadb-redis-server",
+}
+
 var services = []string{
 	"icingadb",
 	"icingadb-redis",
@@ -64,6 +68,14 @@ func Collect(c *collection.Collection) {
 	)
 
 	for _, file := range files {
+		c.AddFiles(ModuleName, file)
+	}
+
+	for _, file := range optionalFiles {
+		if _, err := os.Stat(file); err != nil {
+			continue
+		}
+
 		c.AddFiles(ModuleName, file)
 	}
 
