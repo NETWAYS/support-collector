@@ -23,6 +23,7 @@ var optionalFiles = []string{
 	"/var/log/icinga2/error.log",
 	"/var/log/icinga2/crash",
 	"/var/log/icinga2/debug.log",
+	"/etc/logrotate.d/icinga2",
 }
 
 var commands = map[string][]string{

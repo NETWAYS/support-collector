@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"os"
 )
 
 const (
@@ -24,6 +25,11 @@ var possibleConfigPaths = []string{
 
 var commands = map[string][]string{
 	"mysql-version.txt": {"mysql", "-V"},
+}
+
+var optionalFiles = []string{
+	"/etc/logrotate.d/mariadb",
+	"/etc/logrotate.d/mysql",
 }
 
 // Detect if a MySQL or MariaDB daemon appears to be running.
@@ -54,5 +60,13 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+	}
+
+	for _, file := range optionalFiles {
+		if _, err := os.Stat(file); err != nil {
+			continue
+		}
+
+		c.AddFiles(ModuleName, file)
 	}
 }
