@@ -29,7 +29,9 @@ var commands = [][]string{
 	{"lsusb"},
 	{"dmidecode"},
 	{"df", "-T"},
-	{"top", "-b", "-n1"},
+	{"top", "-b", "-n3"},
+	{"iotop", "-b", "-n3"},
+	{"ioping", "/dev/sda", "-c5"},
 }
 
 func Collect(c *collection.Collection) {
