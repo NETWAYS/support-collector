@@ -66,7 +66,7 @@ func Collect(c *collection.Collection) {
 		"*icinga2*",
 		"netways-plugin*",
 		"monitoring-plugin*",
-		"nagios-plugin*")
+		"nagios-*")
 
 	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")
 
