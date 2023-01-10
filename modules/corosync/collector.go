@@ -14,11 +14,19 @@ var relevantPaths = []string{
 var possibleDaemons = []string{
 	"/lib/systemd/system/corosync.service",
 	"/usr/lib/systemd/system/corosync.service",
+	"/usr/lib/systemd/system/pacemaker.service",
+}
+
+var services = []string{
+	"corosync",
+	"pacemaker",
 }
 
 var files = []string{
 	"/etc/corosync/corosync.conf",
 	"/var/lib/pacemaker/cib/cib.xml",
+	"/var/log/corosync/corosync.log",
+	"/var/log/pacemaker/pacemaker.log",
 }
 
 var commands = map[string][]string{
@@ -50,6 +58,10 @@ func Collect(c *collection.Collection) {
 
 	for _, file := range possibleDaemons {
 		c.AddFilesIfFound(ModuleName, file)
+	}
+
+	for _, service := range services {
+		c.AddServiceStatusRaw(ModuleName+"service-"+service+".txt", service)
 	}
 
 	for name, cmd := range commands {
