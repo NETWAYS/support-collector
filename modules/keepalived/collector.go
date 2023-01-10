@@ -12,6 +12,14 @@ var relevantPaths = []string{
 	"/etc/keepalived",
 }
 
+var possibleDaemons = []string{
+	"/usr/lib/systemd/system/keepalived.service",
+}
+
+var services = []string{
+	"keepalived",
+}
+
 var files = []string{
 	"/etc/keepalived/keepalived.conf",
 }
@@ -48,6 +56,14 @@ func Collect(c *collection.Collection) {
 
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
+	}
+
+	for _, file := range possibleDaemons {
+		c.AddFilesIfFound(ModuleName, file)
+	}
+
+	for _, service := range services {
+		c.AddServiceStatusRaw(ModuleName+"service-"+service+".txt", service)
 	}
 
 	for name, cmd := range commands {
