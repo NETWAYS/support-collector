@@ -3,6 +3,7 @@ package puppet
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "puppet"
@@ -51,12 +52,12 @@ func Collect(c *collection.Collection) {
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*puppet*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*puppet*")
 
 	for _, service := range possibleServices {
-		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
+		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
 	}
 }

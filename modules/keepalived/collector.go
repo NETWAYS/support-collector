@@ -4,6 +4,7 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "keepalived"
@@ -63,10 +64,10 @@ func Collect(c *collection.Collection) {
 	}
 
 	for _, service := range services {
-		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
+		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 }

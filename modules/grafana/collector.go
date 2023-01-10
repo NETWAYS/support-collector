@@ -4,6 +4,7 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "grafana"
@@ -50,14 +51,14 @@ func Collect(c *collection.Collection) {
 
 	c.RegisterObfuscators(obfuscators...)
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*grafana*", "*chrome*", "*chromium*")
-	c.AddServiceStatusRaw(ModuleName+"/service.txt", "grafana-server")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*grafana*", "*chrome*", "*chromium*")
+	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), "grafana-server")
 
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 }

@@ -3,6 +3,7 @@ package postgresql
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "postgresql"
@@ -44,14 +45,14 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting PostgreSQL information")
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*postgresql*", "*pgsql*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*postgresql*", "*pgsql*")
 	c.AddFilesIfFound(ModuleName, files...)
 
 	for _, service := range possibleServices {
-		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
+		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 }

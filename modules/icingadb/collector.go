@@ -4,6 +4,7 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -62,7 +63,7 @@ func Collect(c *collection.Collection) {
 
 	c.RegisterObfuscators(obfuscators...)
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt",
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"),
 		"*icingadb*",
 		"icingadb-redis",
 	)
@@ -80,12 +81,12 @@ func Collect(c *collection.Collection) {
 	}
 
 	for _, service := range services {
-		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
+		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
 	}
 
 	for name, element := range journalctlLogs {
 		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since", "7 days ago")
+			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", "7 days ago")
 		}
 	}
 }
