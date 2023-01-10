@@ -8,7 +8,7 @@ import (
 const ModuleName = "corosync"
 
 var relevantPaths = []string{
-	"/etc/corosync/service.d",
+	"/etc/corosync",
 }
 
 var possibleDaemons = []string{
