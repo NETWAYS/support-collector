@@ -63,7 +63,7 @@ func Collect(c *collection.Collection) {
 	}
 
 	for _, service := range services {
-		c.AddServiceStatusRaw(ModuleName+"service-"+service+".txt", service)
+		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
 	}
 
 	for name, cmd := range commands {
