@@ -3,6 +3,7 @@ package icingadirector
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -40,13 +41,13 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting Icinga Director information")
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icinga*director*")
-	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga-director")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*icinga*director*")
+	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), "icinga-director")
 
 	// TODO: more infos on modules, GIT details
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 
 	for _, file := range possibleDaemons {
@@ -55,12 +56,12 @@ func Collect(c *collection.Collection) {
 
 	for name, element := range journalctlLogs {
 		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since \"7 days ago\"")
+			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since \"7 days ago\"")
 		}
 	}
 
 	// Get GIT Repository details
 	if path, ok := collection.IsGitRepository(InstallationPath); collection.DetectGitInstalled() && ok {
-		c.AddGitRepoInfo(ModuleName+"/git-info.yml", path)
+		c.AddGitRepoInfo(filepath.Join(ModuleName, "git-info.yml"), path)
 	}
 }

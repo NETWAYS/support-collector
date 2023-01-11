@@ -3,6 +3,7 @@ package influxdb
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "influxdb"
@@ -35,8 +36,8 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting InfluxDB information")
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*influx*")
-	c.AddServiceStatusRaw(ModuleName+"/service.txt", "influxdb")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*influx*")
+	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), "influxdb")
 
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)

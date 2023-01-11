@@ -5,6 +5,7 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"gopkg.in/yaml.v3"
 	"os/exec"
+	"path/filepath"
 )
 
 const ModuleName = "base"
@@ -41,13 +42,13 @@ func Collect(c *collection.Collection) {
 
 	// Check if apparmor is installed and get status
 	if _, err := exec.LookPath("apparmor_status"); err == nil {
-		c.AddCommandOutput(ModuleName+"/apparmor-status.txt", "apparmor_status")
+		c.AddCommandOutput(filepath.Join(ModuleName, "apparmor-status.txt"), "apparmor_status")
 	}
 
 	// Check if we can detect SELinux enforcing
 	for _, cmd := range []string{"sestatus", "getenforce"} {
 		if _, err := exec.LookPath(cmd); err == nil {
-			c.AddCommandOutput(ModuleName+"/selinux-status.txt", cmd)
+			c.AddCommandOutput(filepath.Join(ModuleName, "selinux-status.txt"), cmd)
 			break
 		}
 	}
@@ -60,8 +61,7 @@ func Collect(c *collection.Collection) {
 	c.AddFilesIfFound(ModuleName, repositoryFiles...)
 
 	for _, cmd := range commands {
-		name := ModuleName + "/" + cmd[0] + ".txt"
-		c.AddCommandOutput(name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, cmd[0]+".txt"), cmd[0], cmd[1:]...)
 	}
 }
 
@@ -81,7 +81,7 @@ func CollectKernelInfo(c *collection.Collection) {
 		return
 	}
 
-	err = c.AddFileFromReaderRaw(ModuleName+"/kernel.yml", &buf)
+	err = c.AddFileFromReaderRaw(filepath.Join(ModuleName, "kernel.yml"), &buf)
 	if err != nil {
 		c.Log.Error(err)
 	}

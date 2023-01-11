@@ -80,10 +80,10 @@ func Collect(c *collection.Collection) {
 
 	c.RegisterObfuscators(obfuscators...)
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*icingaweb2*", "*icingacli*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*icingaweb2*", "*icingacli*")
 
 	if _, ok := collection.IsGitRepository("/usr/share/icingaweb2"); ok {
-		c.AddGitRepoInfo(ModuleName+"/git.yml", "/usr/share/icingaweb2")
+		c.AddGitRepoInfo(filepath.Join(ModuleName, "git.yml"), "/usr/share/icingaweb2")
 	}
 
 	CollectModuleInfo(c)
@@ -105,11 +105,11 @@ func Collect(c *collection.Collection) {
 	}
 
 	// Detect PHP related packages and services
-	c.AddInstalledPackagesRaw(ModuleName+"/packages-php.txt", "*php*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-php.txt"), "*php*")
 
 	if services, err := collection.FindServices("*php*-fpm"); err == nil && len(services) > 0 {
 		for _, name := range services {
-			c.AddServiceStatusRaw(ModuleName+"/service-"+name+".txt", name)
+			c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+name+".txt"), name)
 		}
 	}
 
@@ -117,12 +117,12 @@ func Collect(c *collection.Collection) {
 
 	for name, element := range journalctlLogs {
 		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since", timestamp)
+			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", timestamp)
 		}
 	}
 
 	// Detect webserver packages
-	c.AddInstalledPackagesRaw(ModuleName+"/packages-webserver.txt", "*apache*", "*httpd*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-webserver.txt"), "*apache*", "*httpd*")
 }
 
 func CollectModuleInfo(c *collection.Collection) {

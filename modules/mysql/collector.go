@@ -3,6 +3,7 @@ package mysql
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -54,12 +55,12 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting MySQL/MariaDB information")
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*mysql*", "*mariadb*")
-	c.AddServiceStatusRaw(ModuleName+"/service.txt", service)
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*mysql*", "*mariadb*")
+	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), service)
 	c.AddFilesIfFound(ModuleName, possibleConfigPaths...)
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 
 	for _, file := range optionalFiles {

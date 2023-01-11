@@ -3,6 +3,7 @@ package corosync
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "corosync"
@@ -61,10 +62,10 @@ func Collect(c *collection.Collection) {
 	}
 
 	for _, service := range services {
-		c.AddServiceStatusRaw(ModuleName+"/service-"+service+".txt", service)
+		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 }

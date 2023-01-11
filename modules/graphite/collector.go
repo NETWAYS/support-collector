@@ -5,6 +5,7 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/NETWAYS/support-collector/pkg/util"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "graphite"
@@ -79,10 +80,10 @@ func Collect(c *collection.Collection) {
 		}
 
 		for name, cmd := range commandsPython {
-			c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+			c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 		}
 
-		c.AddInstalledPackagesRaw(ModuleName+"/packages-python"+suffix+".txt", "*python"+suffix+"*")
+		c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-python"+suffix+".txt"), "*python"+suffix+"*")
 	}
 
 	if !pythonFound {
@@ -109,11 +110,11 @@ func Collect(c *collection.Collection) {
 
 	for name, element := range journalctlLogs {
 		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(ModuleName+"/"+name, "journalctl", "-u", element.Service, "--since", timestamp)
+			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", timestamp)
 		}
 	}
 
-	c.AddFileDataRaw(ModuleName+"/processlist.txt", []byte(processes))
+	c.AddFileDataRaw(filepath.Join(ModuleName, "processlist.txt"), []byte(processes))
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages-graphite.txt", "*graphite*", "*carbon*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-graphite.txt"), "*graphite*", "*carbon*")
 }

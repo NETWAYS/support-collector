@@ -5,6 +5,7 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 const ModuleName = "icinga2"
@@ -63,16 +64,16 @@ func Collect(c *collection.Collection) {
 
 	c.RegisterObfuscators(obfuscators...)
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt",
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"),
 		"*icinga2*",
 		"netways-plugin*",
 		"monitoring-plugin*",
 		"nagios-*")
 
-	c.AddServiceStatusRaw(ModuleName+"/service.txt", "icinga2")
+	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), "icinga2")
 
 	if collection.DetectServiceManager() == "systemd" {
-		c.AddCommandOutput(ModuleName+"/systemd-icinga2.service", "systemctl", "cat", "icinga2.service")
+		c.AddCommandOutput(filepath.Join(ModuleName, "systemd-icinga2.service"), "systemctl", "cat", "icinga2.service")
 	}
 
 	for _, file := range files {
@@ -90,7 +91,7 @@ func Collect(c *collection.Collection) {
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 
 	for _, file := range possibleDaemons {

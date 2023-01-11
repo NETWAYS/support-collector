@@ -3,6 +3,7 @@ package ansible
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
+	"path/filepath"
 )
 
 const ModuleName = "ansible"
@@ -44,10 +45,10 @@ func Collect(c *collection.Collection) {
 	}
 
 	for name, cmd := range commands {
-		c.AddCommandOutput(ModuleName+"/"+name, cmd[0], cmd[1:]...)
+		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 	}
 
-	c.AddInstalledPackagesRaw(ModuleName+"/packages.txt", "*ansible*")
-	c.AddInstalledPackagesRaw(ModuleName+"/packages-python.txt", "*python*")
-	c.AddInstalledPackagesRaw(ModuleName+"/packages-pip.txt", "*pip*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*ansible*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-python.txt"), "*python*")
+	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-pip.txt"), "*pip*")
 }
