@@ -23,8 +23,8 @@ If you want to see what is collected, add `--verbose`.
 
 ```
 Usage of support-collector:
-  -o, --output string              Output file for the ZIP content (default "netways-support-20220523-0929.zip")
-      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
+  -o, --output string              Output file for the zip content
+      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,corosync,keepalived,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
       --disable strings            List of disabled module
       --command-timeout duration   Timeout for command execution in modules (default 1m0s)
   -v, --verbose                    Enable verbose logging
@@ -97,6 +97,27 @@ Module: `icinga-director`
 * Health status
 
 See [modules/icingadirector/collector.go](modules/icingadirector/collector.go) for details.
+
+### Corosync
+
+Module: `corosync`
+
+* Version
+* Service status from `corosync` and `pacemaker`
+* Configuration from corosync
+* Logs from corosync and pacemaker
+
+See [modules/corosync/collector.go](modules/icingadirector/collector.go) for detauls
+
+### Keepalived
+
+Module: `keepalived`
+
+* Version
+* Service status from keepalived
+* Configuration from keepalived
+
+See [modules/keepalived/collector.go](modules/keepalived/collector.go)
 
 ### MySQL
 
