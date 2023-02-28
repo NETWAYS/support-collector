@@ -16,6 +16,7 @@ linters:
     - golint
     - interfacer # deprecated since v1.38.0
     - ifshort # v1.48.0
+    - musttag
   enable:
     - exportloopref
     - revive
