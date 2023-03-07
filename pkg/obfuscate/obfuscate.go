@@ -67,6 +67,15 @@ func NewOutput(replace, command string, arguments ...string) *Obfuscator {
 	return o
 }
 
+// NewAny returns an Obfuscator that can be used to replace any input.
+func NewAny(replace string) *Obfuscator {
+	o := &Obfuscator{Kind: KindAny}
+	o.WithAffecting(regexp.MustCompile(`(.*)`))
+	o.WithReplacement(regexp.MustCompile(replace))
+
+	return o
+}
+
 // WithAffecting adds a new element to the list.
 func (o *Obfuscator) WithAffecting(a *regexp.Regexp) *Obfuscator {
 	o.Affecting = append(o.Affecting, a)

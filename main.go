@@ -18,6 +18,9 @@ import (
 	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/util"
+
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
+
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
@@ -38,10 +41,10 @@ their servers. A resulting ZIP file can then be provided to our support team
 for further inspection.
 
 Find more information and releases at:
-    https://github.com/NETWAYS/support-collector
+		https://github.com/NETWAYS/support-collector
 
 If you are a customer, contact us at:
-    support@netways.de  /  https://netways.de/contact
+		support@netways.de  /  https://netways.de/contact
 
 WARNING: DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
@@ -87,6 +90,7 @@ var (
 	commandTimeout                  = 60 * time.Second
 	outputFile                      string
 	enabledModules, disabledModules []string
+	extraObfuscators                []string
 	verbose, printVersion           bool
 )
 
@@ -122,6 +126,12 @@ func main() {
 			moduleStart := time.Now()
 
 			c.Log.Debugf("Calling module %s", name)
+
+			for _, o := range extraObfuscators {
+				c.Log.Debugf("Adding obfuscator for '%s' to module %s", o, name)
+				c.RegisterObfuscator(obfuscate.NewAny(o))
+			}
+
 			modules[name](c)
 
 			timings[name] = time.Since(moduleStart)
@@ -160,6 +170,7 @@ func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
+	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
 	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	flag.BoolVarP(&verbose, "debug", "d", false, "Enable debug logging (use verbose)")
