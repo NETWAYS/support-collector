@@ -3,3 +3,5 @@
 *.zip
 support-collector
 netways-support-collector
+coverage.html
+coverage.out
