@@ -7,6 +7,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/corosync"
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
+	"github.com/NETWAYS/support-collector/modules/graylog"
 	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadb"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
@@ -38,10 +39,10 @@ their servers. A resulting ZIP file can then be provided to our support team
 for further inspection.
 
 Find more information and releases at:
-    https://github.com/NETWAYS/support-collector
+		https://github.com/NETWAYS/support-collector
 
 If you are a customer, contact us at:
-    support@netways.de  /  https://netways.de/contact
+		support@netways.de  /  https://netways.de/contact
 
 WARNING: DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
@@ -61,6 +62,7 @@ var modules = map[string]func(*collection.Collection){
 	"puppet":          puppet.Collect,
 	"grafana":         grafana.Collect,
 	"graphite":        graphite.Collect,
+	"graylog":         graylog.Collect,
 	"icingadb":        icingadb.Collect,
 }
 
@@ -80,6 +82,7 @@ var (
 		"puppet",
 		"grafana",
 		"graphite",
+		"graylog",
 	}
 )
 
