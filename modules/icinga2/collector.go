@@ -33,6 +33,7 @@ var commands = map[string][]string{
 	"objects-zones.txt":     {"icinga2", "object", "list", "--type", "Zone"},
 	"objects-endpoints.txt": {"icinga2", "object", "list", "--type", "Endpoint"},
 	"variables.txt":         {"icinga2", "variable", "list"},
+	"features.txt":          {"icinga2", "feature", "list"},
 	"user-icinga.txt":       {"id", "icinga"},
 	"user-nagios.txt":       {"id", "nagios"},
 }
