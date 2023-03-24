@@ -200,13 +200,23 @@ Module: `graphite`
 
 See [modules/graphite/collector.go](modules/graphite/collector.go) for details.
 
+### Graylog
+
+Module `graylog`
+
+* Configuration files from`/etc/graylog`
+* Package Versions
+* Service status
+
+See [modules/grafana/collector.go](modules/graylog/collector.go) for details.
+
 ## Supported systems
 
 **Note:** Currently, only Linux is supported by the collector.
 
 Distribution    | Supported | Tested      | Comment
 ----------------|-----------|-------------|--------
-CentOS / EL     | ✅️ | CentOS 7/8️ | Should work on all similar enterprise platforms
+CentOS / EL     | ✅️ | CentOS 7/8 | Should work on all similar enterprise platforms
 Debian          | ✅ |
 Ubuntu          | ✅ |
 SLES / OpenSUSE | ✅ |
