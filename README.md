@@ -17,6 +17,12 @@ Inspired by [icinga2-diagnostics](https://github.com/Icinga/icinga2-diagnostics)
 
 > **WARNING:** Some passwords or secrets are automatically removed, but this no guarantee, so be careful what you share.
 
+The `--hide` flag can be used multiple times to hide sensitive data, it supports regular expressions.
+
+```
+support-collector --hide "Secret:.*" --hide "Password:.*" --enable base
+```
+
 By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.
 
 If you want to see what is collected, add `--verbose`.
@@ -26,6 +32,7 @@ Usage of support-collector:
   -o, --output string              Output file for the zip content
       --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,corosync,keepalived,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
       --disable strings            List of disabled module
+      --hide stringArray           List of keywords to obfuscate. Can be used multiple times.
       --command-timeout duration   Timeout for command execution in modules (default 1m0s)
   -v, --verbose                    Enable verbose logging
   -V, --version                    Print version and exit
