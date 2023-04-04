@@ -1,0 +1,2 @@
+elasticsearch.ssl.keyPassphrase: example123
+server.ssl.keystore.password: example123

@@ -1,0 +1,28 @@
+cluster.name: example
+
+node.name: example
+
+node.master: true
+
+node.data: true
+
+index.number_of_shards: 2
+
+index.number_of_replicas: 1
+
+bootstrap.mlockall: true
+
+gateway.recover_after_nodes: 1
+
+gateway.recover_after_time: 10m
+
+gateway.expected_nodes: 2
+
+action.disable_close_all_indices: true
+action.disable_delete_all_indices: true
+action.disable_shutdown: true
+
+indices.recovery.max_bytes_per_sec: 100mb
+
+elasticsearch.ssl.keyPassphrase: example123
+server.ssl.keystore.password: example123
