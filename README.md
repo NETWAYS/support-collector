@@ -126,6 +126,17 @@ Module: `keepalived`
 
 See [modules/keepalived/collector.go](modules/keepalived/collector.go)
 
+### MongoDB
+
+Module: `mongodb`
+
+* MongoDB version
+* Package versions
+* Service status
+* Configuration from `/etc/mongod.conf`
+
+See [modules/mongodb/collector.go](modules/mongodb/collector.go) for details.
+
 ### MySQL
 
 Module: `mysql`
