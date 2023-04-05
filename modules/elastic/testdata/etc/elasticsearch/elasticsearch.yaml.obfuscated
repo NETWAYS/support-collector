@@ -1,0 +1,2 @@
+elasticsearch.ssl.keyPassphrase: <HIDDEN>
+server.ssl.keystore.password: <HIDDEN>

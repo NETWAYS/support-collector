@@ -5,6 +5,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
+	"github.com/NETWAYS/support-collector/modules/elastic"
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/graylog"
@@ -57,6 +58,7 @@ var modules = map[string]func(*collection.Collection){
 	"icinga2":         icinga2.Collect,
 	"icingaweb2":      icingaweb2.Collect,
 	"icinga-director": icingadirector.Collect,
+	"elastic":         elastic.Collect,
 	"corosync":        corosync.Collect,
 	"keepalived":      keepalived.Collect,
 	"mongodb":         mongodb.Collect,
@@ -78,6 +80,7 @@ var (
 		"icingaweb2",
 		"icinga-director",
 		"icingadb",
+		"elastic",
 		"corosync",
 		"keepalived",
 		"mongodb",

@@ -114,7 +114,19 @@ Module: `corosync`
 * Configuration from corosync
 * Logs from corosync and pacemaker
 
-See [modules/corosync/collector.go](modules/icingadirector/collector.go) for detauls
+See [modules/corosync/collector.go](modules/corosync/collector.go) for details.
+
+### Elastic Stack
+
+Module: `elastic`
+
+Includes `elasticsearch`, `logstash` and `kibana`.
+
+* Version
+* Service status
+* Configuration
+
+See [modules/elastic/collector.go](modules/elastic/collector.go) for details.
 
 ### Keepalived
 
