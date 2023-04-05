@@ -30,7 +30,7 @@ If you want to see what is collected, add `--verbose`.
 ```
 Usage of support-collector:
   -o, --output string              Output file for the zip content
-      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,corosync,keepalived,mysql,influxdb,postgresql,ansible,puppet,grafana,graphite])
+      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,elastic,corosync,keepalived,mongodb,mysql,influxdb,postgresql,prometheus,ansible,puppet,grafana,graphite,graylog])
       --disable strings            List of disabled module
       --hide stringArray           List of keywords to obfuscate. Can be used multiple times.
       --command-timeout duration   Timeout for command execution in modules (default 1m0s)
@@ -173,11 +173,23 @@ Module: `postgresql`
 
 See [modules/postgresql/collector.go](modules/postgresql/collector.go) for details.
 
+### Prometheus
+
+Module: `prometheus`
+
+Includes `prometheus`, `pushgateway` and `alertmanager`.
+
+* Version
+* Service status
+* Configuration
+
+See [modules/prometheus/collector.go](modules/prometheus/collector.go) for details.
+
 ### Ansible
 
 Module: `ansible`
 
-* Configuration from `/etc/ansible` 
+* Configuration from `/etc/ansible`
 * Package versions
 
 See [modules/ansible/collector.go](modules/ansible/collector.go) for details.
