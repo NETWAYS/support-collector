@@ -1,0 +1,22 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  external_labels:
+      monitor: 'example'
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['localhost:9093']
+
+rule_files:
+  - "first_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    example_secret: example123
+  - job_name: 'foo'
+    example_sd_config:
+      basic_auth:
+        password: example123

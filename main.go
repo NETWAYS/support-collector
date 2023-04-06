@@ -18,6 +18,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/mongodb"
 	"github.com/NETWAYS/support-collector/modules/mysql"
 	"github.com/NETWAYS/support-collector/modules/postgresql"
+	"github.com/NETWAYS/support-collector/modules/prometheus"
 	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/util"
@@ -65,6 +66,7 @@ var modules = map[string]func(*collection.Collection){
 	"mysql":           mysql.Collect,
 	"influxdb":        influxdb.Collect,
 	"postgresql":      postgresql.Collect,
+	"prometheus":      prometheus.Collect,
 	"ansible":         ansible.Collect,
 	"puppet":          puppet.Collect,
 	"grafana":         grafana.Collect,
@@ -87,6 +89,7 @@ var (
 		"mysql",
 		"influxdb",
 		"postgresql",
+		"prometheus",
 		"ansible",
 		"puppet",
 		"grafana",
