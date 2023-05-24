@@ -20,6 +20,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/postgresql"
 	"github.com/NETWAYS/support-collector/modules/prometheus"
 	"github.com/NETWAYS/support-collector/modules/puppet"
+	"github.com/NETWAYS/support-collector/modules/webservers"
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/util"
 
@@ -56,6 +57,7 @@ email, it contains potential sensitive information!
 
 var modules = map[string]func(*collection.Collection){
 	"base":            base.Collect,
+	"webservers":      webservers.Collect,
 	"icinga2":         icinga2.Collect,
 	"icingaweb2":      icingaweb2.Collect,
 	"icinga-director": icingadirector.Collect,
@@ -78,6 +80,7 @@ var modules = map[string]func(*collection.Collection){
 var (
 	moduleOrder = []string{
 		"base",
+		"webservers",
 		"icinga2",
 		"icingaweb2",
 		"icinga-director",

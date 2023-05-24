@@ -30,7 +30,7 @@ If you want to see what is collected, add `--verbose`.
 ```
 Usage of support-collector:
   -o, --output string              Output file for the zip content
-      --enable strings             List of enabled module (default [base,icinga2,icingaweb2,icinga-director,icingadb,elastic,corosync,keepalived,mongodb,mysql,influxdb,postgresql,prometheus,ansible,puppet,grafana,graphite,graylog])
+      --enable strings             List of enabled module (default [base,webservers,icinga2,icingaweb2,icinga-director,icingadb,elastic,corosync,keepalived,mongodb,mysql,influxdb,postgresql,prometheus,ansible,puppet,grafana,graphite,graylog])
       --disable strings            List of disabled module
       --hide stringArray           List of keywords to obfuscate. Can be used multiple times.
       --command-timeout duration   Timeout for command execution in modules (default 1m0s)
@@ -57,6 +57,18 @@ Will collect basic information about your system:
 * Repositories
 
 See [modules/base/collector.go](modules/base/collector.go) for details.
+
+### Webservers
+
+Module: `webservers`
+
+Collects basic information about webservers. Currently only apache2, httpd and nginx
+
+* Configuration 
+* Packages
+* Service status
+
+See [modules/webservers/collector.go](modules/webservers/collector.go) for details.
 
 ### Icinga 2
 
