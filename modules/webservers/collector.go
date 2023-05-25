@@ -23,10 +23,17 @@ var optionalFiles = []string{
 	"/etc/logrotate.d/nginx",
 }
 
-var possibleDaemons = map[string]string{
-	"apache2": "/lib/systemd/system/apache2.service",
-	"nginx":   "/usr/lib/systemd/system/nginx.service",
-	"httpd":   "/usr/lib/systemd/system/httpd.service",
+var services = []string{
+	"apache2",
+	"nginx",
+	"httpd",
+}
+
+var possibleDaemons = []string{
+	"/lib/systemd/system/apache2.service",
+	"/usr/lib/systemd/system/nginx.service",
+	"/lib/systemd/system/nginx.service",
+	"/usr/lib/systemd/system/httpd.service",
 }
 
 func DetectWebservers() bool {
@@ -62,13 +69,15 @@ func Collect(c *collection.Collection) {
 		c.AddFiles(ModuleName, file)
 	}
 
-	for name, file := range possibleDaemons {
+	for _, service := range services {
+		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
+	}
+
+	for _, file := range possibleDaemons {
 		if _, err := os.Stat(file); err != nil {
 			continue
 		}
 
-		c.AddFiles(ModuleName, file)
-
-		c.AddServiceStatusRaw(ModuleName, name)
+		c.AddFilesIfFound(ModuleName, file)
 	}
 }
