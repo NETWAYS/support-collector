@@ -17,9 +17,12 @@ var relevantPaths = []string{
 var optionalFiles = []string{
 	"/etc/apache2",
 	"/etc/logrotate.d/apache2",
+	"/var/log/apache2",
 	"/etc/httpd",
+	"/var/log/httpd",
 	"/etc/logrotate.d/httpd",
 	"/etc/nginx",
+	"/var/log/httpd",
 	"/etc/logrotate.d/nginx",
 }
 

@@ -15,6 +15,7 @@ var relevantPaths = []string{
 
 var files = []string{
 	"/etc/influxdb",
+	"/var/log/influxdb",
 }
 
 func Detect() bool {

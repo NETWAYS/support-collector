@@ -16,6 +16,8 @@ var relevantPaths = []string{
 var files = []string{
 	"/etc/postgresql*",
 	"/var/lib/pgsql/data/*.conf", // RedHat based systems, where the configuration is found
+	"/var/log/postgresql",
+	"/var/lib/pgsql/pgstartup.log",
 }
 
 var commands = map[string][]string{

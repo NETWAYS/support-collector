@@ -19,6 +19,7 @@ var possibleServices = []string{
 }
 
 var files = []string{
+	"/var/log/puppet",
 	"/etc/puppetlabs",
 	"/opt/puppetlabs/puppet/cache",
 }

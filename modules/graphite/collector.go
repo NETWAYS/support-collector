@@ -24,6 +24,7 @@ var files = []string{
 	"/etc/graphite-web*",
 	"/etc/sysconfig/graphite-api",
 	"/var/log/carbon",
+	"/var/log/graphite",
 }
 
 var journalctlLogs = map[string]collection.JournalElement{

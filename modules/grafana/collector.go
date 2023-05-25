@@ -16,6 +16,7 @@ var relevantPaths = []string{
 
 var files = []string{
 	"/etc/grafana",
+	"/var/log/grafana/grafana.log",
 }
 
 var commands = map[string][]string{

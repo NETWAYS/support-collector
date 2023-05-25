@@ -24,6 +24,7 @@ var services = []string{
 
 var files = []string{
 	"/etc/mongod.conf",
+	"/var/log/mongodb/mongod.log",
 }
 
 var commands = map[string][]string{
