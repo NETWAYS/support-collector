@@ -42,26 +42,27 @@ collected.
 Most modules check if the component is installed before trying to collect data. If the module is not detected, it will
 not be collected.
 
-| Module name    | Description                                                                                        |
-|----------------|----------------------------------------------------------------------------------------------------|
-| ansible        | Configuration and packages                                                                         |
-| base           | Basic information about the system (OS, memory, cpu, processes, etc.)                              |
-| corosync       | Configuration, logs, packages and service status                                                   |
-| elastic        | Includes elasticsearch, logstash and kibana. Collects configuration, packages and service statuses |
-| grafana        | Configuration, plugins, packages and service status                                                |
-| graphite       | Configuration, python and pip version and list, packages and service statuses                      |
-| graylog        | Configuration, packages and service status                                                         |
-| icinga2        | Configuration, packages, service status, logs, Icinga objects, Icinga variables and plugins        |
-| icingadb       | Includes IcingaDB and Icinga redis Collects configuration, logs, packages and service statuses     |
-| icingadirector | Packages or git information, Director health status and service status                             |
-| icingaweb2     | Configuration, packages, logs, modules, PHP packages and service status                            |
-| influxdb       | Configuration, packages and service status                                                         |
-| keepalived     | Configuration, packages and service status                                                         |
-| mongodb        | Configuration, packages and service status                                                         |
-| mysql          | Configuration, packages and service status                                                         |
-| postgresql     | Configuration, packages and service status                                                         |
-| prometheus     | Configuration, packages and service status                                                         |
-| puppet         | Configuration, module list, packages and service status                                            |
+| Module name    | Description                                                                                      |
+|----------------|--------------------------------------------------------------------------------------------------|
+| ansible        | Configuration and packages                                                                       |
+| base           | Basic information about the system (OS, memory, cpu, processes, etc.)                            |
+| corosync       | Configuration, logs, packages and service status                                                 |
+| elastic        | Includes elasticsearch, logstash and kibana. Collects configuration, packages and service status |
+| grafana        | Configuration, plugins, packages and service status                                              |
+| graphite       | Configuration, python and pip version and list, packages and service status                      |
+| graylog        | Configuration, packages and service status                                                       |
+| icinga2        | Configuration, packages, service status, logs, Icinga objects, Icinga variables and plugins      |
+| icingadb       | Includes IcingaDB and Icinga redis. Collects configuration, logs, packages and service status    |
+| icingadirector | Packages or git information, Director health status and service status                           |
+| icingaweb2     | Configuration, packages, logs, modules, PHP packages and service status                          |
+| influxdb       | Configuration, packages and service status                                                       |
+| keepalived     | Configuration, packages and service status                                                       |
+| mongodb        | Configuration, packages and service status                                                       |
+| mysql          | Configuration, packages and service status                                                       |
+| postgresql     | Configuration, packages and service status                                                       |
+| prometheus     | Configuration, packages and service status                                                       |
+| puppet         | Configuration, module list, packages and service status                                          |
+| webservers     | Includes apache2, httpd and nginx. Collects configuration, packages and service status           |
 
 ## Supported systems
 
