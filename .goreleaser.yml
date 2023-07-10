@@ -18,11 +18,15 @@ builds:
         -X main.date={{.CommitDate}}
 release:
   github:
+    owner: NETWAYS
+    name: support-collector
 archives:
   - format: binary
-    replacements:
-      linux: Linux
-      amd64: x86_64
+    name_template: >-
+      {{- if eq .Arch "amd64" }}x86_64{{ end }}
+      {{- if eq .Os "linux" }}Linux{{ end }}
+      {{- if eq .Os "windows" }}Windows{{ end }}
+      {{- if eq .Os "darwin" }}Darwin{{ end }}
 checksum:
   name_template: 'checksums.txt'
 snapshot:
