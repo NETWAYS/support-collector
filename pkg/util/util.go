@@ -36,7 +36,7 @@ func CommandExists(cmd string) bool {
 	return err == nil
 }
 
-// GetHostnameWithoutDomain returns hostname without domain
+// GetHostnameWithoutDomain returns hostname without domain.
 func GetHostnameWithoutDomain() string {
 	hostname, err := os.Hostname()
 	if err != nil {

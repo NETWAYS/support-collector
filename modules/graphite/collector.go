@@ -120,6 +120,7 @@ func Collect(c *collection.Collection) {
 		}
 
 		timestamp := "7 days ago"
+
 		for name, element := range journalctlLogs {
 			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
 				c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", timestamp)

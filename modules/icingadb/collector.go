@@ -93,6 +93,7 @@ func Collect(c *collection.Collection) {
 		for _, file := range detailedFiles {
 			c.AddFilesIfFound(ModuleName, file)
 		}
+
 		for name, element := range journalctlLogs {
 			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
 				c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", "7 days ago")
