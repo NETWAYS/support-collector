@@ -1,8 +1,11 @@
 package util
 
 import (
+	"github.com/sirupsen/logrus"
+	"os"
 	"os/exec"
 	"os/user"
+	"strings"
 )
 
 // StringInSlice matches if a string is contained in a slice.
@@ -31,4 +34,19 @@ func IsPrivilegedUser() bool {
 func CommandExists(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil
+}
+
+// GetHostnameWithoutDomain returns hostname without domain
+func GetHostnameWithoutDomain() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		logrus.Error(err)
+	}
+
+	result, _, found := strings.Cut(hostname, ".")
+	if !found {
+		return hostname
+	}
+
+	return result
 }

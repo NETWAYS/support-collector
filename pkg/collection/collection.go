@@ -18,6 +18,7 @@ type Collection struct {
 	LogData     *bytes.Buffer
 	ExecTimeout time.Duration
 	Obfuscators []*obfuscate.Obfuscator
+	Detailed    bool
 }
 
 func New(w io.Writer) (c *Collection) {
@@ -26,6 +27,7 @@ func New(w io.Writer) (c *Collection) {
 		Log:         logrus.New(),
 		LogData:     &bytes.Buffer{},
 		ExecTimeout: DefaultTimeout,
+		Detailed:    false,
 	}
 
 	c.Log.Out = c.LogData

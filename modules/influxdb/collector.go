@@ -17,6 +17,10 @@ var files = []string{
 	"/etc/influxdb",
 }
 
+var detailedFiles = []string{
+	"/var/log/influxdb",
+}
+
 func Detect() bool {
 	for _, path := range relevantPaths {
 		_, err := os.Stat(path)
@@ -41,5 +45,11 @@ func Collect(c *collection.Collection) {
 
 	for _, file := range files {
 		c.AddFiles(ModuleName, file)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

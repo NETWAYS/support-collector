@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
 	"path/filepath"
 )
@@ -33,6 +34,14 @@ var optionalFiles = []string{
 	"/etc/logrotate.d/mysql",
 }
 
+var detailedFiles = []string{
+	"/var/log/mysql/error.log",
+}
+
+var obfuscators = []*obfuscate.Obfuscator{
+	obfuscate.NewFile(`(?i)(?:password)=(.*)`, `cnf`),
+}
+
 // Detect if a MySQL or MariaDB daemon appears to be running.
 func Detect() string {
 	for _, name := range possibleServices {
@@ -55,6 +64,8 @@ func Collect(c *collection.Collection) {
 
 	c.Log.Info("Collecting MySQL/MariaDB information")
 
+	c.RegisterObfuscators(obfuscators...)
+
 	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages.txt"), "*mysql*", "*mariadb*")
 	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), service)
 	c.AddFilesIfFound(ModuleName, possibleConfigPaths...)
@@ -69,5 +80,11 @@ func Collect(c *collection.Collection) {
 		}
 
 		c.AddFiles(ModuleName, file)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

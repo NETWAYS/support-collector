@@ -102,11 +102,12 @@ var (
 )
 
 var (
-	commandTimeout                  = 60 * time.Second
-	outputFile                      string
+	verbose, printVersion           bool
 	enabledModules, disabledModules []string
 	extraObfuscators                []string
-	verbose, printVersion           bool
+	outputFile                      string
+	commandTimeout                  = 60 * time.Second
+	detailedCollection              bool
 )
 
 func main() {
@@ -117,6 +118,13 @@ func main() {
 
 	c, cleanup := NewCollection(outputFile)
 	defer cleanup()
+
+	if detailedCollection {
+		c.Detailed = true
+		c.Log.Info("Detailed collection is enabled")
+	} else {
+		c.Log.Warn("Detailed collection is disabled")
+	}
 
 	if !util.IsPrivilegedUser() {
 		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
@@ -185,6 +193,7 @@ func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
+	flag.BoolVar(&detailedCollection, "detailed", false, "Enable detailed collection including logs and more")
 	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
 	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
@@ -220,21 +229,7 @@ func handleArguments() {
 
 // buildFileName returns a filename to store the output of support collector.
 func buildFileName() string {
-	return GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
-}
-
-func GetHostnameWithoutDomain() string {
-	hostname, err := os.Hostname()
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	result, _, found := strings.Cut(hostname, ".")
-	if !found {
-		return hostname
-	}
-
-	return result
+	return util.GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
 }
 
 func NewCollection(outputFile string) (*collection.Collection, func()) {

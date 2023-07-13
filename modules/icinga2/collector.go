@@ -12,7 +12,6 @@ const ModuleName = "icinga2"
 
 var files = []string{
 	"/etc/icinga2",
-	"/var/log/icinga2/icinga2.log",
 }
 
 var pluginFiles = []string{
@@ -21,10 +20,14 @@ var pluginFiles = []string{
 }
 
 var optionalFiles = []string{
+	"/etc/logrotate.d/icinga2",
+}
+
+var detailedFiles = []string{
 	"/var/log/icinga2/error.log",
 	"/var/log/icinga2/crash",
 	"/var/log/icinga2/debug.log",
-	"/etc/logrotate.d/icinga2",
+	"/var/log/icinga2/icinga2.log",
 }
 
 var commands = map[string][]string{
@@ -36,6 +39,10 @@ var commands = map[string][]string{
 	"features.txt":          {"icinga2", "feature", "list"},
 	"user-icinga.txt":       {"id", "icinga"},
 	"user-nagios.txt":       {"id", "nagios"},
+}
+
+var detailedCommands = map[string][]string{
+	"object-list.txt": {"icinga2", "object", "list"},
 }
 
 var possibleDaemons = []string{
@@ -97,5 +104,15 @@ func Collect(c *collection.Collection) {
 
 	for _, file := range possibleDaemons {
 		c.AddFilesIfFound(ModuleName, file)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
+
+		for name, cmd := range detailedCommands {
+			c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
+		}
 	}
 }
