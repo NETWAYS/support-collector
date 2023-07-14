@@ -107,7 +107,7 @@ var (
 	extraObfuscators                []string
 	outputFile                      string
 	commandTimeout                  = 60 * time.Second
-	detailedCollection              bool
+	noDetailedCollection            bool
 )
 
 func main() {
@@ -119,11 +119,11 @@ func main() {
 	c, cleanup := NewCollection(outputFile)
 	defer cleanup()
 
-	if detailedCollection {
-		c.Detailed = true
-		c.Log.Info("Detailed collection is enabled")
-	} else {
+	if noDetailedCollection {
+		c.Detailed = false
 		c.Log.Warn("Detailed collection is disabled")
+	} else {
+		c.Log.Info("Detailed collection is enabled")
 	}
 
 	if !util.IsPrivilegedUser() {
@@ -193,7 +193,7 @@ func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
-	flag.BoolVar(&detailedCollection, "detailed", false, "Enable detailed collection including logs and more")
+	flag.BoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
 	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
 	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")

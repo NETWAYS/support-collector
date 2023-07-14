@@ -27,7 +27,7 @@ func New(w io.Writer) (c *Collection) {
 		Log:         logrus.New(),
 		LogData:     &bytes.Buffer{},
 		ExecTimeout: DefaultTimeout,
-		Detailed:    false,
+		Detailed:    true,
 	}
 
 	c.Log.Out = c.LogData

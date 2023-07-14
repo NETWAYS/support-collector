@@ -24,16 +24,16 @@ By default, we collect all we can find. You can control this by only enabling ce
 
 If you want to see what is collected, add `--verbose`  
 
-| Short | Long              | Description                                                                                                            |
-|:-----:|:------------------|------------------------------------------------------------------------------------------------------------------------|
+| Short | Long              | Description                                                                                                           |
+|:-----:|:------------------|-----------------------------------------------------------------------------------------------------------------------|
 |  -o   | --output          | Output file for the zip content (default: current directory and named like '$HOSTNAME'-netways-support-$TIMESTAMP.zip) |
-|       | --detailed        | Enable detailed collection including logs and more (default: false)                                                    |
-|       | --enable          | List of enabled modules (default: all)                                                                                 |
-|       | --disable         | List of disabled modules (default: none)                                                                               |
-|       | --hide            | List of keywords to obfuscate. Can be used multiple times                                                              |
-|       | --command-timeout | Timeout for command execution in modules (default: 1m0s)                                                               |
-|  -v   | --verbose         | Enable verbose logging                                                                                                 |
-|  -V   | --version         | Print version and exit                                                                                                 |
+|       | --nodetails       | Disable detailed collection including logs and more                                                   |
+|       | --enable          | List of enabled modules (default: all)                                                                                |
+|       | --disable         | List of disabled modules (default: none)                                                                              |
+|       | --hide            | List of keywords to obfuscate. Can be used multiple times                                                             |
+|       | --command-timeout | Timeout for command execution in modules (default: 1m0s)                                                              |
+|  -v   | --verbose         | Enable verbose logging                                                                                                |
+|  -V   | --version         | Print version and exit                                                                                                |
 
 ## Modules
 
