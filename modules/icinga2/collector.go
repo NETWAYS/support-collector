@@ -62,7 +62,7 @@ func detectIcingaVersion() (string, error) {
 		return "", err
 	}
 
-	result := regexp.MustCompile(`\(version:\s+r(\d+.\d+.\d+)`).FindStringSubmatch(string(out))
+	result := regexp.MustCompile("\\(version:\\s+r(\\d+.\\d+.\\d+)").FindStringSubmatch(string(out))
 	if result == nil {
 		return "", err
 	}
