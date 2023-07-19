@@ -9,7 +9,7 @@ import (
 )
 
 func TestCollect(t *testing.T) {
-	if !DetectIcinga() {
+	if !detectIcinga() {
 		t.Skip("could not find icinga2 in the test environment")
 		return
 	}
