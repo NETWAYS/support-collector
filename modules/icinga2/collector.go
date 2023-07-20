@@ -56,21 +56,15 @@ func detectIcinga() bool {
 	return err == nil
 }
 
-func detectIcingaVersion() (string, error) {
-	out, err := collection.LoadCommandOutput("icinga2", "-V")
-	if err != nil {
-		return "", err
-	}
+func detectIcingaVersion(version string) string {
+	result := regexp.MustCompile(`\(version:\s+r(\d+.\d+.\d+)`).FindStringSubmatch(version)
 
-	result := regexp.MustCompile(`\(version:\s+r(\d+.\d+.\d+)`).FindStringSubmatch(string(out))
-	if result == nil {
-		return "", err
-	}
-
-	return result[1], nil
+	return result[1]
 }
 
 func Collect(c *collection.Collection) {
+	var icinga2version string
+
 	if !detectIcinga() {
 		c.Log.Info("Could not find icinga2")
 		return
@@ -106,13 +100,17 @@ func Collect(c *collection.Collection) {
 		c.AddFiles(ModuleName, file)
 	}
 
-	// With Icinga 2 >= 2.14 the icinga2.debug cache is no longer built automatically on every reload. To retrieve a current state we build it manually (only possible from 2.14.0)
-	version, err := detectIcingaVersion()
+	content, err := collection.LoadCommandOutput("icinga2", "-V")
 	if err != nil {
-		c.Log.Warn("cant detect Icinga 2 version")
+		c.Log.Info("Could not find icinga2")
+
+		icinga2version = ""
+	} else {
+		icinga2version = detectIcingaVersion(string(content))
 	}
 
-	if version >= "2.14.0" {
+	// With Icinga 2 >= 2.14 the icinga2.debug cache is no longer built automatically on every reload. To retrieve a current state we build it manually (only possible from 2.14.0)
+	if icinga2version >= "2.14.0" {
 		c.AddCommandOutput("dump-objects.txt", "icinga2", "daemon", "-C", "--dump-objects")
 	}
 
