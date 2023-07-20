@@ -26,6 +26,9 @@ var services = []string{
 var files = []string{
 	"/etc/corosync/corosync.conf",
 	"/var/lib/pacemaker/cib/cib.xml",
+}
+
+var detailedFiles = []string{
 	"/var/log/corosync/corosync.log",
 	"/var/log/pacemaker/pacemaker.log",
 }
@@ -67,5 +70,11 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

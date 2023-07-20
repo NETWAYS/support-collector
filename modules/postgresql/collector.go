@@ -18,6 +18,11 @@ var files = []string{
 	"/var/lib/pgsql/data/*.conf", // RedHat based systems, where the configuration is found
 }
 
+var detailedFiles = []string{
+	"/var/log/postgresql",
+	"/var/lib/pgsql/pgstartup.log",
+}
+
 var commands = map[string][]string{
 	"version.txt": {"psql", "-V"},
 }
@@ -54,5 +59,11 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

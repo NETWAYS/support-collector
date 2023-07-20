@@ -18,6 +18,10 @@ var possibleServices = []string{
 	"puppetserver",
 }
 
+var detailedFiles = []string{
+	"/var/log/puppet",
+}
+
 var files = []string{
 	"/etc/puppetlabs",
 	"/opt/puppetlabs/puppet/cache",
@@ -59,5 +63,11 @@ func Collect(c *collection.Collection) {
 
 	for _, service := range possibleServices {
 		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

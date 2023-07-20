@@ -23,7 +23,11 @@ var files = []string{
 	"/etc/graphite-api*",
 	"/etc/graphite-web*",
 	"/etc/sysconfig/graphite-api",
+}
+
+var detailedFiles = []string{
 	"/var/log/carbon",
+	"/var/log/graphite",
 }
 
 var journalctlLogs = map[string]collection.JournalElement{
@@ -106,15 +110,19 @@ func Collect(c *collection.Collection) {
 		processes = processes + process.Executable() + "\n"
 	}
 
-	timestamp := "7 days ago"
-
-	for name, element := range journalctlLogs {
-		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", timestamp)
-		}
-	}
-
 	c.AddFileDataRaw(filepath.Join(ModuleName, "processlist.txt"), []byte(processes))
 
 	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-graphite.txt"), "*graphite*", "*carbon*")
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
+
+		for name, element := range journalctlLogs {
+			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+				c.AddJournalLog(filepath.Join(ModuleName, name), element.Service)
+			}
+		}
+	}
 }

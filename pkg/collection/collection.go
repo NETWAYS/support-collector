@@ -13,19 +13,23 @@ import (
 )
 
 type Collection struct {
-	Output      *zip.Writer
-	Log         *logrus.Logger
-	LogData     *bytes.Buffer
-	ExecTimeout time.Duration
-	Obfuscators []*obfuscate.Obfuscator
+	Output                 *zip.Writer
+	Log                    *logrus.Logger
+	LogData                *bytes.Buffer
+	ExecTimeout            time.Duration
+	Obfuscators            []*obfuscate.Obfuscator
+	Detailed               bool
+	JournalLoggingInterval string
 }
 
 func New(w io.Writer) (c *Collection) {
 	c = &Collection{
-		Output:      zip.NewWriter(w),
-		Log:         logrus.New(),
-		LogData:     &bytes.Buffer{},
-		ExecTimeout: DefaultTimeout,
+		Output:                 zip.NewWriter(w),
+		Log:                    logrus.New(),
+		LogData:                &bytes.Buffer{},
+		ExecTimeout:            DefaultTimeout,
+		Detailed:               true,
+		JournalLoggingInterval: "7 days ago",
 	}
 
 	c.Log.Out = c.LogData
@@ -224,6 +228,10 @@ func (c *Collection) AddGitRepoInfo(fileName, path string) {
 	}
 
 	c.AddFileYAML(fileName, info)
+}
+
+func (c *Collection) AddJournalLog(fileName, service string) {
+	c.AddCommandOutput(fileName, "journalctl", "-u", service, "-S", c.JournalLoggingInterval)
 }
 
 func (c *Collection) RegisterObfuscator(o *obfuscate.Obfuscator) {

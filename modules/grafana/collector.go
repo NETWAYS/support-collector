@@ -18,6 +18,10 @@ var files = []string{
 	"/etc/grafana",
 }
 
+var detailedFiles = []string{
+	"/var/log/grafana/grafana.log",
+}
+
 var commands = map[string][]string{
 	"grafana-cli-version.txt":      {"grafana-cli", "-v"},
 	"grafana-cli-plugins-list.txt": {"grafana-cli", "plugins", "ls"},
@@ -60,5 +64,11 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

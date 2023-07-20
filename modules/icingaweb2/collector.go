@@ -20,7 +20,16 @@ var relevantPaths = []string{
 
 var files = []string{
 	"/etc/icingaweb2",
+}
+
+var detailedFiles = []string{
 	"/var/log/icingaweb2",
+}
+
+var journalctlLogs = map[string]collection.JournalElement{
+	"journalctl-vspheredb.txt": {Service: "icinga-vspheredb.service"},
+	"journalctl-reporting.txt": {Service: "icinga-reporting.service"},
+	"journalctl-x509.txt":      {Service: "icinga-x509.service"},
 }
 
 var possibleDaemons = []string{
@@ -45,12 +54,6 @@ var commands = map[string][]string{
 	"modules.txt":              {"icingacli", "module", "list"},
 	"vpsheredb-socket.txt":     {"ls", "-la", "/run/icinga-vspheredb/"},
 	"user-icingavspheredb.txt": {"id", "icingavspheredb"},
-}
-
-var journalctlLogs = map[string]collection.JournalElement{
-	"journalctl-vspheredb.txt": {Service: "icinga-vspheredb.service"},
-	"journalctl-reporting.txt": {Service: "icinga-reporting.service"},
-	"journalctl-x509.txt":      {Service: "icinga-x509.service"},
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
@@ -113,11 +116,15 @@ func Collect(c *collection.Collection) {
 		}
 	}
 
-	timestamp := "7 days ago"
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 
-	for name, element := range journalctlLogs {
-		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", timestamp)
+		for name, element := range journalctlLogs {
+			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+				c.AddJournalLog(filepath.Join(ModuleName, name), element.Service)
+			}
 		}
 	}
 

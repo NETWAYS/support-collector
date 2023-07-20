@@ -26,6 +26,10 @@ var files = []string{
 	"/etc/mongod.conf",
 }
 
+var detailedFiles = []string{
+	"/var/log/mongodb/mongod.log",
+}
+
 var commands = map[string][]string{
 	"mongod-version.txt": {"mongod", "--version"},
 	"mongo-version.txt":  {"mongo", "--version"},
@@ -72,5 +76,11 @@ func Collect(c *collection.Collection) {
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }

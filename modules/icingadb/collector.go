@@ -21,6 +21,17 @@ var files = []string{
 	"/etc/icinga2/features-enabled/icingadb.conf",
 }
 
+var detailedFiles = []string{
+	"/var/log/icingadb/",
+	"/var/log/icingadb-redis",
+}
+
+var journalctlLogs = map[string]collection.JournalElement{
+	"journalctl-icingadb.txt":              {Service: "icingadb.service"},
+	"journalctl-icingadb-redis.txt":        {Service: "icingadb-redis.service"},
+	"journalctl-icingadb-redis-server.txt": {Service: "icingadb-redis-server.service"},
+}
+
 var optionalFiles = []string{
 	"/etc/logrotate.d/icingadb-redis-server",
 }
@@ -29,12 +40,6 @@ var services = []string{
 	"icingadb",
 	"icingadb-redis",
 	"icingadb-redis-server",
-}
-
-var journalctlLogs = map[string]collection.JournalElement{
-	"journalctl-icingadb.txt":              {Service: "icingadb.service"},
-	"journalctl-icingadb-redis.txt":        {Service: "icingadb-redis.service"},
-	"journalctl-icingadb-redis-server.txt": {Service: "icingadb-redis-server.service"},
 }
 
 var obfuscators = []*obfuscate.Obfuscator{
@@ -84,9 +89,15 @@ func Collect(c *collection.Collection) {
 		c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+service+".txt"), service)
 	}
 
-	for name, element := range journalctlLogs {
-		if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
-			c.AddCommandOutput(filepath.Join(ModuleName, name), "journalctl", "-u", element.Service, "--since", "7 days ago")
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
+
+		for name, element := range journalctlLogs {
+			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+				c.AddJournalLog(filepath.Join(ModuleName, name), element.Service)
+			}
 		}
 	}
 }

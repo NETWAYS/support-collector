@@ -23,6 +23,12 @@ var optionalFiles = []string{
 	"/etc/logrotate.d/nginx",
 }
 
+var detailedFiles = []string{
+	"/var/log/apache2",
+	"/var/log/httpd",
+	"/var/log/nginx",
+}
+
 var services = []string{
 	"apache2",
 	"nginx",
@@ -79,5 +85,11 @@ func Collect(c *collection.Collection) {
 		}
 
 		c.AddFilesIfFound(ModuleName, file)
+	}
+
+	if c.Detailed {
+		for _, file := range detailedFiles {
+			c.AddFilesIfFound(ModuleName, file)
+		}
 	}
 }
