@@ -5,11 +5,22 @@ import (
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/NETWAYS/support-collector/pkg/util"
+	"os"
 	"testing"
 )
 
 func TestCollect(t *testing.T) {
-	if !DetectIcinga() {
+	file, err := os.ReadFile("testdata/icinga-version.txt")
+	if err != nil {
+		t.Skip("cant read version file")
+	}
+
+	version := detectIcingaVersion(string(file))
+	if version == "" {
+		t.Skip("cant detect icinga2 version")
+	}
+
+	if !detectIcinga() {
 		t.Skip("could not find icinga2 in the test environment")
 		return
 	}

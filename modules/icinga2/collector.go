@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 )
 
 const ModuleName = "icinga2"
@@ -57,13 +58,21 @@ var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:password|community)(.*)`, `log`),
 }
 
-func DetectIcinga() bool {
+func detectIcinga() bool {
 	_, err := exec.LookPath("icinga2")
 	return err == nil
 }
 
+func detectIcingaVersion(version string) string {
+	result := regexp.MustCompile(`\(version:\s+r(\d+.\d+.\d+)`).FindStringSubmatch(version)
+
+	return result[1]
+}
+
 func Collect(c *collection.Collection) {
-	if !DetectIcinga() {
+	var icinga2version string
+
+	if !detectIcinga() {
 		c.Log.Info("Could not find icinga2")
 		return
 	}
@@ -96,6 +105,20 @@ func Collect(c *collection.Collection) {
 		}
 
 		c.AddFiles(ModuleName, file)
+	}
+
+	content, err := collection.LoadCommandOutput("icinga2", "-V")
+	if err != nil {
+		c.Log.Info("Could not find icinga2")
+
+		icinga2version = ""
+	} else {
+		icinga2version = detectIcingaVersion(string(content))
+	}
+
+	// With Icinga 2 >= 2.14 the icinga2.debug cache is no longer built automatically on every reload. To retrieve a current state we build it manually (only possible from 2.14.0)
+	if icinga2version >= "2.14.0" {
+		c.AddCommandOutput("dump-objects.txt", "icinga2", "daemon", "-C", "--dump-objects")
 	}
 
 	for name, cmd := range commands {

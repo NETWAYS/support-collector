@@ -1,0 +1,42 @@
+icinga2 - The Icinga 2 network monitoring daemon (version: r2.14.0-1)
+
+Copyright (c) 2012-2023 Icinga GmbH (https://icinga.com/)
+License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl2.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+System information:
+  Platform: Ubuntu
+  Platform version: 22.04.2 LTS (Jammy Jellyfish)
+  Kernel: Linux
+  Kernel version: 5.15.0-76-generic
+  Architecture: x86_64
+
+Build information:
+  Compiler: GNU 11.3.0
+  Build host: runner-hh8q3bz2-project-575-concurrent-0
+  OpenSSL version: OpenSSL 3.0.2 15 Mar 2022
+
+Application information:
+
+General paths:
+  Config directory: /etc/icinga2
+  Data directory: /var/lib/icinga2
+  Log directory: /var/log/icinga2
+  Cache directory: /var/cache/icinga2
+  Spool directory: /var/spool/icinga2
+  Run directory: /run/icinga2
+
+Old paths (deprecated):
+  Installation root: /usr
+  Sysconf directory: /etc
+  Run directory (base): /run
+  Local state directory: /var
+
+Internal paths:
+  Package data directory: /usr/share/icinga2
+  State path: /var/lib/icinga2/icinga2.state
+  Modified attributes path: /var/lib/icinga2/modified-attributes.conf
+  Objects path: /var/cache/icinga2/icinga2.debug
+  Vars path: /var/cache/icinga2/icinga2.vars
+  PID path: /run/icinga2/icinga2.pid
