@@ -106,6 +106,7 @@ func Collect(c *collection.Collection) {
 		c.AddFiles(ModuleName, file)
 	}
 
+	// With Icinga 2 >= 2.14 the icinga2.debug cache is no longer built automatically on every reload. To retrieve a current state we build it manually (only possible from 2.14.0)
 	version, err := detectIcingaVersion()
 	if err != nil {
 		c.Log.Warn("cant detect Icinga 2 version")
