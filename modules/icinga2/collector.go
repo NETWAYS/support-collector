@@ -22,6 +22,7 @@ var pluginFiles = []string{
 
 var optionalFiles = []string{
 	"/etc/logrotate.d/icinga2",
+	"/etc/icinga-installer/scenarios.d/last_scenario.yaml",
 }
 
 var detailedFiles = []string{
@@ -29,6 +30,7 @@ var detailedFiles = []string{
 	"/var/log/icinga2/crash",
 	"/var/log/icinga2/debug.log",
 	"/var/log/icinga2/icinga2.log",
+	"/var/log/icinga-installer",
 }
 
 var commands = map[string][]string{
@@ -85,7 +87,9 @@ func Collect(c *collection.Collection) {
 		"*icinga2*",
 		"netways-plugin*",
 		"monitoring-plugin*",
-		"nagios-*")
+		"nagios-*",
+		"icinga-installer",
+	)
 
 	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), "icinga2")
 

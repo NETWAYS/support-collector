@@ -52,7 +52,7 @@ not be collected.
 | grafana        | Configuration, logs, plugins, packages and service status                                                              |
 | graphite       | Includes graphite and carbon. Collects configuration, logs, python / pip version and list, packages and service status |
 | graylog        | Configuration, packages and service status                                                                             |
-| icinga2        | Configuration, packages, service status, logs, Icinga objects, Icinga variables and plugins                            |
+| icinga2        | Configuration, packages, service status, logs, Icinga objects, Icinga variables, plugins and icinga-installer          |
 | icingadb       | Includes IcingaDB and IcingaDB redis. Collects configuration, logs, packages and service status                        |
 | icingadirector | Packages or git information, logs, Director health status and service status                                           |
 | icingaweb2     | Configuration, logs, packages, modules, PHP, modules and service status                                                |
