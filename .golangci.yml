@@ -18,6 +18,7 @@ linters:
     - ifshort # v1.48.0
     - musttag
     - lll # disable line length
+    - depguard
   enable:
     - exportloopref
     - revive

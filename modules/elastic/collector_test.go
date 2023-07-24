@@ -2,15 +2,21 @@ package elastic
 
 import (
 	"bytes"
+	"testing"
+
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/NETWAYS/support-collector/pkg/util"
-	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCollect(t *testing.T) {
 	c := collection.New(&bytes.Buffer{})
+
 	Collect(c)
+
+	err := c.Close()
+	assert.NoError(t, err)
 }
 
 func TestObfuscators(t *testing.T) {
