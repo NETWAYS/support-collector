@@ -6,6 +6,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
 	"github.com/NETWAYS/support-collector/modules/elastic"
+	"github.com/NETWAYS/support-collector/modules/foreman"
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/graylog"
@@ -75,6 +76,7 @@ var modules = map[string]func(*collection.Collection){
 	"graphite":        graphite.Collect,
 	"graylog":         graylog.Collect,
 	"icingadb":        icingadb.Collect,
+	"foreman":         foreman.Collect,
 }
 
 var (
@@ -98,6 +100,7 @@ var (
 		"grafana",
 		"graphite",
 		"graylog",
+		"foreman",
 	}
 )
 

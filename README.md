@@ -19,21 +19,21 @@ The `--hide` flag can be used multiple times to hide sensitive data, it supports
 
 `# support-collector --hide "Secret:.*" --hide "Password:.*"`
 
-By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.  
+By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.
 > Logs are also not collected by default. To collect them, add `--detailed`
 
-If you want to see what is collected, add `--verbose`  
+If you want to see what is collected, add `--verbose`
 
-| Short | Long              | Description                                                                                                           |
-|:-----:|:------------------|-----------------------------------------------------------------------------------------------------------------------|
+| Short | Long              | Description                                                                                                            |
+|:-----:|:------------------|------------------------------------------------------------------------------------------------------------------------|
 |  -o   | --output          | Output file for the zip content (default: current directory and named like '$HOSTNAME'-netways-support-$TIMESTAMP.zip) |
-|       | --nodetails       | Disable detailed collection including logs and more                                                   |
-|       | --enable          | List of enabled modules (default: all)                                                                                |
-|       | --disable         | List of disabled modules (default: none)                                                                              |
-|       | --hide            | List of keywords to obfuscate. Can be used multiple times                                                             |
-|       | --command-timeout | Timeout for command execution in modules (default: 1m0s)                                                              |
-|  -v   | --verbose         | Enable verbose logging                                                                                                |
-|  -V   | --version         | Print version and exit                                                                                                |
+|       | --nodetails       | Disable detailed collection including logs and more                                                                    |
+|       | --enable          | List of enabled modules (default: all)                                                                                 |
+|       | --disable         | List of disabled modules (default: none)                                                                               |
+|       | --hide            | List of keywords to obfuscate. Can be used multiple times                                                              |
+|       | --command-timeout | Timeout for command execution in modules (default: 1m0s)                                                               |
+|  -v   | --verbose         | Enable verbose logging                                                                                                 |
+|  -V   | --version         | Print version and exit                                                                                                 |
 
 ## Modules
 
@@ -64,6 +64,7 @@ not be collected.
 | prometheus     | Configuration, packages and service status                                                                             |
 | puppet         | Configuration, logs, module list, packages and service status                                                          |
 | webservers     | Includes apache2, httpd and nginx. Collects configuration, logs, packages and service status                           |
+| foreman        | Configuration, logs, packages and service status                                                                       |
 
 ## Supported systems
 
