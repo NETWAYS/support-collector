@@ -1,3 +1,6 @@
+![go](https://github.com/NETWAYS/support-collector/actions/workflows/go.yml/badge.svg)
+![go](https://github.com/NETWAYS/support-collector/actions/workflows/golangci-lint.yml/badge.svg)
+
 # NETWAYS support collector
 
 The support collector allows to collect relevant information from servers. The resulting ZIP file can be given to second
