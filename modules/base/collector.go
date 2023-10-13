@@ -1,9 +1,7 @@
 package base
 
 import (
-	"bytes"
 	"github.com/NETWAYS/support-collector/pkg/collection"
-	"gopkg.in/yaml.v3"
 	"os/exec"
 	"path/filepath"
 )
@@ -38,7 +36,7 @@ var commands = [][]string{
 func Collect(c *collection.Collection) {
 	c.Log.Info("Collecting base system information")
 
-	CollectKernelInfo(c)
+	//CollectKernelInfo(c)
 
 	// Check if apparmor is installed and get status
 	if _, err := exec.LookPath("apparmor_status"); err == nil {
@@ -65,6 +63,7 @@ func Collect(c *collection.Collection) {
 	}
 }
 
+/*
 func CollectKernelInfo(c *collection.Collection) {
 	buf := bytes.Buffer{}
 
@@ -86,3 +85,4 @@ func CollectKernelInfo(c *collection.Collection) {
 		c.Log.Error(err)
 	}
 }
+*/

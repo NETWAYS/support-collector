@@ -1,12 +1,5 @@
 package base
 
-import (
-	"fmt"
-	"github.com/Showmax/go-fqdn"
-	"syscall"
-	"time"
-)
-
 type KernelInfo struct {
 	Kernel      string
 	Hostname    string
@@ -18,6 +11,7 @@ type KernelInfo struct {
 	CurrentTime string
 }
 
+/*
 func GetKernelInfo() (i KernelInfo, err error) {
 	var uname syscall.Utsname
 
@@ -43,6 +37,7 @@ func GetKernelInfo() (i KernelInfo, err error) {
 
 	return
 }
+*/
 
 func CharsToString(chars []int8) string {
 	s := make([]byte, len(chars))

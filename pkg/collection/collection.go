@@ -22,6 +22,7 @@ type Collection struct {
 	JournalLoggingInterval string
 }
 
+// New creates a new collection
 func New(w io.Writer) (c *Collection) {
 	c = &Collection{
 		Output:                 zip.NewWriter(w),
@@ -37,6 +38,7 @@ func New(w io.Writer) (c *Collection) {
 	return
 }
 
+// Close closes the output file
 func (c *Collection) Close() error {
 	return c.Output.Close()
 }

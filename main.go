@@ -2,36 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/NETWAYS/support-collector/modules/ansible"
-	"github.com/NETWAYS/support-collector/modules/base"
-	"github.com/NETWAYS/support-collector/modules/corosync"
-	"github.com/NETWAYS/support-collector/modules/elastic"
-	"github.com/NETWAYS/support-collector/modules/foreman"
-	"github.com/NETWAYS/support-collector/modules/grafana"
-	"github.com/NETWAYS/support-collector/modules/graphite"
-	"github.com/NETWAYS/support-collector/modules/graylog"
-	"github.com/NETWAYS/support-collector/modules/icinga2"
-	"github.com/NETWAYS/support-collector/modules/icingadb"
-	"github.com/NETWAYS/support-collector/modules/icingadirector"
-	"github.com/NETWAYS/support-collector/modules/icingaweb2"
-	"github.com/NETWAYS/support-collector/modules/influxdb"
-	"github.com/NETWAYS/support-collector/modules/keepalived"
-	"github.com/NETWAYS/support-collector/modules/mongodb"
-	"github.com/NETWAYS/support-collector/modules/mysql"
-	"github.com/NETWAYS/support-collector/modules/postgresql"
-	"github.com/NETWAYS/support-collector/modules/prometheus"
-	"github.com/NETWAYS/support-collector/modules/puppet"
-	"github.com/NETWAYS/support-collector/modules/webservers"
+	"github.com/NETWAYS/support-collector/modules"
 	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/hosts"
 	"github.com/NETWAYS/support-collector/pkg/util"
-
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-
 	"github.com/mattn/go-colorable"
+
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -56,54 +35,6 @@ WARNING: DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
 `
 
-var modules = map[string]func(*collection.Collection){
-	"base":            base.Collect,
-	"webservers":      webservers.Collect,
-	"icinga2":         icinga2.Collect,
-	"icingaweb2":      icingaweb2.Collect,
-	"icinga-director": icingadirector.Collect,
-	"elastic":         elastic.Collect,
-	"corosync":        corosync.Collect,
-	"keepalived":      keepalived.Collect,
-	"mongodb":         mongodb.Collect,
-	"mysql":           mysql.Collect,
-	"influxdb":        influxdb.Collect,
-	"postgresql":      postgresql.Collect,
-	"prometheus":      prometheus.Collect,
-	"ansible":         ansible.Collect,
-	"puppet":          puppet.Collect,
-	"grafana":         grafana.Collect,
-	"graphite":        graphite.Collect,
-	"graylog":         graylog.Collect,
-	"icingadb":        icingadb.Collect,
-	"foreman":         foreman.Collect,
-}
-
-var (
-	moduleOrder = []string{
-		"base",
-		"webservers",
-		"icinga2",
-		"icingaweb2",
-		"icinga-director",
-		"icingadb",
-		"elastic",
-		"corosync",
-		"keepalived",
-		"mongodb",
-		"mysql",
-		"influxdb",
-		"postgresql",
-		"prometheus",
-		"ansible",
-		"puppet",
-		"grafana",
-		"graphite",
-		"graylog",
-		"foreman",
-	}
-)
-
 var (
 	verbose, printVersion           bool
 	enabledModules, disabledModules []string
@@ -111,6 +42,7 @@ var (
 	outputFile                      string
 	commandTimeout                  = 60 * time.Second
 	noDetailedCollection            bool
+	hostsFile                       string
 )
 
 func main() {
@@ -119,82 +51,30 @@ func main() {
 	// set locale to C, to avoid translations in command output
 	_ = os.Setenv("LANG", "C")
 
+	// initialize new collection
 	c, cleanup := NewCollection(outputFile)
 	defer cleanup()
 
-	if noDetailedCollection {
-		c.Detailed = false
-		c.Log.Warn("Detailed collection is disabled")
-	} else {
-		c.Log.Info("Detailed collection is enabled")
+	// Get hosts from given json
+	h, err := hosts.ReadFromJson(hostsFile)
+	if err != nil {
+		c.Log.Fatalf("cant read hosts from json, %s", err)
 	}
 
-	if !util.IsPrivilegedUser() {
-		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
-	}
+	// TODO create file structure
 
-	var (
-		startTime = time.Now()
-		timings   = map[string]time.Duration{}
-	)
-
-	// Set command Timeout from argument
-	c.ExecTimeout = commandTimeout
-
-	// Call all enabled modules
-	for _, name := range moduleOrder {
-		switch {
-		case util.StringInSlice(name, disabledModules):
-			c.Log.Infof("Module %s is disabled", name)
-		case !util.StringInSlice(name, enabledModules):
-			c.Log.Infof("Module %s is not enabled", name)
-		default:
-			moduleStart := time.Now()
-
-			c.Log.Debugf("Calling module %s", name)
-
-			for _, o := range extraObfuscators {
-				c.Log.Debugf("Adding obfuscator for '%s' to module %s", o, name)
-				c.RegisterObfuscator(obfuscate.NewAny(o))
-			}
-
-			modules[name](c)
-
-			timings[name] = time.Since(moduleStart)
-			c.Log.Debugf("Finished with module %s in %.3f seconds", name, timings[name].Seconds())
+	for _, host := range h {
+		err = host.Collect(c)
+		if err != nil {
+			c.Log.Warn(err)
 		}
 	}
-
-	// Collect obfuscation info
-	var files, count uint
-
-	for _, o := range c.Obfuscators {
-		files += o.Files
-
-		count += o.Replaced
-	}
-
-	if files > 0 {
-		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, files, len(c.Obfuscators))
-	}
-
-	// Save timings
-	timings["total"] = time.Since(startTime)
-	c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
-
-	c.AddFileYAML("timing.yml", timings)
-
-	path, err := filepath.Abs(outputFile)
-	if err != nil {
-		c.Log.Debug(err)
-	}
-
-	c.Log.Infof("Generated ZIP file located at %s", path)
 }
 
 func handleArguments() {
 	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
-	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
+	flag.StringVar(&hostsFile, "hosts", "", "Path to hosts file")
+	flag.StringSliceVar(&enabledModules, "enable", modules.Order, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.BoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
 	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
@@ -224,7 +104,7 @@ func handleArguments() {
 
 	// Verify enabled modules
 	for _, name := range enabledModules {
-		if _, ok := modules[name]; !ok {
+		if _, ok := modules.List[name]; !ok {
 			logrus.Fatal("Unknown module to enable: ", name)
 		}
 	}
