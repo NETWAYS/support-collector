@@ -1,29 +1,37 @@
+run:
+  timeout: 5m
+  tests: false
 linters:
-  disable-all: false
-  disable:
-    - gochecknoglobals  # we use these here
-    - exhaustivestruct  # too strict
-    - nlreturn  # too strict for error returns
-    - paralleltest  # not needed
-    - testpackage  # not needed
-    - wrapcheck  # not needed
-    - godox  # we still have a lot of TODOs left
-    - funlen # strange counting for main()
-    - varnamelen # we use these here
-    - nonamedreturns
-    - exhaustruct
-    - scopelint
-    - golint
-    - interfacer # deprecated since v1.38.0
-    - ifshort # v1.48.0
-    - musttag
-    - lll # disable line length
-    - depguard
-  enable:
-    - exportloopref
-    - revive
-  presets:
-    - bugs
-    - unused
-    - style
-  fast: false
+   enable-all: true
+   disable:
+     - cyclop
+     - depguard
+     - exhaustivestruct
+     - exhaustruct
+     - forbidigo
+     - forcetypeassert
+     - gci
+     - gochecknoglobals
+     - gochecknoinits
+     - godox
+     - godot
+     - goerr113
+     - gofumpt
+     - gomnd
+     - lll
+     - musttag
+     - nakedret
+     - nlreturn
+     - nolintlint
+     - nonamedreturns
+     - tagliatelle
+     - varnamelen
+     - wrapcheck
+linters-settings:
+   funlen:
+     ignore-comments: true
+     lines: 75
+   estif:
+     min-complexity: 4
+   maligned:
+     suggest-new: true
