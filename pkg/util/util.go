@@ -1,11 +1,12 @@
 package util
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"os/user"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 // StringInSlice matches if a string is contained in a slice.

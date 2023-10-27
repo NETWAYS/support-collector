@@ -1,9 +1,10 @@
 package util
 
 import (
+	"testing"
+
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var (

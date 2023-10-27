@@ -2,10 +2,11 @@ package base
 
 import (
 	"bytes"
-	"github.com/NETWAYS/support-collector/pkg/collection"
-	"gopkg.in/yaml.v3"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/NETWAYS/support-collector/pkg/collection"
+	"gopkg.in/yaml.v3"
 )
 
 const ModuleName = "base"

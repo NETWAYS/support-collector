@@ -4,12 +4,13 @@ import (
 	"archive/zip"
 	"bytes"
 	"fmt"
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v3"
 	"io"
 	"strings"
 	"time"
+
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v3"
 )
 
 type Collection struct {

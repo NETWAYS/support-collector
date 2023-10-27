@@ -1,9 +1,10 @@
 package influxdb
 
 import (
-	"github.com/NETWAYS/support-collector/pkg/collection"
 	"os"
 	"path/filepath"
+
+	"github.com/NETWAYS/support-collector/pkg/collection"
 )
 
 const ModuleName = "influxdb"

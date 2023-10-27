@@ -2,8 +2,9 @@ package collection
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCollection_AddFileFromReader(t *testing.T) {

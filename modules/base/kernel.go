@@ -2,9 +2,10 @@ package base
 
 import (
 	"fmt"
-	"github.com/Showmax/go-fqdn"
 	"syscall"
 	"time"
+
+	"github.com/Showmax/go-fqdn"
 )
 
 type KernelInfo struct {

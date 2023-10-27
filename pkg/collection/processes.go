@@ -1,8 +1,9 @@
 package collection
 
 import (
-	"github.com/mitchellh/go-ps"
 	"strings"
+
+	"github.com/mitchellh/go-ps"
 )
 
 // ProcessList returns array of type ps.Process. Error returns nil if no error.
