@@ -1,12 +1,13 @@
 package icinga2
 
 import (
-	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+
+	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 )
 
 const ModuleName = "icinga2"

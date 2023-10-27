@@ -1,11 +1,12 @@
 package graphite
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/NETWAYS/support-collector/pkg/collection"
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
 	"github.com/NETWAYS/support-collector/pkg/util"
-	"os"
-	"path/filepath"
 )
 
 const ModuleName = "graphite"

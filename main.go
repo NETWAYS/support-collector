@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
@@ -23,17 +28,12 @@ import (
 	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/modules/webservers"
 	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/util"
-
 	"github.com/NETWAYS/support-collector/pkg/obfuscate"
+	"github.com/NETWAYS/support-collector/pkg/util"
 
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 const Product = "NETWAYS support collector"

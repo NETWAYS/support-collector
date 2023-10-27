@@ -1,9 +1,10 @@
 package collection
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDetectGitInstalled(t *testing.T) {

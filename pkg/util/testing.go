@@ -1,11 +1,12 @@
 package util
 
 import (
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/NETWAYS/support-collector/pkg/obfuscate"
+	"github.com/stretchr/testify/assert"
 )
 
 // AssertObfuscation is a helper function for tests where we want to validate if obfuscation.Obfuscator works correctly.
