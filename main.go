@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/NETWAYS/support-collector/modules"
-	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/hosts"
-	"github.com/NETWAYS/support-collector/pkg/util"
+	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/collection/modules"
+	"github.com/NETWAYS/support-collector/internal/connector"
+	util2 "github.com/NETWAYS/support-collector/internal/util"
 	"github.com/mattn/go-colorable"
 
 	"github.com/sirupsen/logrus"
@@ -55,18 +55,21 @@ func main() {
 	c, cleanup := NewCollection(outputFile)
 	defer cleanup()
 
-	// Get hosts from given json
-	h, err := hosts.ReadFromJson(hostsFile)
-	if err != nil {
-		c.Log.Fatalf("cant read hosts from json, %s", err)
-	}
-
-	// TODO create file structure
-
-	for _, host := range h {
-		err = host.Collect(c)
+	// CollectHosts hosts from given json
+	if hostsFile != "" {
+		h, err := connector.CollectHosts(hostsFile)
 		if err != nil {
-			c.Log.Warn(err)
+			c.Log.Fatalf("cant read hosts from json, %s", err)
+		}
+
+		for _, host := range h {
+			c.Log.Infof("Start collection for %s", host.Hostname)
+
+			err = host.Collect(c)
+			if err != nil {
+				c.Log.Warn(err)
+			}
+			c.Log.Infof("Finished collection for %s", host.Hostname)
 		}
 	}
 }
@@ -112,9 +115,10 @@ func handleArguments() {
 
 // buildFileName returns a filename to store the output of support collector.
 func buildFileName() string {
-	return util.GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
+	return util2.GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
 }
 
+// NewCollection initializes a new collection
 func NewCollection(outputFile string) (*collection.Collection, func()) {
 	file, err := os.Create(outputFile)
 	if err != nil {
@@ -131,7 +135,7 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 	}
 
 	// Add console log output via logrus.Hook
-	c.Log.AddHook(&util.ExtraLogHook{
+	c.Log.AddHook(&util2.ExtraLogHook{
 		Formatter: &logrus.TextFormatter{ForceColors: true},
 		Writer:    colorable.NewColorableStdout(),
 		Level:     consoleLevel,

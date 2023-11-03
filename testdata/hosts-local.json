@@ -1,0 +1,9 @@
+{
+  "hosts": [
+    {
+      "hostname": "icinga2-master",
+      "localhost": true,
+      "description": "Icinga 2 config master"
+    }
+  ]
+}

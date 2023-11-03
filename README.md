@@ -40,7 +40,7 @@ If you want to see what is collected, add `--verbose`
 
 ## Modules
 
-A brief overview about the modules, you can check the source code under [modules](modules) for what exactly is
+A brief overview about the modules, you can check the source code under [modules](internal/collection/modules/modules) for what exactly is
 collected.
 
 Most modules check if the component is installed before trying to collect data. If the module is not detected, it will
