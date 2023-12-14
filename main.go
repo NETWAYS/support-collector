@@ -50,7 +50,7 @@ Find more information and releases at:
 		https://github.com/NETWAYS/support-collector
 
 If you are a customer, contact us at:
-		support@netways.de  /  https://netways.de/contact
+		support@netways.de  /  https://netways.de/en/contact/
 
 WARNING: DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
