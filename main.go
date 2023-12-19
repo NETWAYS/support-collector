@@ -145,16 +145,16 @@ func main() {
 	for _, name := range moduleOrder {
 		switch {
 		case util.StringInSlice(name, disabledModules):
-			c.Log.Infof("Module %s is disabled", name)
+			c.Log.Debugf("Module %s is disabled", name)
 		case !util.StringInSlice(name, enabledModules):
-			c.Log.Infof("Module %s is not enabled", name)
+			c.Log.Debugf("Module %s is not enabled", name)
 		default:
 			moduleStart := time.Now()
 
-			c.Log.Debugf("Calling module %s", name)
+			c.Log.Debugf("Start collecting data for module %s", name)
 
 			for _, o := range extraObfuscators {
-				c.Log.Debugf("Adding obfuscator for '%s' to module %s", o, name)
+				c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
 				c.RegisterObfuscator(obfuscate.NewAny(o))
 			}
 

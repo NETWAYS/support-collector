@@ -135,12 +135,12 @@ func Collect(c *collection.Collection) {
 
 func CollectModuleInfo(c *collection.Collection) {
 	if !collection.DetectGitInstalled() {
-		c.Log.Warnf("we need git to inspect modules closer")
+		c.Log.Debug("we need git to inspect modules closer")
 	}
 
 	modulesFiles, err := os.ReadDir(ModulesPath)
 	if err != nil {
-		c.Log.Warnf("Could not list modules in %s - %s", ModulesPath, err)
+		c.Log.Debugf("Could not list modules in %s - %s", ModulesPath, err)
 		return
 	}
 

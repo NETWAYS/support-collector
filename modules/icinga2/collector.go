@@ -114,7 +114,7 @@ func Collect(c *collection.Collection) {
 
 	content, err := collection.LoadCommandOutput("icinga2", "-V")
 	if err != nil {
-		c.Log.Info("Could not find icinga2")
+		c.Log.Debug("Could not find executable for icinga2")
 
 		icinga2version = ""
 	} else {
