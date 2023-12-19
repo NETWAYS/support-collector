@@ -131,7 +131,7 @@ func (c *Collection) AddFileYAML(fileName string, data interface{}) {
 
 	err := yaml.NewEncoder(&buf).Encode(&data)
 	if err != nil {
-		c.Log.Warnf("could not encode YAML data for '%s': %s", fileName, err)
+		c.Log.Debugf("could not encode YAML data for '%s': %s", fileName, err)
 	}
 
 	file := NewFile(fileName)
@@ -145,7 +145,7 @@ func (c *Collection) AddFiles(prefix, source string) {
 
 	files, err := LoadFiles(prefix, source)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Debug(err)
 	}
 
 	for _, file := range files {
@@ -182,13 +182,13 @@ func (c *Collection) AddCommandOutputWithTimeout(file string,
 
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Debug(err)
 	}
 
 	// obfuscate
 	output, err = c.callObfuscators(obfuscate.KindOutput, obfuscate.JoinCommand(command, arguments...), output)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Debug(err)
 	}
 
 	c.AddFileDataRaw(file, output)
@@ -203,7 +203,7 @@ func (c *Collection) AddInstalledPackagesRaw(fileName string, pattern ...string)
 
 	packages, err := ListInstalledPackagesRaw(pattern...)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Debug(err)
 	}
 
 	c.AddFileDataRaw(fileName, packages)
@@ -214,7 +214,7 @@ func (c *Collection) AddServiceStatusRaw(fileName, name string) {
 
 	output, err := GetServiceStatusRaw(name)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Debug(err)
 	}
 
 	c.AddFileDataRaw(fileName, output)
@@ -225,7 +225,7 @@ func (c *Collection) AddGitRepoInfo(fileName, path string) {
 
 	info, err := LoadGitRepoInfo(path)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Debug(err)
 	}
 
 	c.AddFileYAML(fileName, info)

@@ -92,7 +92,7 @@ func Collect(c *collection.Collection) {
 	}
 
 	if !pythonFound {
-		c.Log.Warn("Python not found on system")
+		c.Log.Debug("Python not found on system")
 	}
 
 	for _, file := range files {
@@ -101,7 +101,7 @@ func Collect(c *collection.Collection) {
 
 	processList, err := collection.ProcessListFilter(processFilter)
 	if err != nil {
-		c.Log.Warn("cant get process list")
+		c.Log.Debug("cant get process list")
 	}
 
 	// save process names to string array
