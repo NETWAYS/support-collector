@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-	"github.com/NETWAYS/support-collector/pkg/util"
+	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"github.com/stretchr/testify/assert"
 )
 

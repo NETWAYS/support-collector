@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )

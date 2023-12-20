@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/internal/collection"
 )
 
 const ModuleName = "influxdb"
