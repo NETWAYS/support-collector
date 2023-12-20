@@ -7,6 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
@@ -27,9 +30,6 @@ import (
 	"github.com/NETWAYS/support-collector/modules/prometheus"
 	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/modules/webservers"
-	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-	"github.com/NETWAYS/support-collector/pkg/util"
 
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"

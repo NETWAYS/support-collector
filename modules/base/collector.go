@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/NETWAYS/support-collector/pkg/collection"
+	"github.com/NETWAYS/support-collector/internal/collection"
 	"gopkg.in/yaml.v3"
 )
 

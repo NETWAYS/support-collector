@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/NETWAYS/support-collector/pkg/collection"
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
-	"github.com/NETWAYS/support-collector/pkg/util"
+	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const ModuleName = "graphite"

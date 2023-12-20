@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/NETWAYS/support-collector/pkg/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"github.com/stretchr/testify/assert"
 )
 
