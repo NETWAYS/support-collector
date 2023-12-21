@@ -1,6 +1,7 @@
 package icinga2
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"github.com/NETWAYS/support-collector/internal/collection"
@@ -29,6 +30,7 @@ func InitAPICollection(c *collection.Collection) error {
 	if len(APIEndpoints) == 0 {
 		return fmt.Errorf("0 API endpoints provided. No data will be collected from remote targets")
 	}
+
 	c.Log.Info("Start collection of Icinga 2 API endpoints")
 
 	// return if username or password is not provided
@@ -43,6 +45,7 @@ func InitAPICollection(c *collection.Collection) error {
 			c.Log.Warn(err)
 			continue
 		}
+
 		c.Log.Debugf("Endpoint '%s' is reachable", endpoint)
 
 		// collect /v1/status from endpoint
@@ -79,8 +82,12 @@ func collectStatus(endpoint string, c *collection.Collection) error {
 	}
 	client := &http.Client{Transport: tr}
 
+	// build context for request
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	// build request
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://%s/v1/status", endpoint), nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://%s/v1/status", endpoint), nil)
 	if err != nil {
 		return fmt.Errorf("cant build new request for '%s': %w", endpoint, err)
 	}
@@ -93,6 +100,7 @@ func collectStatus(endpoint string, c *collection.Collection) error {
 	if err != nil {
 		return fmt.Errorf("cant requests status from '%s': %w", endpoint, err)
 	}
+
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
