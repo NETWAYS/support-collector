@@ -3,6 +3,7 @@ package collection
 import (
 	"archive/zip"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -140,6 +141,20 @@ func (c *Collection) AddFileYAML(fileName string, data interface{}) {
 	_ = c.AddFileToOutput(file)
 }
 
+func (c *Collection) AddFileJSON(fileName string, data interface{}) {
+	var buf bytes.Buffer
+
+	err := json.NewEncoder(&buf).Encode(&data)
+	if err != nil {
+		c.Log.Debugf("could not encode JSON data for '%s': %s", fileName, err)
+	}
+
+	file := NewFile(fileName)
+	file.Data = buf.Bytes()
+
+	_ = c.AddFileToOutput(file)
+}
+
 func (c *Collection) AddFiles(prefix, source string) {
 	c.Log.Debug("Collecting files from ", source)
 
@@ -178,7 +193,7 @@ func (c *Collection) AddFilesIfFound(prefix string, sources ...string) {
 
 func (c *Collection) AddCommandOutputWithTimeout(file string,
 	timeout time.Duration, command string, arguments ...string) {
-	c.Log.Debugf("Collecting command output: %s %s", command, strings.Join(arguments, " "))
+	c.Log.Debugf("Collecting command output: '%s %s'", command, strings.Join(arguments, " "))
 
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
 	if err != nil {

@@ -143,4 +143,10 @@ func Collect(c *collection.Collection) {
 			c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)
 		}
 	}
+
+	// start the collection of remote api endpoints
+	err = InitAPICollection(c)
+	if err != nil {
+		c.Log.Warn(err)
+	}
 }
