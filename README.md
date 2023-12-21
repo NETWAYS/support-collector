@@ -23,7 +23,6 @@ The `--hide` flag can be used multiple times to hide sensitive data, it supports
 `# support-collector --hide "Secret:.*" --hide "Password:.*"`
 
 By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.
-> Logs are also not collected by default. To collect them, add `--detailed`
 
 If you want to see what is collected, add `--verbose`
 
