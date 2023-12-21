@@ -76,9 +76,10 @@ func endpointIsReachable(endpoint string) error {
 func collectStatus(endpoint string, c *collection.Collection) error {
 	c.Log.Debugf("request data from endpoint '%s/v1/status'", endpoint)
 
-	// allow insecure connections because of Icinga 2 certificates
+	// allow insecure connections because of Icinga 2 certificates and add proxy if one is defined in the environments
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+		Proxy:           http.ProxyFromEnvironment,
 	}
 	client := &http.Client{Transport: tr}
 
@@ -87,7 +88,7 @@ func collectStatus(endpoint string, c *collection.Collection) error {
 	defer cancel()
 
 	// build request
-	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://%s/v1/status", endpoint), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s/v1/status", endpoint), nil)
 	if err != nil {
 		return fmt.Errorf("cant build new request for '%s': %w", endpoint, err)
 	}
