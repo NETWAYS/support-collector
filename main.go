@@ -193,17 +193,23 @@ func main() {
 }
 
 func handleArguments() {
-	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
+	// arguments for collection handling
 	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
+	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.BoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
 	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
 	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
-	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
-	flag.BoolVarP(&verbose, "debug", "d", false, "Enable debug logging (use verbose)")
-	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
 
-	_ = flag.CommandLine.MarkHidden("debug")
+	// api credentials for icinga 2 modules
+	flag.StringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure")                                                                          //nolint:lll
+	flag.StringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure")                                                                         //nolint:lll
+	flag.StringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "List of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)") //nolint:lll
+
+	// basic arguments
+	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
+	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+
 	flag.CommandLine.SortFlags = false
 
 	// Output a proper help message with details
