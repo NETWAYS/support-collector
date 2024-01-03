@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/NETWAYS/support-collector/internal/argument"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"github.com/NETWAYS/support-collector/internal/util"
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
@@ -105,96 +104,103 @@ var (
 )
 
 var (
-	verbose, printVersion           bool
-	enabledModules, disabledModules []string
-	extraObfuscators                []string
-	outputFile                      string
-	commandTimeout                  = 60 * time.Second
-	noDetailedCollection            bool
+	verbose, printVersion bool
+	disabledModules       []string
+	extraObfuscators      []string
+	outputFile            string
+	commandTimeout        = 60 * time.Second
+	noDetailedCollection  bool
 )
 
 func main() {
-	handleArguments()
+	handleArguments2()
+	/*
+		handleArguments()
 
-	// set locale to C, to avoid translations in command output
-	_ = os.Setenv("LANG", "C")
+		// set locale to C, to avoid translations in command output
+		_ = os.Setenv("LANG", "C")
 
-	c, cleanup := NewCollection(outputFile)
-	defer cleanup()
+		c, cleanup := NewCollection(outputFile)
+		defer cleanup()
 
-	if noDetailedCollection {
-		c.Detailed = false
-		c.Log.Warn("Detailed collection is disabled")
-	} else {
-		c.Log.Info("Detailed collection is enabled")
-	}
-
-	if !util.IsPrivilegedUser() {
-		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
-	}
-
-	var (
-		startTime = time.Now()
-		timings   = map[string]time.Duration{}
-	)
-
-	// Set command Timeout from argument
-	c.ExecTimeout = commandTimeout
-
-	// Call all enabled modules
-	for _, name := range moduleOrder {
-		switch {
-		case util.StringInSlice(name, disabledModules):
-			c.Log.Debugf("Module %s is disabled", name)
-		case !util.StringInSlice(name, enabledModules):
-			c.Log.Debugf("Module %s is not enabled", name)
-		default:
-			moduleStart := time.Now()
-
-			c.Log.Debugf("Start collecting data for module %s", name)
-
-			for _, o := range extraObfuscators {
-				c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
-				c.RegisterObfuscator(obfuscate.NewAny(o))
-			}
-
-			modules[name](c)
-
-			timings[name] = time.Since(moduleStart)
-			c.Log.Debugf("Finished with module %s in %.3f seconds", name, timings[name].Seconds())
+		if noDetailedCollection {
+			c.Detailed = false
+			c.Log.Warn("Detailed collection is disabled")
+		} else {
+			c.Log.Info("Detailed collection is enabled")
 		}
-	}
 
-	// Collect obfuscation info
-	var files, count uint
+		if !util.IsPrivilegedUser() {
+			c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
+		}
 
-	for _, o := range c.Obfuscators {
-		files += o.Files
+		var (
+			startTime = time.Now()
+			timings   = map[string]time.Duration{}
+		)
 
-		count += o.Replaced
-	}
+		// Set command Timeout from argument
+		c.ExecTimeout = commandTimeout
 
-	if files > 0 {
-		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, files, len(c.Obfuscators))
-	}
+		// Call all enabled modules
+		for _, name := range moduleOrder {
+			switch {
+			case util.StringInSlice(name, disabledModules):
+				c.Log.Debugf("Module %s is disabled", name)
+			case !util.StringInSlice(name, enabledModules):
+				c.Log.Debugf("Module %s is not enabled", name)
+			default:
+				moduleStart := time.Now()
 
-	// Save timings
-	timings["total"] = time.Since(startTime)
-	c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
+				c.Log.Debugf("Start collecting data for module %s", name)
 
-	c.AddFileYAML("timing.yml", timings)
+				for _, o := range extraObfuscators {
+					c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
+					c.RegisterObfuscator(obfuscate.NewAny(o))
+				}
 
-	path, err := filepath.Abs(outputFile)
-	if err != nil {
-		c.Log.Debug(err)
-	}
+				modules[name](c)
 
-	c.Log.Infof("Generated ZIP file located at %s", path)
+				timings[name] = time.Since(moduleStart)
+				c.Log.Debugf("Finished with module %s in %.3f seconds", name, timings[name].Seconds())
+			}
+		}
+
+		// Collect obfuscation info
+		var files, count uint
+
+		for _, o := range c.Obfuscators {
+			files += o.Files
+
+			count += o.Replaced
+		}
+
+		if files > 0 {
+			c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, files, len(c.Obfuscators))
+		}
+
+		// Save timings
+		timings["total"] = time.Since(startTime)
+		c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
+
+		c.AddFileYAML("timing.yml", timings)
+
+		path, err := filepath.Abs(outputFile)
+		if err != nil {
+			c.Log.Debug(err)
+		}
+
+		c.Log.Infof("Generated ZIP file located at %s", path)
+	*/
+}
+
+// TODO
+func handleArguments2() {
+
 }
 
 func handleArguments() {
 	// arguments for collection handling
-	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
 	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.BoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
@@ -229,7 +235,15 @@ func handleArguments() {
 	}
 
 	// Verify enabled modules
-	for _, name := range enabledModules {
+	activeModule := strings.Split(fmt.Sprintf("%s", argument.EnabledModules), ",")
+
+	// TODO remove
+	for _, mod := range activeModule {
+		fmt.Println(mod)
+	}
+
+	// TODO update
+	for _, name := range activeModule {
 		if _, ok := modules[name]; !ok {
 			logrus.Fatal("Unknown module to enable: ", name)
 		}
