@@ -115,7 +115,7 @@ func collectStatus(endpoint string, c *collection.Collection) error {
 	}
 
 	// add body to file
-	c.AddFileJSON(filepath.Join(ModuleName, fmt.Sprintf("api-v1_status_%s.json", extractHostname(endpoint))), string(body))
+	c.AddFileJSON(filepath.Join(ModuleName, fmt.Sprintf("api-v1_status_%s.json", extractHostname(endpoint))), body)
 
 	return nil
 }
