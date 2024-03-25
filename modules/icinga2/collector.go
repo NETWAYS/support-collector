@@ -14,6 +14,8 @@ const ModuleName = "icinga2"
 
 var files = []string{
 	"/etc/icinga2",
+	"/var/lib/icinga2/api/packages",
+	"/var/lib/icinga2/api/zones"
 }
 
 var pluginFiles = []string{
