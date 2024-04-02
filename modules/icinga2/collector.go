@@ -14,8 +14,7 @@ const ModuleName = "icinga2"
 
 var files = []string{
 	"/etc/icinga2",
-	"/var/lib/icinga2/api/packages",
-	"/var/lib/icinga2/api/zones",
+	"/var/lib/icinga2/api/packages/_api/active-stage",
 }
 
 var pluginFiles = []string{
@@ -45,6 +44,8 @@ var commands = map[string][]string{
 	"features.txt":          {"icinga2", "feature", "list"},
 	"user-icinga.txt":       {"id", "icinga"},
 	"user-nagios.txt":       {"id", "nagios"},
+	"icinga2-api-stage-directories.txt": {"ls", "-ld" , "/var/lib/icinga2/api/packages/_api/*/"},
+	"director-api-stage-directories.txt": {"ls", "-ld" , "/var/lib/icinga2/api/packages/director/*/"},
 }
 
 var detailedCommands = map[string][]string{
