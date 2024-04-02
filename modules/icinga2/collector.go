@@ -36,16 +36,16 @@ var detailedFiles = []string{
 }
 
 var commands = map[string][]string{
-	"version.txt":           {"icinga2", "-V"},
-	"config-check.txt":      {"icinga2", "daemon", "-C"},
-	"objects-zones.txt":     {"icinga2", "object", "list", "--type", "Zone"},
-	"objects-endpoints.txt": {"icinga2", "object", "list", "--type", "Endpoint"},
-	"variables.txt":         {"icinga2", "variable", "list"},
-	"features.txt":          {"icinga2", "feature", "list"},
-	"user-icinga.txt":       {"id", "icinga"},
-	"user-nagios.txt":       {"id", "nagios"},
-	"icinga2-api-stage-directories.txt": {"ls", "-ld" , "/var/lib/icinga2/api/packages/_api/*/"},
-	"director-api-stage-directories.txt": {"ls", "-ld" , "/var/lib/icinga2/api/packages/director/*/"},
+	"version.txt":                        {"icinga2", "-V"},
+	"config-check.txt":                   {"icinga2", "daemon", "-C"},
+	"objects-zones.txt":                  {"icinga2", "object", "list", "--type", "Zone"},
+	"objects-endpoints.txt":              {"icinga2", "object", "list", "--type", "Endpoint"},
+	"variables.txt":                      {"icinga2", "variable", "list"},
+	"features.txt":                       {"icinga2", "feature", "list"},
+	"user-icinga.txt":                    {"id", "icinga"},
+	"user-nagios.txt":                    {"id", "nagios"},
+	"icinga2-api-stage-directories.txt":  {"ls", "-ld", "/var/lib/icinga2/api/packages/_api/*/"},
+	"director-api-stage-directories.txt": {"ls", "-ld", "/var/lib/icinga2/api/packages/director/*/"},
 }
 
 var detailedCommands = map[string][]string{
