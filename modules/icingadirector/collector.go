@@ -12,6 +12,10 @@ const (
 	InstallationPath = "/usr/share/icingaweb2/modules/director"
 )
 
+var files = []string{
+	"/var/lib/icinga2/api/packages/director/active-stage",
+}
+
 var commands = map[string][]string{
 	"health.txt":              {"icingacli", "director", "health"},
 	"user-icingadirector.txt": {"id", "icingadirector"},
@@ -46,6 +50,10 @@ func Collect(c *collection.Collection) {
 	c.AddServiceStatusRaw(filepath.Join(ModuleName, "service.txt"), "icinga-director")
 
 	// TODO: more infos on modules, GIT details
+
+	for _, file := range files {
+		c.AddFiles(ModuleName, file)
+	}
 
 	for name, cmd := range commands {
 		c.AddCommandOutput(filepath.Join(ModuleName, name), cmd[0], cmd[1:]...)

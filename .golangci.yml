@@ -28,11 +28,20 @@ linters:
      - tagliatelle
      - varnamelen
      - wrapcheck
+     - golint # deprecated
+     - nosnakecase # deprecated
+     - scopelint # deprecated
+     - ifshort # deprecated
+     - interfacer # deprecated
+     - structcheck # deprecated
+     - maligned # deprecated
+     - varcheck # deprecated
+     - deadcode # deprecated
+     - goconst # not needed in our case
+     - perfsprint # not needed in our case
 linters-settings:
    funlen:
      ignore-comments: true
      lines: 75
-   estif:
-     min-complexity: 4
-   maligned:
-     suggest-new: true
+   nestif:
+     min-complexity: 5

@@ -147,6 +147,7 @@ func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, e
 				ending = string(r) + ending
 				return true
 			}
+
 			return false
 		})
 
