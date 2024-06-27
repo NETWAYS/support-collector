@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/NETWAYS/support-collector/internal/metrics"
 	"os"
 	"path/filepath"
 	"strings"
@@ -111,16 +113,31 @@ var (
 	outputFile                      string
 	commandTimeout                  = 60 * time.Second
 	noDetailedCollection            bool
+	startTime                       = time.Now()
+	metric                          *metrics.Metrics
 )
 
 func main() {
 	handleArguments()
 
-	// set locale to C, to avoid translations in command output
+	// Set locale to C, to avoid translations in command output
 	_ = os.Setenv("LANG", "C")
 
-	c, cleanup := NewCollection(outputFile)
-	defer cleanup()
+	c, closeCollection := NewCollection(outputFile)
+	// Close collection
+	defer closeCollection()
+
+	// Initialize new metrics and defer function to save it to json
+	metric = metrics.New(getVersion())
+	defer func() {
+		// Save metrics to file
+		body, err := json.Marshal(metric)
+		if err != nil {
+			c.Log.Warn("cant unmarshal metrics: %w", err)
+		}
+
+		c.AddFileJSON("metrics.json", body)
+	}()
 
 	if noDetailedCollection {
 		c.Detailed = false
@@ -133,37 +150,16 @@ func main() {
 		c.Log.Warn("This tool should be run as a privileged user (root) to collect all necessary information")
 	}
 
-	var (
-		startTime = time.Now()
-		timings   = map[string]time.Duration{}
-	)
-
 	// Set command Timeout from argument
 	c.ExecTimeout = commandTimeout
 
-	// Call all enabled modules
-	for _, name := range moduleOrder {
-		switch {
-		case util.StringInSlice(name, disabledModules):
-			c.Log.Debugf("Module %s is disabled", name)
-		case !util.StringInSlice(name, enabledModules):
-			c.Log.Debugf("Module %s is not enabled", name)
-		default:
-			moduleStart := time.Now()
+	// Collect modules
+	collectModules(c)
 
-			c.Log.Debugf("Start collecting data for module %s", name)
+	// Save overall timing
+	metric.Timings["total"] = time.Since(startTime)
 
-			for _, o := range extraObfuscators {
-				c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
-				c.RegisterObfuscator(obfuscate.NewAny(o))
-			}
-
-			modules[name](c)
-
-			timings[name] = time.Since(moduleStart)
-			c.Log.Debugf("Finished with module %s in %.3f seconds", name, timings[name].Seconds())
-		}
-	}
+	c.Log.Infof("Collection complete, took us %.3f seconds", metric.Timings["total"].Seconds())
 
 	// Collect obfuscation info
 	var files, count uint
@@ -178,12 +174,7 @@ func main() {
 		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, files, len(c.Obfuscators))
 	}
 
-	// Save timings
-	timings["total"] = time.Since(startTime)
-	c.Log.Infof("Collection complete, took us %.3f seconds", timings["total"].Seconds())
-
-	c.AddFileYAML("timing.yml", timings)
-
+	// get absolute path of outputFile
 	path, err := filepath.Abs(outputFile)
 	if err != nil {
 		c.Log.Debug(err)
@@ -224,7 +215,7 @@ func handleArguments() {
 	flag.Parse()
 
 	if printVersion {
-		fmt.Println(Product, "version", buildVersion()) //nolint:forbidigo
+		fmt.Println(Product, "version", getBuildInfo()) //nolint:forbidigo
 		os.Exit(0)
 	}
 
@@ -241,6 +232,9 @@ func buildFileName() string {
 	return util.GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
 }
 
+// NewCollection starts a new collection. outputFile will be created.
+//
+// Collection and cleanup function to defer are returned
 func NewCollection(outputFile string) (*collection.Collection, func()) {
 	file, err := os.Create(outputFile)
 	if err != nil {
@@ -263,9 +257,8 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 		Level:     consoleLevel,
 	})
 
-	versionString := buildVersion()
+	versionString := getBuildInfo()
 	c.Log.Infof("Starting %s version %s", Product, versionString)
-	c.AddFileDataRaw("version", []byte(versionString+"\n"))
 
 	return c, func() {
 		// Close all open outputs in order, but only log errors
@@ -278,6 +271,37 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 			if err != nil {
 				logrus.Error(err)
 			}
+		}
+	}
+}
+
+func collectModules(c *collection.Collection) {
+	// Check if module is enabled / disabled and call it
+	for _, name := range moduleOrder {
+		switch {
+		case util.StringInSlice(name, disabledModules):
+			c.Log.Debugf("Module %s is disabled", name)
+		case !util.StringInSlice(name, enabledModules):
+			c.Log.Debugf("Module %s is not enabled", name)
+		default:
+			// Save current time
+			moduleStart := time.Now()
+
+			c.Log.Debugf("Start collecting data for module %s", name)
+
+			// Register custom obfuscators
+			for _, o := range extraObfuscators {
+				c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
+				c.RegisterObfuscator(obfuscate.NewAny(o))
+			}
+
+			// Call collection function for module
+			modules[name](c)
+
+			// Save runtime of module
+			metric.Timings[name] = time.Since(moduleStart)
+
+			c.Log.Debugf("Finished with module %s in %.3f seconds", name, metric.Timings[name].Seconds())
 		}
 	}
 }

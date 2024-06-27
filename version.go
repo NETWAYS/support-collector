@@ -10,7 +10,7 @@ var (
 )
 
 //goland:noinspection GoBoolExpressions
-func buildVersion() string {
+func getBuildInfo() string {
 	result := version
 
 	if commit != "" {
@@ -22,4 +22,8 @@ func buildVersion() string {
 	}
 
 	return result
+}
+
+func getVersion() string {
+	return version
 }

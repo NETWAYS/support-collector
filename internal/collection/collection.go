@@ -3,6 +3,7 @@ package collection
 import (
 	"archive/zip"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -23,6 +24,7 @@ type Collection struct {
 	JournalLoggingInterval string
 }
 
+// New initializes new collection
 func New(w io.Writer) (c *Collection) {
 	c = &Collection{
 		Output:                 zip.NewWriter(w),
@@ -141,7 +143,22 @@ func (c *Collection) AddFileYAML(fileName string, data interface{}) {
 }
 
 func (c *Collection) AddFileJSON(fileName string, data []byte) {
-	c.AddFileDataRaw(fileName, data)
+	var jsonData interface{}
+
+	err := json.Unmarshal(data, &jsonData)
+	if err != nil {
+		c.Log.Debugf("could not unmarshal JSON data for '%s': %s", fileName, err)
+	}
+
+	prettyJSON, err := json.MarshalIndent(jsonData, "", "")
+	if err != nil {
+		c.Log.Debugf("could not marshal JSON data for '%s': %s", fileName, err)
+	}
+
+	file := NewFile(fileName)
+	file.Data = prettyJSON
+
+	_ = c.AddFileToOutput(file)
 }
 
 func (c *Collection) AddFiles(prefix, source string) {
