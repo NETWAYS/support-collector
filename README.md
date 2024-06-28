@@ -22,6 +22,9 @@ The `--hide` flag can be used multiple times to hide sensitive data, it supports
 
 `# support-collector --hide "Secret:.*" --hide "Password:.*"`
 
+In addition, files and folders that follow a specific pattern are not collected. This affects all files that correspond to the following filters:  
+`.*`, `*~`, `*.key`, `*.csr`, `*.crt`, and `*.pem`
+
 By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.
 
 If you want to see what is collected, add `--verbose`

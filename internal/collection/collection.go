@@ -183,13 +183,7 @@ func (c *Collection) AddFilesIfFound(prefix string, sources ...string) {
 			return
 		}
 
-		c.Log.Debug("Collecting files from ", source)
-
-		for _, file := range files {
-			foundFiles++
-
-			_ = c.AddFileToOutput(file)
-		}
+		c.AddFiles(prefix, source)
 	}
 
 	if foundFiles == 0 {
