@@ -20,7 +20,7 @@ type File struct {
 	io.Writer
 }
 
-var reIgnoreFiles = regexp.MustCompile(`(^\.|~$)`)
+var reIgnoreFiles = regexp.MustCompile(`(^\.|~$|\.key$|\.csr$|\.crt$|\.pem$)`)
 
 func NewFile(name string) *File {
 	return &File{
@@ -56,7 +56,9 @@ func LoadFiles(prefix, source string) (files []*File, err error) {
 		return
 	}
 
-	files = append(files, file)
+	if !reIgnoreFiles.MatchString(file.Name) {
+		files = append(files, file)
+	}
 
 	return
 }
