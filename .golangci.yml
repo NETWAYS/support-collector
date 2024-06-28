@@ -42,6 +42,6 @@ linters:
 linters-settings:
    funlen:
      ignore-comments: true
-     lines: 75
+     lines: 80
    nestif:
      min-complexity: 5

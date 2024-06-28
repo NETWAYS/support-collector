@@ -125,8 +125,12 @@ func Collect(c *collection.Collection) {
 	}
 
 	// With Icinga 2 >= 2.14 the icinga2.debug cache is no longer built automatically on every reload. To retrieve a current state we build it manually (only possible from 2.14.0)
+	// Needs to be done before commands are collected
 	if icinga2version >= "2.14.0" {
-		c.AddCommandOutput("dump-objects.txt", "icinga2", "daemon", "-C", "--dump-objects")
+		_, err = collection.LoadCommandOutput("icinga2", "daemon", "-C", "--dump-objects")
+		if err != nil {
+			c.Log.Warn(err)
+		}
 	}
 
 	for name, cmd := range commands {
