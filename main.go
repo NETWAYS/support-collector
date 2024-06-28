@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/NETWAYS/support-collector/internal/arguments"
 	"github.com/NETWAYS/support-collector/internal/metrics"
 	"os"
 	"path/filepath"
@@ -184,10 +185,14 @@ func main() {
 }
 
 func handleArguments() {
+	// TODO only a prototype
+	arguments.NewStringVar(&outputFile, buildFileName(), "Output file for the ZIP content")
+	arguments.NewStringSliceVar(&enabledModules, moduleOrder, "Comma seperated list of enabled module")
+
 	// arguments for collection handling
-	flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
+	//flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
 	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
-	flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
+	//flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
 	flag.BoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
 	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
 	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
