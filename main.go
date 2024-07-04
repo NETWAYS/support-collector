@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NETWAYS/support-collector/internal/arguments"
 	"github.com/NETWAYS/support-collector/internal/metrics"
+	flag "github.com/spf13/pflag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,16 +37,15 @@ import (
 
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
-	flag "github.com/spf13/pflag"
 )
 
-const Product = "NETWAYS support collector"
+const Product = "NETWAYS support-collector"
 
 // FilePrefix for the outfile file.
-const FilePrefix = "netways-support"
+const FilePrefix = "support-collector"
 
 const Readme = `
-The support collector allows our customers to collect relevant information from
+The support-collector allows our customers to collect relevant information from
 their servers. A resulting ZIP file can then be provided to our support team
 for further inspection.
 
@@ -108,22 +108,79 @@ var (
 )
 
 var (
-	verbose, printVersion           bool
-	enabledModules, disabledModules []string
-	extraObfuscators                []string
-	outputFile                      string
-	commandTimeout                  = 60 * time.Second
-	noDetailedCollection            bool
-	startTime                       = time.Now()
-	metric                          *metrics.Metrics
+	verbose, printVersion, noDetailedCollection       bool
+	enabledModules, disabledModules, extraObfuscators []string
+	outputFile                                        string
+	commandTimeout                                    = 60 * time.Second
+	startTime                                         = time.Now()
+	metric                                            *metrics.Metrics
 )
 
-func main() {
-	handleArguments()
-
+func init() {
 	// Set locale to C, to avoid translations in command output
 	_ = os.Setenv("LANG", "C")
 
+	args := arguments.NewHandler()
+
+	// General arguments without interactive prompt
+	flag.BoolVar(&arguments.NonInteractive, "nonInteractive", false, "Enable non-interactive mode")
+	flag.BoolVar(&printVersion, "version", false, "Print version and exit")
+	flag.BoolVar(&verbose, "verbose", false, "Enable verbose logging")
+
+	// TODO
+	//flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
+
+	// Run specific arguments
+	args.NewPromptStringVar(&outputFile, "output", buildFileName(), "Output file for the ZIP content", true)
+	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Comma separated list of enabled modules", false)
+	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Comma separated list of disabled modules", false)
+	args.NewPromptBoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
+
+	// Icinga 2 specific arguments
+	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false)
+	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false)
+	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Comma separated list of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false)
+
+	flag.CommandLine.SortFlags = false
+
+	// Output a proper help message with details
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n%s\n\n", Product, strings.Trim(Readme, "\n"))
+
+		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
+	if printVersion {
+		fmt.Println(Product, "version", getBuildInfo()) //nolint:forbidigo
+		os.Exit(0)
+	}
+
+	if !arguments.NonInteractive {
+		args.ReadArgumentsFromStdin()
+	}
+
+	// Verify enabled modules
+	for _, name := range enabledModules {
+		if _, ok := modules[name]; !ok {
+			logrus.Fatal("Unknown module to enable: ", name)
+		}
+	}
+
+	fmt.Println(noDetailedCollection)
+
+	os.Exit(1)
+}
+
+// buildFileName returns a filename to store the output of support collector.
+func buildFileName() string {
+	return FilePrefix + "_" + util.GetHostnameWithoutDomain() + "_" + time.Now().Format("20060102-1504") + ".zip"
+}
+
+func main() {
 	c, closeCollection := NewCollection(outputFile)
 	// Close collection
 	defer closeCollection()
@@ -182,59 +239,6 @@ func main() {
 	}
 
 	c.Log.Infof("Generated ZIP file located at %s", path)
-}
-
-func handleArguments() {
-	// TODO only a prototype
-	arguments.NewStringVar(&outputFile, buildFileName(), "Output file for the ZIP content")
-	arguments.NewStringSliceVar(&enabledModules, moduleOrder, "Comma seperated list of enabled module")
-
-	// arguments for collection handling
-	//flag.StringSliceVar(&enabledModules, "enable", moduleOrder, "List of enabled module")
-	flag.StringSliceVar(&disabledModules, "disable", []string{}, "List of disabled module")
-	//flag.StringVarP(&outputFile, "output", "o", buildFileName(), "Output file for the ZIP content")
-	flag.BoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
-	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
-	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
-
-	// api credentials for icinga 2 modules
-	flag.StringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure")                                                                          //nolint:lll
-	flag.StringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure")                                                                         //nolint:lll
-	flag.StringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "List of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)") //nolint:lll
-
-	// basic arguments
-	flag.BoolVarP(&printVersion, "version", "V", false, "Print version and exit")
-	flag.BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
-
-	flag.CommandLine.SortFlags = false
-
-	// Output a proper help message with details
-	flag.Usage = func() {
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n%s\n\n", Product, strings.Trim(Readme, "\n"))
-
-		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	if printVersion {
-		fmt.Println(Product, "version", getBuildInfo()) //nolint:forbidigo
-		os.Exit(0)
-	}
-
-	// Verify enabled modules
-	for _, name := range enabledModules {
-		if _, ok := modules[name]; !ok {
-			logrus.Fatal("Unknown module to enable: ", name)
-		}
-	}
-}
-
-// buildFileName returns a filename to store the output of support collector.
-func buildFileName() string {
-	return util.GetHostnameWithoutDomain() + "-" + FilePrefix + "-" + time.Now().Format("20060102-1504") + ".zip"
 }
 
 // NewCollection starts a new collection. outputFile will be created.
