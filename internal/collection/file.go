@@ -126,7 +126,7 @@ func LoadFilesFromDirectory(prefix, source string) (files []*File, err error) {
 				return fmt.Errorf("could not read link: %w", err)
 			}
 
-			file = NewFile(path + "-symlink.txt")
+			file = NewFile(filepath.Join(prefix, path) + "-symlink.txt")
 			file.Data = []byte(link)
 		} else {
 			file, err = loadFile(prefix, path, info)
