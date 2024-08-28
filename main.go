@@ -124,6 +124,7 @@ func init() {
 	args := arguments.New()
 
 	// General arguments without interactive prompt
+	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
 	flag.BoolVar(&arguments.NonInteractive, "non-interactive", false, "Enable non-interactive mode")
 	flag.BoolVar(&printVersion, "version", false, "Print version and exit")
 	flag.BoolVar(&verbose, "verbose", false, "Enable verbose logging")

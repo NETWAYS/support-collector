@@ -16,6 +16,17 @@ Inspired by [NETWAYS/icinga2-diagnostics](https://github.com/Icinga/icinga2-diag
 
 ## Usage
 
+`$ support-collector`
+
+The CLI wizard will guide you through the possible arguments after calling the command.  
+If you prefer to pass the arguments in the command call, use `--non-interactive` and pass the arguments as described in the documentation.
+
+`--hide`, `--command-timeout` can only be used as CLI argument.
+
+You can also combine your CLI arguments and the wizard. All arguments you pass from the CLI will be given into the wizard.
+
+---
+
 > **WARNING:** Some passwords or secrets are automatically removed, but this no guarantee, so be careful what you share!
 
 The `--hide` flag can be used multiple times to hide sensitive data, it supports regular expressions.
@@ -26,23 +37,25 @@ By default, we collect all we can find. You can control this by only enabling ce
 
 If you want to see what is collected, add `--verbose`
 
-To collect advanced data for module `Icinga 2`, you can use the Icinga 2 API to collect data from all endpoints provided.
-The API requests are performed with a global API user you have to create yourself. Just create that user in a global zone like 'director-global'
+To collect advanced data for module `Icinga 2`, you can use the Icinga 2 API to collect data from all endpoints
+provided.
+The API requests are performed with a global API user you have to create yourself. Just create that user in a global
+zone like 'director-global' to sync it to all endpoints
 
-
-| Short | Long                    | Description                                                                                                                                   |
-|:-----:|:------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-|  -o   | --output                | Output file for the zip content (default: current directory and named like '$HOSTNAME'-netways-support-$TIMESTAMP.zip)                        |
-|       | --nodetails             | Disable detailed collection including logs and more                                                                                           |
-|       | --enable                | List of enabled modules (default: all)                                                                                                        |
-|       | --disable               | List of disabled modules (default: none)                                                                                                      |
-|       | --hide                  | List of keywords to obfuscate. Can be used multiple times                                                                                     |
-|       | --command-timeout       | Timeout for command execution in modules (default: 1m0s)                                                                                      |
-|       | --icinga2-api-user      | Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure                                                            |
-|       | --icinga2-api-pass      | Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure                                                           |
-|       | --icinga2-api-endpoints | List of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665) |
-|  -v   | --verbose               | Enable verbose logging                                                                                                                        |
-|  -V   | --version               | Print version and exit                                                                                                                        |
+| Short | Long                    | Description                                                                                                                                                                            |
+|:-----:|:------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|  -o   | --output                | Output file for the zip content (default: current directory and named like '\$HOSTNAME'-netways-support-\$TIMESTAMP.zip)                                                               |
+|       | --non-interactive       | Disable the interactive CLI wizard                                                                                                                                                     |
+|       | --no-details            | Disable detailed collection including logs and more                                                                                                                                    |
+|       | --enable                | List of enabled modules (default: all)                                                                                                                                                 |
+|       | --disable               | List of disabled modules (default: none)                                                                                                                                               |
+|       | --hide                  | List of keywords to obfuscate. Can be used multiple times                                                                                                                              |
+|       | --command-timeout       | Timeout for command execution in modules (default: 1m0s)                                                                                                                               |
+|       | --icinga2-api-user      | Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure (Optional and only for module `icinga2`)                                                            |
+|       | --icinga2-api-pass      | Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure (Optional and only for module `icinga2`)                                                           |
+|       | --icinga2-api-endpoints | List of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665) (Optional and only for module `icinga2`) |
+|  -v   | --verbose               | Enable verbose logging                                                                                                                                                                 |
+|  -V   | --version               | Print version and exit                                                                                                                                                                 |
 
 ## Modules
 
