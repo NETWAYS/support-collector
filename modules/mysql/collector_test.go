@@ -9,6 +9,7 @@ import (
 )
 
 func TestCollect(t *testing.T) {
+
 	c := collection.New(&bytes.Buffer{})
 
 	Collect(c)

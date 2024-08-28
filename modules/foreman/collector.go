@@ -2,7 +2,6 @@ package foreman
 
 import (
 	"github.com/NETWAYS/support-collector/internal/util"
-	"os"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
@@ -25,11 +24,6 @@ var detailedFiles = []string{
 	"/var/log/foreman",
 	"/var/log/foreman-installer",
 	"/var/log/foreman-proxy",
-}
-
-func detect() bool {
-	_, err := os.Stat("/etc/foreman")
-	return err == nil
 }
 
 var obfuscaters = []*obfuscate.Obfuscator{

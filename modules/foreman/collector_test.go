@@ -11,12 +11,12 @@ import (
 )
 
 func TestCollect(t *testing.T) {
-	c := collection.New(&bytes.Buffer{})
-
-	if !detect() {
+	if !util.ModuleExists(relevantPaths) {
 		t.Skip("could not find foreman in the test environment")
 		return
 	}
+
+	c := collection.New(&bytes.Buffer{})
 
 	Collect(c)
 

@@ -12,6 +12,11 @@ import (
 )
 
 func TestCollect(t *testing.T) {
+	if !util.ModuleExists(relevantPaths) {
+		t.Skip("could not find icinga2 in the test environment")
+		return
+	}
+
 	file, err := os.ReadFile("testdata/icinga-version.txt")
 	if err != nil {
 		t.Skip("cant read version file")
@@ -22,7 +27,7 @@ func TestCollect(t *testing.T) {
 		t.Skip("cant detect icinga2 version")
 	}
 
-	if !detectIcinga() {
+	if !util.ModuleExists(relevantPaths) {
 		t.Skip("could not find icinga2 in the test environment")
 		return
 	}
