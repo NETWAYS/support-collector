@@ -133,13 +133,19 @@ func init() {
 	// Run specific arguments
 	args.NewPromptStringVar(&outputFile, "output", buildFileName(), "Filename for resulting zip", true, nil)
 	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Enabled modules for collection (comma separated)", false, nil)
-	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Explicit disabled modules for collection (comma separated)", false, nil)
+	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Explicit disabled modules for collection (comma separated)", false, func() bool {
+		if len(enabledModules) == 0 || len(enabledModules) == len(moduleOrder) {
+			return true
+		}
+
+		return false
+	})
 	args.NewPromptBoolVar(&noDetailedCollection, "no-details", false, "Disable detailed collection including logs and more", nil)
 
 	// Icinga 2 specific arguments
-	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Icinga 2: Username of global API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
-	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Icinga 2: Password for global API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
-	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Icinga 2: Comma separated list of API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false, icinga2Enabled)
+	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Icinga 2: Username of global API user to collect data about Icinga 2 Infrastructure", false, isIcingaEnabled)
+	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Icinga 2: Password for global API user to collect data about Icinga 2 Infrastructure", false, isIcingaEnabled)
+	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Icinga 2: Comma separated list of API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false, isIcingaEnabled)
 
 	flag.CommandLine.SortFlags = false
 
@@ -178,7 +184,7 @@ func buildFileName() string {
 	return FilePrefix + "_" + util.GetHostnameWithoutDomain() + "_" + time.Now().Format("20060102-1504") + ".zip"
 }
 
-func icinga2Enabled() bool {
+func isIcingaEnabled() bool {
 	for _, name := range enabledModules {
 		if name == "icinga2" {
 			return true
@@ -268,17 +274,17 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 	}
 
 	c := collection.New(file)
-	c.Log.SetLevel(logrus.DebugLevel)
 
 	consoleLevel := logrus.InfoLevel
 	if verbose {
-		// logrus.StandardLogger().SetLevel(logrus.DebugLevel)
 		consoleLevel = logrus.DebugLevel
 	}
 
+	c.Log.SetLevel(consoleLevel)
+
 	// Add console log output via logrus.Hook
 	c.Log.AddHook(&util.ExtraLogHook{
-		Formatter: &logrus.TextFormatter{ForceColors: true},
+		Formatter: &logrus.TextFormatter{ForceColors: true, FullTimestamp: true, TimestampFormat: "15:04:05"},
 		Writer:    colorable.NewColorableStdout(),
 		Level:     consoleLevel,
 	})
