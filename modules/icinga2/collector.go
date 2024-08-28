@@ -1,8 +1,8 @@
 package icinga2
 
 import (
+	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 
@@ -11,6 +11,11 @@ import (
 )
 
 const ModuleName = "icinga2"
+
+var relevantPaths = []string{
+	"/etc/icinga2",
+	"/var/lib/icinga2",
+}
 
 var files = []string{
 	"/etc/icinga2",
@@ -64,11 +69,6 @@ var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:password|community)(.*)`, `log`),
 }
 
-func detectIcinga() bool {
-	_, err := exec.LookPath("icinga2")
-	return err == nil
-}
-
 func detectIcingaVersion(version string) string {
 	result := regexp.MustCompile(`\(version:\s+r(\d+.\d+.\d+)`).FindStringSubmatch(version)
 
@@ -78,7 +78,7 @@ func detectIcingaVersion(version string) string {
 func Collect(c *collection.Collection) {
 	var icinga2version string
 
-	if !detectIcinga() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find icinga2")
 		return
 	}

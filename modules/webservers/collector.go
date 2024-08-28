@@ -1,6 +1,7 @@
 package webservers
 
 import (
+	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
@@ -43,19 +44,8 @@ var possibleDaemons = []string{
 	"/usr/lib/systemd/system/httpd.service",
 }
 
-func DetectWebservers() bool {
-	for _, path := range relevantPaths {
-		_, err := os.Stat(path)
-		if err == nil {
-			return true
-		}
-	}
-
-	return false
-}
-
 func Collect(c *collection.Collection) {
-	if !DetectWebservers() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find webservers")
 		return
 	}

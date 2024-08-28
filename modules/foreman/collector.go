@@ -1,6 +1,7 @@
 package foreman
 
 import (
+	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
@@ -9,6 +10,10 @@ import (
 )
 
 const ModuleName = "foreman"
+
+var relevantPaths = []string{
+	"/etc/foreman",
+}
 
 var files = []string{
 	"/etc/foreman",
@@ -33,7 +38,7 @@ var obfuscaters = []*obfuscate.Obfuscator{
 }
 
 func Collect(c *collection.Collection) {
-	if !detect() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find Foreman")
 		return
 	}

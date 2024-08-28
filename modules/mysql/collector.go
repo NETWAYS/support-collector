@@ -44,7 +44,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 }
 
 // Detect if a MySQL or MariaDB daemon appears to be running.
-func Detect() string {
+func getService() string {
 	for _, name := range possibleServices {
 		_, err := collection.GetServiceStatusRaw(name)
 		if err == nil {
@@ -57,7 +57,7 @@ func Detect() string {
 
 // Collect data for MySQL or MariaDB.
 func Collect(c *collection.Collection) {
-	service := Detect()
+	service := getService()
 	if service == "" {
 		c.Log.Info("Could not a running MySQL or MariaDB service")
 		return

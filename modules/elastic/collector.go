@@ -1,7 +1,7 @@
 package elastic
 
 import (
-	"os"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
@@ -42,19 +42,8 @@ var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:password|keypassphrase).*\s*:\s*(.*)`, `yaml`),
 }
 
-func Detect() bool {
-	for _, path := range relevantPaths {
-		_, err := os.Stat(path)
-		if err == nil {
-			return true
-		}
-	}
-
-	return false
-}
-
 func Collect(c *collection.Collection) {
-	if !Detect() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find Elastic Stack")
 		return
 	}
