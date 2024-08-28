@@ -43,10 +43,10 @@ func New() Handler {
 	}
 }
 
-func (args *Handler) CollectArgsFromStdin(availableModules string) {
+func (args *Handler) CollectArgsFromStdin(availableModules string) []error {
 	fmt.Printf(interactiveHelpText+"\n\n", availableModules)
 
-	var errors []error
+	errors := make([]error, 0, len(args.arguments))
 
 	for _, argument := range args.arguments {
 		if argument.Dependency == nil {
@@ -59,8 +59,12 @@ func (args *Handler) CollectArgsFromStdin(availableModules string) {
 			continue
 		}
 
-		errors = append(errors, fmt.Errorf("%s is not matching the needed depenency", argument.Name))
+		errors = append(errors, fmt.Errorf("argument '%s' is not matching the needed depenency. Skipping... ", argument.Name))
 	}
+
+	fmt.Print("\nInteractive wizard finished. Starting...\n\n")
+
+	return errors
 }
 
 func (args *Handler) NewPromptStringVar(callback *string, name, defaultValue, usage string, required bool, dependency func() bool) {
@@ -113,26 +117,27 @@ func (args *Handler) NewPromptBoolVar(callback *bool, name string, defaultValue 
 func (args *Handler) newStringPrompt(callback *string, defaultValue, usage string, required bool) {
 	for {
 		fmt.Printf("%s - (Preselection: '%s'): ", usage, defaultValue)
+
 		if args.scanner.Scan() {
 			input := args.scanner.Text()
-			if input != "" {
+
+			switch {
+			case input != "":
 				*callback = input
-				break
-			} else if input == "" && defaultValue != "" {
+				return
+			case input == "" && defaultValue != "":
 				*callback = defaultValue
-				break
-			} else if input == "" && !required {
-				break
+				return
+			case input == "" && !required:
+				return
 			}
 		} else {
 			if err := args.scanner.Err(); err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, "reading standard input:", err)
-				break
+				return
 			}
 		}
 	}
-
-	return
 }
 
 func (args *Handler) newBoolPrompt(callback *bool, defaultValue bool, usage string) {

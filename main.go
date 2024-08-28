@@ -114,6 +114,7 @@ var (
 	commandTimeout                                    = 60 * time.Second
 	startTime                                         = time.Now()
 	metric                                            *metrics.Metrics
+	initErrors                                        []error
 )
 
 func init() {
@@ -130,14 +131,14 @@ func init() {
 
 	// Run specific arguments
 	args.NewPromptStringVar(&outputFile, "output", buildFileName(), "Filename for resulting zip", true, nil)
-	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Enabled modules for collection (comma seperated)", false, nil)
-	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Explicit disabled modules for collection (comma seperated)", false, nil)
+	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Enabled modules for collection (comma separated)", false, nil)
+	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Explicit disabled modules for collection (comma separated)", false, nil)
 	args.NewPromptBoolVar(&noDetailedCollection, "no-details", false, "Disable detailed collection including logs and more", nil)
 
 	// Icinga 2 specific arguments
-	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
-	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
-	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Comma separated list of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false, icinga2Enabled)
+	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Icinga 2: Username of global API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
+	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Icinga 2: Password for global API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
+	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Icinga 2: Comma separated list of API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false, icinga2Enabled)
 
 	flag.CommandLine.SortFlags = false
 
@@ -160,7 +161,7 @@ func init() {
 
 	// Start interactive wizard if interactive is enabled
 	if !arguments.NonInteractive {
-		args.CollectArgsFromStdin(strings.Join(moduleOrder, ","))
+		initErrors = args.CollectArgsFromStdin(strings.Join(moduleOrder, ","))
 	}
 
 	// Verify enabled modules
@@ -192,6 +193,13 @@ func main() {
 
 	// Close collection
 	defer closeCollection()
+
+	// Check for errors in init()
+	if len(initErrors) > 0 {
+		for _, err := range initErrors {
+			c.Log.Info(err)
+		}
+	}
 
 	// Initialize new metrics and defer function to save it to json
 	metric = metrics.New(getVersion())
