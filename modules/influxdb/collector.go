@@ -1,7 +1,7 @@
 package influxdb
 
 import (
-	"os"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
@@ -22,19 +22,8 @@ var detailedFiles = []string{
 	"/var/log/influxdb",
 }
 
-func Detect() bool {
-	for _, path := range relevantPaths {
-		_, err := os.Stat(path)
-		if err == nil {
-			return true
-		}
-	}
-
-	return false
-}
-
 func Collect(c *collection.Collection) {
-	if !Detect() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find InfluxDB")
 		return
 	}

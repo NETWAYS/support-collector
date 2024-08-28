@@ -11,6 +11,11 @@ import (
 )
 
 func TestCollect(t *testing.T) {
+	if !util.ModuleExists(relevantPaths) {
+		t.Skip("could not find keepalived in the test environment")
+		return
+	}
+
 	c := collection.New(&bytes.Buffer{})
 
 	Collect(c)

@@ -1,6 +1,7 @@
 package icingaweb2
 
 import (
+	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
@@ -61,21 +62,9 @@ var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:bind_pw|password|token)\s*=\s*(.*)`, `ini`),
 }
 
-// Detect if icingaweb2 is installed on the system.
-func Detect() bool {
-	for _, path := range relevantPaths {
-		_, err := os.Stat(path)
-		if err == nil {
-			return true
-		}
-	}
-
-	return false
-}
-
 // Collect data for icingaweb2.
 func Collect(c *collection.Collection) {
-	if !Detect() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find icingaweb2")
 		return
 	}

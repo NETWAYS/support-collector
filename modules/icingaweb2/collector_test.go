@@ -11,7 +11,7 @@ import (
 )
 
 func TestCollect(t *testing.T) {
-	if !Detect() {
+	if !util.ModuleExists(relevantPaths) {
 		t.Skip("could not find icingaweb2 in the test environment")
 		return
 	}

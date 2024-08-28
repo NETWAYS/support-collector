@@ -1,7 +1,7 @@
 package icingadirector
 
 import (
-	"os"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
@@ -31,15 +31,9 @@ var journalctlLogs = map[string]collection.JournalElement{
 	"journalctl-director.txt": {Service: "icinga-director.service"},
 }
 
-// Detect if Icinga Director is installed on the system.
-func Detect() bool {
-	_, err := os.Stat(InstallationPath)
-	return err == nil
-}
-
 // Collect data for Icinga Director.
 func Collect(c *collection.Collection) {
-	if !Detect() {
+	if !util.ModuleExists([]string{InstallationPath}) {
 		c.Log.Info("Could not find Icinga Director")
 		return
 	}

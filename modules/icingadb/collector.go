@@ -1,6 +1,7 @@
 package icingadb
 
 import (
+	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
@@ -48,19 +49,8 @@ var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:password)\s*=\s*(.*)`, `yml`),
 }
 
-func Detect() bool {
-	for _, path := range relevantPaths {
-		_, err := os.Stat(path)
-		if err == nil {
-			return true
-		}
-	}
-
-	return false
-}
-
 func Collect(c *collection.Collection) {
-	if !Detect() {
+	if !util.ModuleExists(relevantPaths) {
 		c.Log.Info("Could not find IcingaDB")
 		return
 	}
