@@ -120,26 +120,24 @@ func init() {
 	// Set locale to C, to avoid translations in command output
 	_ = os.Setenv("LANG", "C")
 
-	args := arguments.NewHandler()
+	args := arguments.New()
 
 	// General arguments without interactive prompt
-	flag.BoolVar(&arguments.NonInteractive, "nonInteractive", false, "Enable non-interactive mode")
+	flag.BoolVar(&arguments.NonInteractive, "non-interactive", false, "Enable non-interactive mode")
 	flag.BoolVar(&printVersion, "version", false, "Print version and exit")
 	flag.BoolVar(&verbose, "verbose", false, "Enable verbose logging")
-
-	// TODO
-	//flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
+	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
 
 	// Run specific arguments
-	args.NewPromptStringVar(&outputFile, "output", buildFileName(), "Output file for the ZIP content", true)
-	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Comma separated list of enabled modules", false)
-	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Comma separated list of disabled modules", false)
-	args.NewPromptBoolVar(&noDetailedCollection, "nodetails", false, "Disable detailed collection including logs and more")
+	args.NewPromptStringVar(&outputFile, "output", buildFileName(), "Filename for resulting zip", true, nil)
+	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Enabled modules for collection (comma seperated)", false, nil)
+	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Explicit disabled modules for collection (comma seperated)", false, nil)
+	args.NewPromptBoolVar(&noDetailedCollection, "no-details", false, "Disable detailed collection including logs and more", nil)
 
 	// Icinga 2 specific arguments
-	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false)
-	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false)
-	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Comma separated list of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false)
+	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
+	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure", false, icinga2Enabled)
+	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Comma separated list of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false, icinga2Enabled)
 
 	flag.CommandLine.SortFlags = false
 
@@ -152,6 +150,7 @@ func init() {
 		flag.PrintDefaults()
 	}
 
+	// Parse flags from command-line
 	flag.Parse()
 
 	if printVersion {
@@ -159,8 +158,9 @@ func init() {
 		os.Exit(0)
 	}
 
+	// Start interactive wizard if interactive is enabled
 	if !arguments.NonInteractive {
-		args.ReadArgumentsFromStdin()
+		args.CollectArgsFromStdin(strings.Join(moduleOrder, ","))
 	}
 
 	// Verify enabled modules
@@ -169,10 +169,6 @@ func init() {
 			logrus.Fatal("Unknown module to enable: ", name)
 		}
 	}
-
-	fmt.Println(noDetailedCollection)
-
-	os.Exit(1)
 }
 
 // buildFileName returns a filename to store the output of support collector.
@@ -180,8 +176,20 @@ func buildFileName() string {
 	return FilePrefix + "_" + util.GetHostnameWithoutDomain() + "_" + time.Now().Format("20060102-1504") + ".zip"
 }
 
+func icinga2Enabled() bool {
+	for _, name := range enabledModules {
+		if name == "icinga2" {
+			return true
+		}
+	}
+
+	return false
+}
+
 func main() {
+	// Initialize new collection
 	c, closeCollection := NewCollection(outputFile)
+
 	// Close collection
 	defer closeCollection()
 

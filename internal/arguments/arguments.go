@@ -11,70 +11,110 @@ import (
 var (
 	NonInteractive     bool
 	validBooleanInputs = map[string]bool{
-		"y":   true,
-		"yes": true,
-		"n":   false,
-		"no":  false,
+		"y":     true,
+		"yes":   true,
+		"n":     false,
+		"no":    false,
+		"true":  true,
+		"false": false,
 	}
 )
 
-type Handler struct {
-	scanner *bufio.Scanner
-	prompts []func()
+const interactiveHelpText = `Welcome to the support-collector argument wizard!
+We will guide you through all required details.
+
+Available modules are: %s`
+
+type Argument struct {
+	Name          string
+	InputFunction func()
+	Dependency    func() bool
 }
 
-func NewHandler() Handler {
+type Handler struct {
+	scanner   *bufio.Scanner
+	arguments []Argument
+}
+
+// New creates a new Handler object
+func New() Handler {
 	return Handler{
 		scanner: bufio.NewScanner(os.Stdin),
 	}
 }
 
-func (h *Handler) ReadArgumentsFromStdin() {
-	for _, prompt := range h.prompts {
-		prompt()
+func (args *Handler) CollectArgsFromStdin(availableModules string) {
+	fmt.Printf(interactiveHelpText+"\n\n", availableModules)
+
+	var errors []error
+
+	for _, argument := range args.arguments {
+		if argument.Dependency == nil {
+			argument.InputFunction()
+			continue
+		}
+
+		if ok := argument.Dependency(); ok {
+			argument.InputFunction()
+			continue
+		}
+
+		errors = append(errors, fmt.Errorf("%s is not matching the needed depenency", argument.Name))
 	}
 }
 
-func (h *Handler) NewPromptStringVar(callback *string, name, defaultValue, usage string, required bool) {
+func (args *Handler) NewPromptStringVar(callback *string, name, defaultValue, usage string, required bool, dependency func() bool) {
 	flag.StringVar(callback, name, defaultValue, usage)
 
-	h.prompts = append(h.prompts, func() {
-		if *callback != "" {
-			defaultValue = *callback
-		}
+	args.arguments = append(args.arguments, Argument{
+		Name: name,
+		InputFunction: func() {
+			if *callback != "" {
+				defaultValue = *callback
+			}
 
-		h.newStringPrompt(callback, defaultValue, usage, required)
+			args.newStringPrompt(callback, defaultValue, usage, required)
+		},
+		Dependency: dependency,
 	})
 }
 
-func (h *Handler) NewPromptStringSliceVar(callback *[]string, name string, defaultValue []string, usage string, required bool) {
+func (args *Handler) NewPromptStringSliceVar(callback *[]string, name string, defaultValue []string, usage string, required bool, dependency func() bool) {
 	flag.StringSliceVar(callback, name, defaultValue, usage)
 
-	h.prompts = append(h.prompts, func() {
-		if len(*callback) > 0 {
-			defaultValue = *callback
-		}
+	args.arguments = append(args.arguments, Argument{
+		Name: name,
+		InputFunction: func() {
+			if len(*callback) > 0 {
+				defaultValue = *callback
+			}
 
-		var input string
+			var input string
 
-		h.newStringPrompt(&input, strings.Join(defaultValue, ","), usage, required)
-		*callback = strings.Split(input, ",")
+			args.newStringPrompt(&input, strings.Join(defaultValue, ","), usage, required)
+			*callback = strings.Split(input, ",")
+		},
+		Dependency: dependency,
 	})
 }
 
-func (h *Handler) NewPromptBoolVar(callback *bool, name string, defaultValue bool, usage string) {
+func (args *Handler) NewPromptBoolVar(callback *bool, name string, defaultValue bool, usage string, dependency func() bool) {
 	flag.BoolVar(callback, name, defaultValue, usage)
 
-	h.prompts = append(h.prompts, func() {
-		h.newBoolPrompt(callback, defaultValue, usage)
+	args.arguments = append(args.arguments, Argument{
+		Name: name,
+		InputFunction: func() {
+			args.newBoolPrompt(callback, defaultValue, usage)
+		},
+		Dependency: dependency,
 	})
 }
 
-func (h *Handler) newStringPrompt(callback *string, defaultValue, usage string, required bool) {
+func (args *Handler) newStringPrompt(callback *string, defaultValue, usage string, required bool) {
 	for {
 		fmt.Printf("%s - (Preselection: '%s'): ", usage, defaultValue)
-		if h.scanner.Scan() {
-			input := h.scanner.Text()
+		if args.scanner.Scan() {
+			input := args.scanner.Text()
 			if input != "" {
 				*callback = input
 				break
@@ -85,7 +125,7 @@ func (h *Handler) newStringPrompt(callback *string, defaultValue, usage string, 
 				break
 			}
 		} else {
-			if err := h.scanner.Err(); err != nil {
+			if err := args.scanner.Err(); err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, "reading standard input:", err)
 				break
 			}
@@ -95,12 +135,12 @@ func (h *Handler) newStringPrompt(callback *string, defaultValue, usage string, 
 	return
 }
 
-func (h *Handler) newBoolPrompt(callback *bool, defaultValue bool, usage string) {
+func (args *Handler) newBoolPrompt(callback *bool, defaultValue bool, usage string) {
 	for {
 		fmt.Printf("%s [y/n] - (Preselection: '%t'): ", usage, defaultValue)
 
-		if h.scanner.Scan() {
-			input := strings.ToLower(h.scanner.Text())
+		if args.scanner.Scan() {
+			input := strings.ToLower(args.scanner.Text())
 
 			if input != "" && isValidBoolString(input) {
 				*callback = validBooleanInputs[input]
