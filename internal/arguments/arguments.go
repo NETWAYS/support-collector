@@ -21,9 +21,7 @@ var (
 )
 
 const interactiveHelpText = `Welcome to the support-collector argument wizard!
-We will guide you through all required details.
-
-Available modules are: %s`
+We will guide you through all required details.`
 
 type Argument struct {
 	Name          string
@@ -44,7 +42,7 @@ func New() Handler {
 }
 
 func (args *Handler) CollectArgsFromStdin(availableModules string) []error {
-	fmt.Printf(interactiveHelpText+"\n\n", availableModules)
+	fmt.Printf("%s\n\nAvailable modules are: %s\n\n", interactiveHelpText, availableModules)
 
 	errors := make([]error, 0, len(args.arguments))
 
