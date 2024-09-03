@@ -3,8 +3,7 @@
 
 # NETWAYS support collector
 
-The support collector allows to collect relevant information from servers. The resulting ZIP file can be given to second
-to get an insight into the system.
+The support collector allows to collect relevant information from servers. The resulting ZIP file can be given to second to get an insight into the system.
 
 > **WARNING:** DO NOT transfer the generated file over insecure connections, it contains potential sensitive
 > information!
@@ -40,10 +39,8 @@ By default, we collect all we can find. You can control this by only enabling ce
 
 If you want to see what is collected, add `--verbose`
 
-To collect advanced data for module `Icinga 2`, you can use the Icinga 2 API to collect data from all endpoints
-provided.
-The API requests are performed with a global API user you have to create yourself. Just create that user in a global
-zone like 'director-global' to sync it to all endpoints
+To collect advanced data for module `Icinga 2`, you can use the Icinga 2 API to collect data from all endpoints provided.
+The API requests are performed with a global API user you have to create yourself. Just create that user in a global zone like 'director-global' to sync it to all endpoints
 
 | Short | Long                    | Description                                                                                                                                                                            |
 |:-----:|:------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -62,11 +59,9 @@ zone like 'director-global' to sync it to all endpoints
 
 ## Modules
 
-A brief overview about the modules, you can check the source code under [modules](modules) for what exactly is
-collected.
+A brief overview about the modules, you can check the source code under [modules](modules) for what exactly is collected.
 
-Most modules check if the component is installed before trying to collect data. If the module is not detected, it will
-not be collected.
+Most modules check if the component is installed before trying to collect data. If the module is not detected, it will not be collected.
 
 | Module name    | Description                                                                                                                                              |
 |----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -74,6 +69,7 @@ not be collected.
 | base           | Basic information about the system (operating system, kernel, memory, cpu, processes, repositories, firewalls, etc.)                                     |
 | corosync       | Includes corosync and pacemaker. Collects configuration, logs, packages and service status                                                               |
 | elastic        | Includes elasticsearch, logstash and kibana. Collects configuration, packages and service status                                                         |
+| foreman        | Configuration, logs, packages and service status                                                                                                         |
 | grafana        | Configuration, logs, plugins, packages and service status                                                                                                |
 | graphite       | Includes graphite and carbon. Collects configuration, logs, python / pip version and list, packages and service status                                   |
 | graylog        | Configuration, packages and service status                                                                                                               |
@@ -88,8 +84,8 @@ not be collected.
 | postgresql     | Configuration, logs, packages and service status                                                                                                         |
 | prometheus     | Configuration, packages and service status                                                                                                               |
 | puppet         | Configuration, logs, module list, packages and service status                                                                                            |
+| redis          | Configuration, logs, packages and service status                                                                                                         |
 | webservers     | Includes apache2, httpd and nginx. Collects configuration, logs, packages and service status                                                             |
-| foreman        | Configuration, logs, packages and service status                                                                                                         |
 
 ## Supported systems
 

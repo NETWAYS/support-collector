@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/NETWAYS/support-collector/internal/arguments"
 	"github.com/NETWAYS/support-collector/internal/metrics"
+	"github.com/NETWAYS/support-collector/modules/redis"
 	flag "github.com/spf13/pflag"
 	"os"
 	"path/filepath"
@@ -60,50 +61,52 @@ email, it contains potential sensitive information!
 `
 
 var modules = map[string]func(*collection.Collection){
-	"base":            base.Collect,
-	"webservers":      webservers.Collect,
-	"icinga2":         icinga2.Collect,
-	"icingaweb2":      icingaweb2.Collect,
-	"icinga-director": icingadirector.Collect,
-	"elastic":         elastic.Collect,
-	"corosync":        corosync.Collect,
-	"keepalived":      keepalived.Collect,
-	"mongodb":         mongodb.Collect,
-	"mysql":           mysql.Collect,
-	"influxdb":        influxdb.Collect,
-	"postgresql":      postgresql.Collect,
-	"prometheus":      prometheus.Collect,
 	"ansible":         ansible.Collect,
-	"puppet":          puppet.Collect,
+	"base":            base.Collect,
+	"corosync":        corosync.Collect,
+	"elastic":         elastic.Collect,
+	"foreman":         foreman.Collect,
 	"grafana":         grafana.Collect,
 	"graphite":        graphite.Collect,
 	"graylog":         graylog.Collect,
+	"icinga-director": icingadirector.Collect,
+	"icinga2":         icinga2.Collect,
 	"icingadb":        icingadb.Collect,
-	"foreman":         foreman.Collect,
+	"icingaweb2":      icingaweb2.Collect,
+	"influxdb":        influxdb.Collect,
+	"keepalived":      keepalived.Collect,
+	"mongodb":         mongodb.Collect,
+	"mysql":           mysql.Collect,
+	"postgresql":      postgresql.Collect,
+	"prometheus":      prometheus.Collect,
+	"puppet":          puppet.Collect,
+	"redis":           redis.Collect,
+	"webservers":      webservers.Collect,
 }
 
 var (
 	moduleOrder = []string{
-		"base",
-		"webservers",
-		"icinga2",
-		"icingaweb2",
-		"icinga-director",
-		"icingadb",
-		"elastic",
-		"corosync",
-		"keepalived",
-		"mongodb",
-		"mysql",
-		"influxdb",
-		"postgresql",
-		"prometheus",
 		"ansible",
-		"puppet",
+		"base",
+		"corosync",
+		"elastic",
+		"foreman",
 		"grafana",
 		"graphite",
 		"graylog",
-		"foreman",
+		"icinga-director",
+		"icinga2",
+		"icingadb",
+		"icingaweb2",
+		"influxdb",
+		"keepalived",
+		"mongodb",
+		"mysql",
+		"postgresql",
+		"prometheus",
+		"puppet",
+		"redis",
+		"webservers",
 	}
 )
 
