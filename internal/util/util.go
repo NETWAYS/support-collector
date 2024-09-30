@@ -5,9 +5,13 @@ import (
 	"os/exec"
 	"os/user"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
+
+// FilePrefix for the outfile file.
+const FilePrefix = "support-collector"
 
 // StringInSlice matches if a string is contained in a slice.
 func StringInSlice(a string, list []string) bool {
@@ -50,4 +54,9 @@ func GetHostnameWithoutDomain() string {
 	}
 
 	return result
+}
+
+// BuildFileName returns a filename to store the output of support collector.
+func BuildFileName() string {
+	return FilePrefix + "_" + GetHostnameWithoutDomain() + "_" + time.Now().Format("20060102-1504") + ".zip"
 }

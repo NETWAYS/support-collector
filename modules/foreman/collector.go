@@ -33,7 +33,7 @@ var obfuscaters = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find Foreman")
+		c.Log.Info("Could not find foreman. Skipping")
 		return
 	}
 

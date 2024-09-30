@@ -34,7 +34,7 @@ var journalctlLogs = map[string]collection.JournalElement{
 // Collect data for Icinga Director.
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists([]string{InstallationPath}) {
-		c.Log.Info("Could not find Icinga Director")
+		c.Log.Info("Could not find icinga-director. Skipping")
 		return
 	}
 

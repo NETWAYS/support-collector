@@ -59,7 +59,7 @@ func getService() string {
 func Collect(c *collection.Collection) {
 	service := getService()
 	if service == "" {
-		c.Log.Info("Could not a running MySQL or MariaDB service")
+		c.Log.Info("Could not find mysql. Skipping")
 		return
 	}
 

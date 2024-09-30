@@ -1,10 +1,12 @@
 package icinga2
 
 import (
+	"fmt"
 	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
@@ -79,7 +81,7 @@ func Collect(c *collection.Collection) {
 	var icinga2version string
 
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find icinga2")
+		c.Log.Info("Could not find icinga2. Skipping")
 		return
 	}
 
@@ -151,9 +153,31 @@ func Collect(c *collection.Collection) {
 		}
 	}
 
-	// start the collection of remote api endpoints
-	err = InitAPICollection(c)
-	if err != nil {
-		c.Log.Warn(err)
+	// Collect from API endpoints if given
+	if len(c.Config.Icinga2.Endpoints) > 0 {
+		c.Log.Debug("Start to collect data from Icinga API endpoints")
+		for _, e := range c.Config.Icinga2.Endpoints {
+			c.Log.Debugf("New API endpoint found: '%s'. Trying...", e.Address)
+
+			// Check if endpoint is reachable
+			if err := e.IsReachable(); err != nil {
+				c.Log.Warn(err)
+				continue
+			}
+
+			c.Log.Debug("Collect from resource 'v1/status'")
+
+			// Request stats and health from endpoint
+			res, err := e.Request("v1/status")
+			if err != nil {
+				c.Log.Warn(err)
+				continue
+			}
+
+			// Save output to file. Replace "." in address with "_" and use as filename.
+			c.AddFileJSON(filepath.Join(ModuleName, "api", "v1", "status", fmt.Sprintf("%s.json", strings.Replace(e.Address, ".", "_", -1))), res)
+
+			c.Log.Debugf("Successfully finished endpoint '%s'", e.Address)
+		}
 	}
 }

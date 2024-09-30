@@ -65,7 +65,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 // Collect data for icingaweb2.
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find icingaweb2")
+		c.Log.Info("Could not find icingaweb2. Skipping")
 		return
 	}
 

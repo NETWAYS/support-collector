@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/NETWAYS/support-collector/internal/config"
+	"github.com/NETWAYS/support-collector/internal/metrics"
 	"io"
 	"strings"
 	"time"
@@ -22,17 +24,22 @@ type Collection struct {
 	Obfuscators            []*obfuscate.Obfuscator
 	Detailed               bool
 	JournalLoggingInterval string
+	Config                 config.Config
+	Metric                 *metrics.Metrics
 }
 
-// New initializes new collection
+// New initializes new collection with defaults
 func New(w io.Writer) (c *Collection) {
 	c = &Collection{
 		Output:                 zip.NewWriter(w),
 		Log:                    logrus.New(),
 		LogData:                &bytes.Buffer{},
 		ExecTimeout:            DefaultTimeout,
+		Obfuscators:            nil,
 		Detailed:               true,
 		JournalLoggingInterval: "7 days ago",
+		Config:                 config.GetControlDefaultObject(),
+		Metric:                 nil,
 	}
 
 	c.Log.Out = c.LogData
