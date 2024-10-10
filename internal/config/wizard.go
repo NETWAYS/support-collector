@@ -150,7 +150,6 @@ func (w *Wizard) AddIcingaEndpoints(callback *[]icingaapi.Endpoint, name, usage 
 			}
 
 			*callback = endpoints
-
 		},
 		dependency: dependency,
 	})
@@ -221,7 +220,9 @@ func (w *Wizard) newIntPromptWithDefault(callback *int, defaultValue int, usage 
 				if err != nil {
 					logrus.Fatalf("could not convert '%s' to integer: %s", input, err)
 				}
+
 				*callback = converted
+
 				return
 			case input == "" && required:
 				*callback = defaultValue
@@ -267,7 +268,7 @@ func isValidBoolString(input string) bool {
 // newIcinga2EndpointPrompt creates all needed stdout / stdin prompts to build an Icinga API endpoint. Returns icingaapi.Endpoint
 func (w *Wizard) newIcinga2EndpointPrompt() (e icingaapi.Endpoint) {
 	w.newStringPromptWithDefault(&e.Address, "127.0.0.1", "Host address / FQDN of the endpoint", true)
-	w.newIntPromptWithDefault(&e.Port, 5665, "Port number of the endpoint", true)
+	w.newIntPromptWithDefault(&e.Port, 5665, "Port number of the endpoint", true) //nolint:mnd
 	w.newStringPrompt(&e.Username, "Username for the api connection", true)
 	w.newStringPrompt(&e.Password, "Password for the api connection", true)
 

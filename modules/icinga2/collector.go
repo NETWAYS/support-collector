@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
@@ -156,11 +157,12 @@ func Collect(c *collection.Collection) {
 	// Collect from API endpoints if given
 	if len(c.Config.Icinga2.Endpoints) > 0 {
 		c.Log.Debug("Start to collect data from Icinga API endpoints")
+
 		for _, e := range c.Config.Icinga2.Endpoints {
 			c.Log.Debugf("New API endpoint found: '%s'. Trying...", e.Address)
 
 			// Check if endpoint is reachable
-			if err := e.IsReachable(); err != nil {
+			if err := e.IsReachable(5 * time.Second); err != nil { //nolint:mnd
 				c.Log.Warn(err)
 				continue
 			}
@@ -168,14 +170,14 @@ func Collect(c *collection.Collection) {
 			c.Log.Debug("Collect from resource 'v1/status'")
 
 			// Request stats and health from endpoint
-			res, err := e.Request("v1/status")
+			res, err := e.Request("v1/status", 10*time.Second) //nolint:mnd
 			if err != nil {
 				c.Log.Warn(err)
 				continue
 			}
 
 			// Save output to file. Replace "." in address with "_" and use as filename.
-			c.AddFileJSON(filepath.Join(ModuleName, "api", "v1", "status", fmt.Sprintf("%s.json", strings.Replace(e.Address, ".", "_", -1))), res)
+			c.AddFileJSON(filepath.Join(ModuleName, "api", "v1", "status", fmt.Sprintf("%s.json", strings.ReplaceAll(e.Address, ".", "_"))), res)
 
 			c.Log.Debugf("Successfully finished endpoint '%s'", e.Address)
 		}

@@ -63,7 +63,7 @@ func GetControlDefaultObject() Config {
 			DisabledModules:    nil,
 			ExtraObfuscators:   nil,
 			DetailedCollection: true,
-			CommandTimeout:     60 * time.Second,
+			CommandTimeout:     60 * time.Second, //nolint:mnd
 		},
 		Icinga2: Icinga2{},
 	}
@@ -76,5 +76,6 @@ func ValidateConfig(conf Config) (errors []error) {
 			errors = append(errors, fmt.Errorf("invalid module '%s' provided. Cant be enabled", name))
 		}
 	}
+
 	return errors
 }

@@ -25,7 +25,7 @@ func GenerateDefaultAnswerFile() error {
 		return fmt.Errorf("could not marshal yamldata for answer-file: %w", err)
 	}
 
-	_, err = io.WriteString(file, string(yamlData))
+	_, err = io.Writer.Write(file, yamlData)
 	if err != nil {
 		return fmt.Errorf("could not write to answer file: %w", err)
 	}

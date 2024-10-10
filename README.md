@@ -3,6 +3,8 @@
 
 # NETWAYS support collector
 
+**TODO: Update README**
+
 The support collector allows to collect relevant information from servers. The resulting ZIP file can be given to second to get an insight into the system.
 
 > **WARNING:** DO NOT transfer the generated file over insecure connections, it contains potential sensitive

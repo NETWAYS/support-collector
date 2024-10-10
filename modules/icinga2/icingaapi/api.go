@@ -29,9 +29,9 @@ func newClient() *http.Client {
 }
 
 // IsReachable checks if the endpoint is reachable within 5 sec
-func (endpoint *Endpoint) IsReachable() error {
+func (endpoint *Endpoint) IsReachable(timeout time.Duration) error {
 	// try to dial tcp connection within 5 seconds
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", endpoint.Address, endpoint.Port), 5*time.Second)
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", endpoint.Address, endpoint.Port), timeout)
 	if err != nil {
 		return fmt.Errorf("cant connect to endpoint '%s' within 5 seconds: %w", endpoint.Address, err)
 	}
@@ -45,18 +45,18 @@ func (endpoint *Endpoint) IsReachable() error {
 //
 //	A context with 10sec timeout for the request is build. BasicAuth with username and password set.
 //	Returns err if something went wrong. Result is given as []byte.
-func (endpoint *Endpoint) Request(resourcePath string) ([]byte, error) {
+func (endpoint *Endpoint) Request(resourcePath string, timeout time.Duration) ([]byte, error) {
 	// Return err if no username or password provided
 	if endpoint.Username == "" || endpoint.Password == "" {
 		return nil, fmt.Errorf("invalid or no username or password provided for api endpoint '%s'", endpoint.Address)
 	}
 
 	// Build context for the request
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	// Build with context and url
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s:%d/%s", endpoint.Address, endpoint.Port, resourcePath), nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s/%s", net.JoinHostPort(endpoint.Address, fmt.Sprintf("%d", endpoint.Port)), resourcePath), nil)
 	if err != nil {
 		return nil, fmt.Errorf("cant build new request for '%s': %w", endpoint.Address, err)
 	}

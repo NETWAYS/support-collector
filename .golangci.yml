@@ -4,10 +4,10 @@ run:
 linters:
    enable-all: true
    disable:
+     - err113
      - goimports
      - cyclop
      - depguard
-     - exhaustivestruct
      - exhaustruct
      - forbidigo
      - forcetypeassert
@@ -16,7 +16,6 @@ linters:
      - gochecknoinits
      - godox
      - godot
-     - goerr113
      - gofumpt
      - gomnd
      - lll
@@ -25,18 +24,10 @@ linters:
      - nlreturn
      - nolintlint
      - nonamedreturns
+     - tagalign
      - tagliatelle
      - varnamelen
      - wrapcheck
-     - golint # deprecated
-     - nosnakecase # deprecated
-     - scopelint # deprecated
-     - ifshort # deprecated
-     - interfacer # deprecated
-     - structcheck # deprecated
-     - maligned # deprecated
-     - varcheck # deprecated
-     - deadcode # deprecated
      - goconst # not needed in our case
      - perfsprint # not needed in our case
 linters-settings:

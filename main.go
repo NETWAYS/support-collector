@@ -108,6 +108,7 @@ func main() {
 		if err := config.ReadAnswerFile(answerFile, &conf); err != nil {
 			logrus.Fatal(err)
 		}
+
 		conf.General.AnswerFile = answerFile
 	}
 
@@ -126,6 +127,7 @@ func main() {
 		for _, e := range validationErrors {
 			logrus.Error(e)
 		}
+
 		os.Exit(1)
 	}
 
@@ -146,6 +148,7 @@ func main() {
 
 		c.AddFileJSON("metrics.json", body)
 	}()
+
 	c.Metric.Controls = c.Config
 
 	// Choose whether detailed collection will be enabled or not
@@ -285,7 +288,7 @@ func startConfigWizard(conf *config.Config) {
 
 	// Define arguments for interactive input via stdin
 	wizard.AddStringVar(&conf.General.OutputFile, "output", util.BuildFileName(), "Filename for resulting zip", true, nil)
-	wizard.AddStringSliceVar(&conf.General.EnabledModules, "enable", []string{"all"}, "Which modules should be enabled? (Comma seperated list of modules)", false, nil)
+	wizard.AddStringSliceVar(&conf.General.EnabledModules, "enable", []string{"all"}, "Which modules should be enabled? (Comma separated list of modules)", false, nil)
 	wizard.AddBoolVar(&detailedCollection, "detailed", true, "Enable detailed collection including logs and more (recommended)?", nil)
 
 	// Collect Icinga 2 API endpoints if module 'icinga2' is enabled
