@@ -46,7 +46,7 @@ var possibleDaemons = []string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find webservers")
+		c.Log.Info("Could not find webservers. Skipping")
 		return
 	}
 

@@ -48,7 +48,7 @@ var processFilter = []string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find graphite")
+		c.Log.Info("Could not find graphite. Skipping")
 		return
 	}
 

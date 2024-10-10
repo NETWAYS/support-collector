@@ -51,7 +51,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find IcingaDB")
+		c.Log.Info("Could not find icingadb. Skipping")
 		return
 	}
 

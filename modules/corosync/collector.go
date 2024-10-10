@@ -40,7 +40,7 @@ var commands = map[string][]string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find corosync")
+		c.Log.Info("Could not find corosync. Skipping")
 		return
 	}
 

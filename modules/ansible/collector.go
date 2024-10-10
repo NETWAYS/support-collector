@@ -24,7 +24,7 @@ var commands = map[string][]string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find ansible")
+		c.Log.Info("Could not find ansible. Skipping")
 		return
 	}
 

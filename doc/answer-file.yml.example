@@ -1,0 +1,18 @@
+general:
+  outputFile: support-collector_icinga-dev_20241010-1037.zip
+  enabledModules:
+    - all
+  disabledModules: [ ]
+  extraObfuscators: [ ]
+  detailedCollection: true
+  commandTimeout: 1m0s
+icinga2:
+  endpoints:
+    - address: localhost
+      port: 5665
+      username: poweruser
+      password: poweruser
+    - address: 127.0.0.1
+      port: 5665
+      username: poweruser
+      password: poweruser

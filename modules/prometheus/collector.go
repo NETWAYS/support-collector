@@ -46,7 +46,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find Prometheus")
+		c.Log.Info("Could not find prometheus. Skipping")
 		return
 	}
 

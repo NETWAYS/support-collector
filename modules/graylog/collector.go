@@ -28,7 +28,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find Graylog")
+		c.Log.Info("Could not find graylog. Skipping")
 		return
 	}
 
