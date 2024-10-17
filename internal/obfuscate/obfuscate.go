@@ -29,23 +29,23 @@ const (
 
 // Obfuscator provides the basic functionality of an obfuscation engine.
 //
-// Kind filters the variant of resource we want to work on, while Affecting defines a list of regexp.Regexp, to match
+// Kind filters the variant of resource we want to work on, while ShouldAffect defines a list of regexp.Regexp, to match
 // against for the file names, or command.
 //
 // Replacements will be iterated, so all matches or matched groups will be replaced.
 type Obfuscator struct {
 	Kind
-	Affecting    []*regexp.Regexp
-	Replacements []*regexp.Regexp
-	Files        uint
-	Replaced     uint
+	ShouldAffect    []*regexp.Regexp
+	Replacements    []*regexp.Regexp
+	ObfuscatedFiles []string
+	Replaced        uint
 }
 
 // New returns a basic Obfuscator with provided regexp.Regexp.
 func New(kind Kind, affects, replace *regexp.Regexp) *Obfuscator {
 	return &Obfuscator{
 		Kind:         kind,
-		Affecting:    []*regexp.Regexp{affects},
+		ShouldAffect: []*regexp.Regexp{affects},
 		Replacements: []*regexp.Regexp{replace},
 	}
 }
@@ -79,7 +79,7 @@ func NewAny(replace string) *Obfuscator {
 
 // WithAffecting adds a new element to the list.
 func (o *Obfuscator) WithAffecting(a *regexp.Regexp) *Obfuscator {
-	o.Affecting = append(o.Affecting, a)
+	o.ShouldAffect = append(o.ShouldAffect, a)
 
 	return o
 }
@@ -97,7 +97,7 @@ func (o Obfuscator) IsAccepting(kind Kind, name string) bool {
 		return false
 	}
 
-	for _, re := range o.Affecting {
+	for _, re := range o.ShouldAffect {
 		if re.MatchString(name) {
 			return true
 		}
@@ -106,16 +106,18 @@ func (o Obfuscator) IsAccepting(kind Kind, name string) bool {
 	return false
 }
 
-// Process takes data and returns it obfuscated.
-func (o *Obfuscator) Process(data []byte) (uint, []byte, error) {
-	count, out, err := o.ProcessReader(bytes.NewReader(data))
+// Process takes data and returns it obfuscated. Also takes name of file that is obfuscated
+//
+// Returns count of replaced values as uint, obfuscated data as []byte, and error
+func (o *Obfuscator) Process(data []byte, name string) (uint, []byte, error) {
+	count, out, err := o.ProcessReader(bytes.NewReader(data), name)
 
 	//goland:noinspection GoNilness
 	return count, out.Bytes(), err
 }
 
 // ProcessReader takes an io.Reader and returns a new one obfuscated.
-func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, err error) {
+func (o *Obfuscator) ProcessReader(r io.Reader, name string) (count uint, out bytes.Buffer, err error) {
 	rd := bufio.NewReader(r)
 
 	var (
@@ -168,7 +170,7 @@ func (o *Obfuscator) ProcessReader(r io.Reader) (count uint, out bytes.Buffer, e
 	}
 
 	if count > 0 {
-		o.Files++
+		o.ObfuscatedFiles = append(o.ObfuscatedFiles, name)
 	}
 
 	return count, out, err

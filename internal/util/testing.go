@@ -19,7 +19,7 @@ func AssertObfuscation(t *testing.T, obfuscators []*obfuscate.Obfuscator,
 			continue
 		}
 
-		_, out, err := o.Process([]byte(input))
+		_, out, err := o.Process([]byte(input), name)
 		if err != nil {
 			t.Errorf("error during obfuscation: %s", err)
 			return

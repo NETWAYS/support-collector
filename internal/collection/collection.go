@@ -272,14 +272,17 @@ func (c *Collection) callObfuscators(kind obfuscate.Kind, name string, data []by
 
 	for _, o := range c.Obfuscators {
 		if o.IsAccepting(kind, name) {
-			count, out, err = o.Process(data)
+			count, out, err = o.Process(data, name)
 			if err != nil {
 				return
 			}
 
-			if count > 0 {
-				c.Log.Debugf("Obfuscation replaced %d token in %s", count, name)
-			}
+			data = out
+		}
+
+		if count > 0 {
+			c.Log.Debugf("Replacement %s replaced %d token in %s", o.Replacements, count, name)
+			count = 0
 		}
 	}
 

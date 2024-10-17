@@ -249,9 +249,8 @@ func main() {
 	var files, count uint
 
 	for _, o := range c.Obfuscators {
-		files += o.Files
-
 		count += o.Replaced
+		files += uint(len(o.ObfuscatedFiles))
 	}
 
 	if files > 0 {
