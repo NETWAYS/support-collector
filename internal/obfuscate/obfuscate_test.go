@@ -24,7 +24,7 @@ func ExampleObfuscator() {
 	content := []byte(`password = "secret"`)
 
 	if o.IsAccepting(KindFile, "test.ini") {
-		count, data, err := o.Process(content)
+		count, data, err := o.Process(content, "")
 		fmt.Println(err)
 		fmt.Println(count)
 		fmt.Println(string(data))
@@ -69,12 +69,12 @@ func TestObfuscator_Process(t *testing.T) {
 		},
 	}
 
-	count, out, err := o.Process([]byte("default content\r\n"))
+	count, out, err := o.Process([]byte("default content\r\n"), "")
 	assert.NoError(t, err)
 	assert.Equal(t, uint(0), count)
 	assert.Equal(t, "default content\r\n", string(out))
 
-	count, out, err = o.Process([]byte(iniExample))
+	count, out, err = o.Process([]byte(iniExample), "")
 	assert.NoError(t, err)
 	assert.Equal(t, uint(1), count)
 	assert.Equal(t, iniResult, string(out))
@@ -83,14 +83,14 @@ func TestObfuscator_Process(t *testing.T) {
 func TestNewFile(t *testing.T) {
 	o := NewFile(`^password\s*=\s*(.*)`, "conf")
 	assert.Equal(t, KindFile, o.Kind)
-	assert.Len(t, o.Affecting, 1)
+	assert.Len(t, o.ShouldAffect, 1)
 	assert.Len(t, o.Replacements, 1)
 }
 
 func TestNewOutput(t *testing.T) {
 	o := NewOutput(`^password\s*=\s*(.*)`, "icinga2", "daemon", "-C")
 	assert.Equal(t, KindOutput, o.Kind)
-	assert.Len(t, o.Affecting, 1)
+	assert.Len(t, o.ShouldAffect, 1)
 	assert.Len(t, o.Replacements, 1)
 
 	assert.True(t, o.IsAccepting(KindOutput, "icinga2 daemon -C"))
