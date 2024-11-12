@@ -54,7 +54,7 @@ func CharsToString(chars []int8) string {
 			break
 		}
 
-		s[i] = uint8(chars[i])
+		s[i] = byte(chars[i])
 	}
 
 	return string(s[0:i])
