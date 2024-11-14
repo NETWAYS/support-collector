@@ -3,7 +3,6 @@ package collection
 import (
 	"archive/zip"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -142,22 +141,18 @@ func (c *Collection) AddFileYAML(fileName string, data interface{}) {
 	_ = c.AddFileToOutput(file)
 }
 
-// AddFileJSON will add raw file data without obfuscation
+// AddFileJSON will add json data and apply obfuscation
 func (c *Collection) AddFileJSON(fileName string, data []byte) {
-	var jsonData interface{}
-
-	err := json.Unmarshal(data, &jsonData)
-	if err != nil {
-		c.Log.Debugf("could not unmarshal JSON data for '%s': %s", fileName, err)
-	}
-
-	prettyJSON, err := json.MarshalIndent(jsonData, "", "")
-	if err != nil {
-		c.Log.Debugf("could not marshal JSON data for '%s': %s", fileName, err)
-	}
-
 	file := NewFile(fileName)
-	file.Data = prettyJSON
+	file.Data = data
+
+	_ = c.AddFileToOutput(file)
+}
+
+// AddFileJSONRaw will add raw json data without obfuscation
+func (c *Collection) AddFileJSONRaw(fileName string, data []byte) {
+	file := NewFile(fileName)
+	file.Data = data
 
 	_ = c.AddFileToOutputRaw(file)
 }

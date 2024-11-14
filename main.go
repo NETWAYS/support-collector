@@ -220,7 +220,7 @@ func main() {
 			c.Log.Warn("cant unmarshal metrics: %w", err)
 		}
 
-		c.AddFileJSON("metrics.json", body)
+		c.AddFileJSONRaw("metrics.json", body)
 	}()
 
 	if noDetailedCollection {
