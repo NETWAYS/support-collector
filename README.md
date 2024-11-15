@@ -60,6 +60,7 @@ A more detailed control is possible through the use of an answer-file.
 |       | --generate-answer-file | Generate an example answer-file with default values       |
 | -V    | --verbose              | Enable verbose logging                                    |
 | -v    | --version              | Print version and exit                                    |
+| -v    | --version              | Print version and exit                                    |
 
 ## Obfuscation
 
