@@ -297,7 +297,7 @@ func startConfigWizard(conf *config.Config) {
 	// Collect Icinga 2 API endpoints if module 'icinga2' is enabled
 	// Because we only add this when module 'icinga2' or 'all' is enabled, this needs to be after saving the enabled modules
 	wizard.AddIcingaEndpoints(&conf.Icinga2.Endpoints, "icinga-endpoints", "\nModule 'icinga2'is  enabled.\nDo you want to collect data from Icinga 2 API endpoints?", func() bool {
-		if ok := slices.Contains(conf.General.EnabledModules, "all") || slices.Contains(conf.General.EnabledModules, "icinga"); ok {
+		if ok := util.StringInSlice("all", conf.General.EnabledModules) || slices.Contains(conf.General.EnabledModules, "icinga2"); ok {
 			return true
 		}
 
