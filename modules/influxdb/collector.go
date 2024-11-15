@@ -24,7 +24,7 @@ var detailedFiles = []string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find InfluxDB")
+		c.Log.Info("Could not find influxdb. Skipping")
 		return
 	}
 

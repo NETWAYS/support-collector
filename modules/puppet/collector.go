@@ -35,7 +35,7 @@ var commands = map[string][]string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find puppet")
+		c.Log.Info("Could not find puppet. Skipping")
 		return
 	}
 

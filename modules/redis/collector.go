@@ -44,7 +44,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find redis")
+		c.Log.Info("Could not find redis. Skipping")
 		return
 	}
 

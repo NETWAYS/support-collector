@@ -3,18 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/NETWAYS/support-collector/internal/arguments"
-	"github.com/NETWAYS/support-collector/internal/metrics"
-	"github.com/NETWAYS/support-collector/modules/redis"
-	flag "github.com/spf13/pflag"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
-
 	"github.com/NETWAYS/support-collector/internal/collection"
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
-	"github.com/NETWAYS/support-collector/internal/util"
+	"github.com/NETWAYS/support-collector/internal/config"
+	"github.com/NETWAYS/support-collector/internal/metrics"
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
@@ -23,7 +14,6 @@ import (
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/graylog"
-	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadb"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
@@ -34,16 +24,23 @@ import (
 	"github.com/NETWAYS/support-collector/modules/postgresql"
 	"github.com/NETWAYS/support-collector/modules/prometheus"
 	"github.com/NETWAYS/support-collector/modules/puppet"
+	"github.com/NETWAYS/support-collector/modules/redis"
 	"github.com/NETWAYS/support-collector/modules/webservers"
+	flag "github.com/spf13/pflag"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+	"time"
 
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
+	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
 )
 
 const Product = "NETWAYS support-collector"
-
-// FilePrefix for the outfile file.
-const FilePrefix = "support-collector"
 
 const Readme = `
 The support-collector allows our customers to collect relevant information from
@@ -59,6 +56,13 @@ If you are a customer, contact us at:
 WARNING: DO NOT transfer the generated file over insecure connections or by
 email, it contains potential sensitive information!
 `
+
+var (
+	disableWizard                             bool
+	answerFile                                string
+	verbose, printVersion, detailedCollection bool
+	startTime                                 = time.Now()
+)
 
 var modules = map[string]func(*collection.Collection){
 	"ansible":         ansible.Collect,
@@ -84,138 +88,60 @@ var modules = map[string]func(*collection.Collection){
 	"webservers":      webservers.Collect,
 }
 
-var (
-	moduleOrder = []string{
-		"ansible",
-		"base",
-		"corosync",
-		"elastic",
-		"foreman",
-		"grafana",
-		"graphite",
-		"graylog",
-		"icinga-director",
-		"icinga2",
-		"icingadb",
-		"icingaweb2",
-		"influxdb",
-		"keepalived",
-		"mongodb",
-		"mysql",
-		"postgresql",
-		"prometheus",
-		"puppet",
-		"redis",
-		"webservers",
-	}
-)
-
-var (
-	verbose, printVersion, noDetailedCollection       bool
-	enabledModules, disabledModules, extraObfuscators []string
-	outputFile                                        string
-	commandTimeout                                    = 60 * time.Second
-	startTime                                         = time.Now()
-	metric                                            *metrics.Metrics
-	initErrors                                        []error
-)
-
 func init() {
 	// Set locale to C, to avoid translations in command output
 	_ = os.Setenv("LANG", "C")
-
-	args := arguments.New()
-
-	// General arguments without interactive prompt
-	flag.StringArrayVar(&extraObfuscators, "hide", []string{}, "List of additional strings to obfuscate. Can be used multiple times and supports regex.") //nolint:lll
-	flag.BoolVar(&arguments.NonInteractive, "non-interactive", false, "Enable non-interactive mode")
-	flag.BoolVar(&printVersion, "version", false, "Print version and exit")
-	flag.BoolVar(&verbose, "verbose", false, "Enable verbose logging")
-	flag.DurationVar(&commandTimeout, "command-timeout", commandTimeout, "Timeout for command execution in modules")
-
-	// Run specific arguments
-	args.NewPromptStringVar(&outputFile, "output", buildFileName(), "Filename for resulting zip", true, nil)
-	args.NewPromptStringSliceVar(&enabledModules, "enable", moduleOrder, "Enabled modules for collection (comma separated)", false, nil)
-	args.NewPromptStringSliceVar(&disabledModules, "disable", []string{}, "Explicit disabled modules for collection (comma separated)", false, func() bool {
-		if len(enabledModules) == 0 || len(enabledModules) == len(moduleOrder) {
-			return true
-		}
-
-		return false
-	})
-	args.NewPromptBoolVar(&noDetailedCollection, "no-details", false, "Disable detailed collection including logs and more", nil)
-
-	// Icinga 2 specific arguments
-	args.NewPromptStringVar(&icinga2.APICred.Username, "icinga2-api-user", "", "Icinga 2: Username of global API user to collect data about Icinga 2 Infrastructure", false, isIcingaEnabled)
-	args.NewPromptStringVar(&icinga2.APICred.Password, "icinga2-api-pass", "", "Icinga 2: Password for global API user to collect data about Icinga 2 Infrastructure", false, isIcingaEnabled)
-	args.NewPromptStringSliceVar(&icinga2.APIEndpoints, "icinga2-api-endpoints", []string{}, "Icinga 2: Comma separated list of API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665)", false, isIcingaEnabled)
-
-	flag.CommandLine.SortFlags = false
-
-	// Output a proper help message with details
-	flag.Usage = func() {
-		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n%s\n\n", Product, strings.Trim(Readme, "\n"))
-
-		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-
-		flag.PrintDefaults()
-	}
-
-	// Parse flags from command-line
-	flag.Parse()
-
-	if printVersion {
-		fmt.Println(Product, "version", getBuildInfo()) //nolint:forbidigo
-		os.Exit(0)
-	}
-
-	// Start interactive wizard if interactive is enabled
-	if !arguments.NonInteractive {
-		initErrors = args.CollectArgsFromStdin(strings.Join(moduleOrder, ","))
-	}
-
-	// Verify enabled modules
-	for _, name := range enabledModules {
-		if _, ok := modules[name]; !ok {
-			logrus.Fatal("Unknown module to enable: ", name)
-		}
-	}
-}
-
-// buildFileName returns a filename to store the output of support collector.
-func buildFileName() string {
-	return FilePrefix + "_" + util.GetHostnameWithoutDomain() + "_" + time.Now().Format("20060102-1504") + ".zip"
-}
-
-func isIcingaEnabled() bool {
-	for _, name := range enabledModules {
-		if name == "icinga2" {
-			return true
-		}
-	}
-
-	return false
 }
 
 func main() {
-	// Initialize new collection
-	c, closeCollection := NewCollection(outputFile)
+	// Create new config object with defaults
+	conf := config.GetControlDefaultObject()
+
+	// Add and parse flags
+	if err := parseFlags(); err != nil {
+		logrus.Fatal(err)
+	}
+
+	// Read input from answer-file if provided
+	// Needs to done after parsing flags to have the value for answerFile
+	if answerFile != "" {
+		if err := config.ReadAnswerFile(answerFile, &conf); err != nil {
+			logrus.Fatal(err)
+		}
+
+		conf.General.AnswerFile = answerFile
+	}
+
+	// Start interactive config wizard if not disabled via flag and no answer-file is provided
+	if !disableWizard && answerFile == "" {
+		startConfigWizard(&conf)
+	}
+
+	// If "all" provided for enabled modules, enable all
+	if slices.Contains(conf.General.EnabledModules, "all") {
+		conf.General.EnabledModules = config.ModulesOrder
+	}
+
+	// Validate conf. If errors found, print them and exit
+	if validationErrors := config.ValidateConfig(conf); len(validationErrors) > 0 {
+		for _, e := range validationErrors {
+			logrus.Error(e)
+		}
+
+		os.Exit(1)
+	}
+
+	// Initialize new collection with default values
+	c, closeCollection := NewCollection(conf)
 
 	// Close collection
 	defer closeCollection()
 
-	// Check for errors in init()
-	if len(initErrors) > 0 {
-		for _, err := range initErrors {
-			c.Log.Info(err)
-		}
-	}
-
 	// Initialize new metrics and defer function to save it to json
-	metric = metrics.New(getVersion())
+	c.Metric = metrics.New(getVersion())
 	defer func() {
 		// Save metrics to file
-		body, err := json.Marshal(metric)
+		body, err := json.Marshal(c.Metric)
 		if err != nil {
 			c.Log.Warn("cant unmarshal metrics: %w", err)
 		}
@@ -223,10 +149,15 @@ func main() {
 		c.AddFileJSONRaw("metrics.json", body)
 	}()
 
-	if noDetailedCollection {
+	c.Metric.Controls = c.Config
+
+	// Choose whether detailed collection will be enabled or not
+	if !conf.General.DetailedCollection {
 		c.Detailed = false
+		c.Config.General.DetailedCollection = false
 		c.Log.Warn("Detailed collection is disabled")
 	} else {
+		c.Detailed = true
 		c.Log.Info("Detailed collection is enabled")
 	}
 
@@ -235,15 +166,15 @@ func main() {
 	}
 
 	// Set command Timeout from argument
-	c.ExecTimeout = commandTimeout
+	c.ExecTimeout = c.Config.General.CommandTimeout
 
-	// Collect modules
+	// Parse modules
 	collectModules(c)
 
 	// Save overall timing
-	metric.Timings["total"] = time.Since(startTime)
+	c.Metric.Timings["total"] = time.Since(startTime)
 
-	c.Log.Infof("Collection complete, took us %.3f seconds", metric.Timings["total"].Seconds())
+	c.Log.Infof("Collection complete, took us %.3f seconds", c.Metric.Timings["total"].Seconds())
 
 	// Collect obfuscation info
 	var (
@@ -262,7 +193,7 @@ func main() {
 	}
 
 	// get absolute path of outputFile
-	path, err := filepath.Abs(outputFile)
+	path, err := filepath.Abs(c.Config.General.OutputFile)
 	if err != nil {
 		c.Log.Debug(err)
 	}
@@ -270,16 +201,17 @@ func main() {
 	c.Log.Infof("Generated ZIP file located at %s", path)
 }
 
-// NewCollection starts a new collection. outputFile will be created.
+// NewCollection starts a new collection based on given controls.Config
 //
 // Collection and cleanup function to defer are returned
-func NewCollection(outputFile string) (*collection.Collection, func()) {
-	file, err := os.Create(outputFile)
+func NewCollection(control config.Config) (*collection.Collection, func()) {
+	file, err := os.Create(control.General.OutputFile)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Fatalf("cant create or open file for collection for given value '%s' - %s", control.General.OutputFile, err)
 	}
 
 	c := collection.New(file)
+	c.Config = control
 
 	consoleLevel := logrus.InfoLevel
 	if verbose {
@@ -313,13 +245,77 @@ func NewCollection(outputFile string) (*collection.Collection, func()) {
 	}
 }
 
+// parseFlags adds the default control arguments and parses them
+func parseFlags() (err error) {
+	var generateAnswerFile bool
+	// General arguments without interactive prompt
+	flag.BoolVar(&disableWizard, "disable-wizard", false, "Disable interactive wizard for input via stdin")
+	flag.BoolVarP(&printVersion, "version", "v", false, "Print version and exit")
+	flag.BoolVarP(&verbose, "verbose", "V", false, "Enable verbose logging")
+	flag.BoolVar(&generateAnswerFile, "generate-answer-file", false, "Generate an example answer-file with default values")
+	flag.StringVarP(&answerFile, "answer-file", "f", "", "Provide an answer-file to control the collection")
+
+	// Output a proper help message with details
+	flag.Usage = func() {
+		_, _ = fmt.Fprintf(os.Stderr, "%s\n\n%s\n\n", Product, strings.Trim(Readme, "\n"))
+
+		_, _ = fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+
+		flag.PrintDefaults()
+	}
+
+	// Parse flags from command-line
+	flag.Parse()
+
+	// Print version and exit
+	if printVersion {
+		fmt.Println(Product, "version", getBuildInfo()) //nolint:forbidigo
+		os.Exit(0)
+	}
+
+	if generateAnswerFile {
+		err = config.GenerateDefaultAnswerFile()
+		if err != nil {
+			return err
+		}
+
+		os.Exit(0)
+	}
+
+	return nil
+}
+
+// startConfigWizard will start the stdin config wizard to provide config
+func startConfigWizard(conf *config.Config) {
+	wizard := config.NewWizard()
+
+	// Define arguments for interactive input via stdin
+	wizard.AddStringVar(&conf.General.OutputFile, "output", util.BuildFileName(), "Filename for resulting zip", true, nil)
+	wizard.AddStringSliceVar(&conf.General.EnabledModules, "enable", []string{"all"}, "Which modules should be enabled? (Comma separated list of modules)", false, nil)
+	wizard.AddBoolVar(&detailedCollection, "detailed", true, "Enable detailed collection including logs and more (recommended)?", nil)
+
+	// Collect Icinga 2 API endpoints if module 'icinga2' is enabled
+	// Because we only add this when module 'icinga2' or 'all' is enabled, this needs to be after saving the enabled modules
+	wizard.AddIcingaEndpoints(&conf.Icinga2.Endpoints, "icinga-endpoints", "\nModule 'icinga2'is  enabled.\nDo you want to collect data from Icinga 2 API endpoints?", func() bool {
+		if ok := slices.Contains(conf.General.EnabledModules, "all") || slices.Contains(conf.General.EnabledModules, "icinga"); ok {
+			return true
+		}
+
+		return false
+	})
+
+	wizard.Parse(strings.Join(config.ModulesOrder, ","))
+
+	fmt.Printf("\nArgument wizard finished. Starting...\n\n")
+}
+
 func collectModules(c *collection.Collection) {
 	// Check if module is enabled / disabled and call it
-	for _, name := range moduleOrder {
+	for _, name := range config.ModulesOrder {
 		switch {
-		case util.StringInSlice(name, disabledModules):
+		case util.StringInSlice(name, c.Config.General.DisabledModules):
 			c.Log.Debugf("Module %s is disabled", name)
-		case !util.StringInSlice(name, enabledModules):
+		case !util.StringInSlice(name, c.Config.General.EnabledModules):
 			c.Log.Debugf("Module %s is not enabled", name)
 		default:
 			// Save current time
@@ -328,18 +324,19 @@ func collectModules(c *collection.Collection) {
 			c.Log.Debugf("Start collecting data for module %s", name)
 
 			// Register custom obfuscators
-			for _, o := range extraObfuscators {
+			for _, o := range c.Config.General.ExtraObfuscators {
 				c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
 				c.RegisterObfuscator(obfuscate.NewAny(o))
 			}
 
 			// Call collection function for module
+			// TODO return errors?
 			modules[name](c)
 
 			// Save runtime of module
-			metric.Timings[name] = time.Since(moduleStart)
+			c.Metric.Timings[name] = time.Since(moduleStart)
 
-			c.Log.Debugf("Finished with module %s in %.3f seconds", name, metric.Timings[name].Seconds())
+			c.Log.Debugf("Finished with module %s in %.3f seconds", name, c.Metric.Timings[name].Seconds())
 		}
 	}
 }

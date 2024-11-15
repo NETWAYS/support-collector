@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"github.com/NETWAYS/support-collector/internal/config"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"os"
 	"strings"
@@ -8,9 +9,10 @@ import (
 )
 
 type Metrics struct {
-	Command string                   `json:"command"`
-	Version string                   `json:"version"`
-	Timings map[string]time.Duration `json:"timings"`
+	Command  string                   `json:"command"`
+	Controls config.Config            `json:"controls"`
+	Version  string                   `json:"version"`
+	Timings  map[string]time.Duration `json:"timings"`
 }
 
 // New creates new Metrics

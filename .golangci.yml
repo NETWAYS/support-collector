@@ -2,46 +2,38 @@ run:
   timeout: 5m
   tests: false
 linters:
-   enable-all: true
-   disable:
-     - goimports
-     - cyclop
-     - depguard
-     - exhaustivestruct
-     - exhaustruct
-     - forbidigo
-     - forcetypeassert
-     - gci
-     - gochecknoglobals
-     - gochecknoinits
-     - godox
-     - godot
-     - goerr113
-     - gofumpt
-     - gomnd
-     - lll
-     - musttag
-     - nakedret
-     - nlreturn
-     - nolintlint
-     - nonamedreturns
-     - tagliatelle
-     - varnamelen
-     - wrapcheck
-     - golint # deprecated
-     - nosnakecase # deprecated
-     - scopelint # deprecated
-     - ifshort # deprecated
-     - interfacer # deprecated
-     - structcheck # deprecated
-     - maligned # deprecated
-     - varcheck # deprecated
-     - deadcode # deprecated
-     - goconst # not needed in our case
-     - perfsprint # not needed in our case
+  enable-all: true
+  disable:
+   - err113
+   - goimports
+   - cyclop
+   - depguard
+   - exhaustruct
+   - forbidigo
+   - forcetypeassert
+   - gci
+   - gochecknoglobals
+   - gochecknoinits
+   - godox
+   - godot
+   - gofumpt
+   - gomnd
+   - lll
+   - musttag
+   - nakedret
+   - nlreturn
+   - nolintlint
+   - nonamedreturns
+   - tagalign
+   - tagliatelle
+   - varnamelen
+   - wrapcheck
+   - goconst # not needed in our case
+   - perfsprint # not needed in our case
 linters-settings:
-   funlen:
+  funlen:
      ignore-comments: true
-     lines: 80
-   nestif:
-     min-complexity: 5
+     lines: 120
+     statements: -1
+  nestif:
+    min-complexity: 5

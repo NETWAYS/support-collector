@@ -34,7 +34,7 @@ var possibleServices = []string{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find PostgreSQL")
+		c.Log.Info("Could not find postgresql. Skipping")
 		return
 	}
 

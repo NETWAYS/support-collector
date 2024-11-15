@@ -37,7 +37,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find grafana")
+		c.Log.Info("Could not find grafana. Skipping")
 		return
 	}
 

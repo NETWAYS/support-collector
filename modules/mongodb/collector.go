@@ -42,7 +42,7 @@ var obfuscators = []*obfuscate.Obfuscator{
 
 func Collect(c *collection.Collection) {
 	if !util.ModuleExists(relevantPaths) {
-		c.Log.Info("Could not find mongodb")
+		c.Log.Info("Could not find mongodb. Skipping")
 		return
 	}
 

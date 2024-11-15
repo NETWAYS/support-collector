@@ -1,0 +1,21 @@
+general:
+    outputFile: data.zip
+    enabledModules:
+        - all
+    disabledModules:
+        - mysql
+    extraObfuscators:
+        - Secret:\s*?(.*)
+        - Pass[:|=]\s*(.+)
+    detailedCollection: true
+    commandTimeout: 1m0s
+icinga2:
+    endpoints:
+        - address: 10.20.140.10
+          port: 5665
+          username: icinga
+          password: superStrong1!
+        - address: 10.20.140.11
+          port: 5665
+          username: icinga
+          password: alsoSuperStrong2!
