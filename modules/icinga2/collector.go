@@ -2,6 +2,7 @@ package icinga2
 
 import (
 	"fmt"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
@@ -10,7 +11,6 @@ import (
 	"time"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
 )
 
 const ModuleName = "icinga2"

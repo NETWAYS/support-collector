@@ -146,7 +146,7 @@ func main() {
 			c.Log.Warn("cant unmarshal metrics: %w", err)
 		}
 
-		c.AddFileJSON("metrics.json", body)
+		c.AddFileJSONRaw("metrics.json", body)
 	}()
 
 	c.Metric.Controls = c.Config
@@ -176,17 +176,20 @@ func main() {
 
 	c.Log.Infof("Collection complete, took us %.3f seconds", c.Metric.Timings["total"].Seconds())
 
-	// Parse obfuscation info
-	var files, count uint
+	// Collect obfuscation info
+	var (
+		count         uint
+		affectedFiles []string
+	)
 
 	for _, o := range c.Obfuscators {
-		files += o.Files
-
 		count += o.Replaced
+
+		affectedFiles = append(affectedFiles, o.ObfuscatedFiles...)
 	}
 
-	if files > 0 {
-		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, files, len(c.Obfuscators))
+	if len(affectedFiles) > 0 {
+		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, len(util.DistinctStringSlice(affectedFiles)), len(c.Obfuscators))
 	}
 
 	// get absolute path of outputFile

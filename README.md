@@ -30,9 +30,13 @@ You can also combine your CLI arguments and the wizard. All arguments you pass f
 
 > **WARNING:** Some passwords or secrets are automatically removed, but this no guarantee, so be careful what you share!
 
-The `--hide` flag can be used multiple times to hide sensitive data, it supports regular expressions.
+The `--hide` flag can be used multiple times to hide sensitive data.  
+As these obfuscators are based on regex, you must add a regex pattern that meets your requirements.
 
-`# support-collector --hide "Secret:.*" --hide "Password:.*"`
+`# support-collector --hide "Secret:\s*(.*)"`
+
+This will replace:
+* Values like `Secret: DummyValue`
 
 In addition, files and folders that follow a specific pattern are not collected. This affects all files that correspond to the following filters:  
 `.*`, `*~`, `*.key`, `*.csr`, `*.crt`, and `*.pem`
