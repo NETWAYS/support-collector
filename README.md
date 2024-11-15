@@ -48,8 +48,8 @@ Most modules check if the component is installed before trying to collect data. 
 
 `$ support-collector`
 
-The CLI wizard will guide you through the possible arguments after calling the command.  
-If you prefer to skip the wizard, you can use `--disable-wizard` and use the default control values. A detailed 
+The CLI wizard will guide you through the possible arguments after calling the command. If you prefer to skip the wizard, you can use `--disable-wizard` and use the default control values.  
+A more detailed control is possible through the use of an answer-file.
 
 **Available arguments:**
 
@@ -75,10 +75,10 @@ In addition, files and folders that follow a specific pattern are not collected.
 
 ## Answer File
 
-With providing an answer-file you can customize the collection by your needs.  
-In addition to some general control values that customize the collection, further details of modules can also be collected and configured that are not included by default.
+By providing an answer-file you can customize the data collection.  
+In addition to some general control values that customize the collection, further details for modules - that are not included by default - can be collected and configured.
 
-The answer-file has to be in YAML format. 
+The answer-file has to be in YAML format.  
 To generate a default answer-file, you can use `--generate-answer-file`.    
 
 To provide an answer-file, just use `--answer-file <file>.yml` or `-f <path>.yml`. With using this, the wizard will be skipped.
