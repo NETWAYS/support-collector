@@ -20,6 +20,22 @@ func StringInSlice(a string, list []string) bool {
 	return false
 }
 
+// DistinctStringSlice returns the given slice with unique values
+func DistinctStringSlice(arr []string) []string {
+	seen := make(map[string]bool)
+
+	var result []string
+
+	for _, val := range arr {
+		if !seen[val] {
+			result = append(result, val)
+			seen[val] = true
+		}
+	}
+
+	return result
+}
+
 // IsPrivilegedUser returns true when the current user is root.
 func IsPrivilegedUser() bool {
 	u, err := user.Current()

@@ -3,7 +3,6 @@ package collection
 import (
 	"archive/zip"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -142,23 +141,20 @@ func (c *Collection) AddFileYAML(fileName string, data interface{}) {
 	_ = c.AddFileToOutput(file)
 }
 
+// AddFileJSON will add json data and apply obfuscation
 func (c *Collection) AddFileJSON(fileName string, data []byte) {
-	var jsonData interface{}
-
-	err := json.Unmarshal(data, &jsonData)
-	if err != nil {
-		c.Log.Debugf("could not unmarshal JSON data for '%s': %s", fileName, err)
-	}
-
-	prettyJSON, err := json.MarshalIndent(jsonData, "", "")
-	if err != nil {
-		c.Log.Debugf("could not marshal JSON data for '%s': %s", fileName, err)
-	}
-
 	file := NewFile(fileName)
-	file.Data = prettyJSON
+	file.Data = data
 
 	_ = c.AddFileToOutput(file)
+}
+
+// AddFileJSONRaw will add raw json data without obfuscation
+func (c *Collection) AddFileJSONRaw(fileName string, data []byte) {
+	file := NewFile(fileName)
+	file.Data = data
+
+	_ = c.AddFileToOutputRaw(file)
 }
 
 func (c *Collection) AddFiles(prefix, source string) {
@@ -250,16 +246,19 @@ func (c *Collection) AddJournalLog(fileName, service string) {
 	c.AddCommandOutput(fileName, "journalctl", "-u", service, "-S", c.JournalLoggingInterval)
 }
 
+// RegisterObfuscator adds the given Obfuscator to the Obfuscators of Collection
 func (c *Collection) RegisterObfuscator(o *obfuscate.Obfuscator) {
 	c.Obfuscators = append(c.Obfuscators, o)
 }
 
+// RegisterObfuscators adds the given list of Obfuscator to the Obfuscators of Collection
 func (c *Collection) RegisterObfuscators(list ...*obfuscate.Obfuscator) {
 	for _, o := range list {
 		c.RegisterObfuscator(o)
 	}
 }
 
+// ClearObfuscators clears the list of Obfuscators in the Collection
 func (c *Collection) ClearObfuscators() {
 	c.Obfuscators = c.Obfuscators[:0]
 }
@@ -272,14 +271,17 @@ func (c *Collection) callObfuscators(kind obfuscate.Kind, name string, data []by
 
 	for _, o := range c.Obfuscators {
 		if o.IsAccepting(kind, name) {
-			count, out, err = o.Process(data)
+			count, out, err = o.Process(data, name)
 			if err != nil {
 				return
 			}
 
-			if count > 0 {
-				c.Log.Debugf("Obfuscation replaced %d token in %s", count, name)
-			}
+			data = out
+		}
+
+		if count > 0 {
+			c.Log.Debugf("ReplacePattern '%s' replaced %d token in %s", o.ReplacePattern, count, name)
+			count = 0
 		}
 	}
 

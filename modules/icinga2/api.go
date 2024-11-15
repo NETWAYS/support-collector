@@ -60,7 +60,7 @@ func InitAPICollection(c *collection.Collection) error {
 
 // endpointIsReachable checks if the given endpoint is reachable within 5 sec
 func endpointIsReachable(endpoint string) error {
-	timeout := 5 * time.Second
+	timeout := 5 * time.Second //nolint:mnd
 
 	// try to dial tcp connection within 5 seconds
 	conn, err := net.DialTimeout("tcp", endpoint, timeout)
@@ -84,7 +84,7 @@ func collectStatus(endpoint string, c *collection.Collection) error {
 	client := &http.Client{Transport: tr}
 
 	// build context for request
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) //nolint:mnd
 	defer cancel()
 
 	// build request
