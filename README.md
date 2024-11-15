@@ -3,67 +3,17 @@
 
 # NETWAYS support collector
 
-**TODO: Update README**
-
 The support collector allows to collect relevant information from servers. The resulting ZIP file can be given to second to get an insight into the system.
 
-> **WARNING:** DO NOT transfer the generated file over insecure connections, it contains potential sensitive
+> **WARNING:** Do not transfer the generated file over insecure connections, it contains potential sensitive
 > information!
 
 If you are a customer, you can contact us at [support@netways.de](mailto:support@netways.de) or
 [netways.de/en/contact/](https://www.netways.de/en/contact/).
 
-Inspired by [NETWAYS/icinga2-diagnostics](https://github.com/Icinga/icinga2-diagnostics).
+The initial idea and inspiration came from [NETWAYS/icinga2-diagnostics](https://github.com/Icinga/icinga2-diagnostics).
 
-## Usage
-
-`$ support-collector`
-
-The CLI wizard will guide you through the possible arguments after calling the command.  
-If you prefer to pass the arguments in the command call, use `--non-interactive` and pass the arguments as described in the documentation.
-
-`--hide`, `--command-timeout` can only be used as CLI argument.
-
-You can also combine your CLI arguments and the wizard. All arguments you pass from the CLI will be given into the wizard.
-
----
-
-> **WARNING:** Some passwords or secrets are automatically removed, but this no guarantee, so be careful what you share!
-
-The `--hide` flag can be used multiple times to hide sensitive data.  
-As these obfuscators are based on regex, you must add a regex pattern that meets your requirements.
-
-`# support-collector --hide "Secret:\s*(.*)"`
-
-This will replace:
-* Values like `Secret: DummyValue`
-
-In addition, files and folders that follow a specific pattern are not collected. This affects all files that correspond to the following filters:  
-`.*`, `*~`, `*.key`, `*.csr`, `*.crt`, and `*.pem`
-
-By default, we collect all we can find. You can control this by only enabling certain modules, or disabling some.
-
-If you want to see what is collected, add `--verbose`
-
-To collect advanced data for module `Icinga 2`, you can use the Icinga 2 API to collect data from all endpoints provided.
-The API requests are performed with a global API user you have to create yourself. Just create that user in a global zone like 'director-global' to sync it to all endpoints
-
-| Short | Long                    | Description                                                                                                                                                                            |
-|:-----:|:------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|  -o   | --output                | Output file for the zip content (default: current directory and named like '\$HOSTNAME'-netways-support-\$TIMESTAMP.zip)                                                               |
-|       | --non-interactive       | Disable the interactive CLI wizard                                                                                                                                                     |
-|       | --no-details            | Disable detailed collection including logs and more                                                                                                                                    |
-|       | --enable                | List of enabled modules (default: all)                                                                                                                                                 |
-|       | --disable               | List of disabled modules (default: none)                                                                                                                                               |
-|       | --hide                  | List of keywords to obfuscate. Can be used multiple times                                                                                                                              |
-|       | --command-timeout       | Timeout for command execution in modules (default: 1m0s)                                                                                                                               |
-|       | --icinga2-api-user      | Username of global Icinga 2 API user to collect data about Icinga 2 Infrastructure (Optional and only for module `icinga2`)                                                            |
-|       | --icinga2-api-pass      | Password for global Icinga 2 API user to collect data about Icinga 2 Infrastructure (Optional and only for module `icinga2`)                                                           |
-|       | --icinga2-api-endpoints | List of Icinga 2 API Endpoints (including port) to collect data from. FQDN or IP address must be reachable. (Example: i2-master01.local:5665) (Optional and only for module `icinga2`) |
-|  -v   | --verbose               | Enable verbose logging                                                                                                                                                                 |
-|  -V   | --version               | Print version and exit                                                                                                                                                                 |
-
-## Modules
+## Available Modules
 
 A brief overview about the modules, you can check the source code under [modules](modules) for what exactly is collected.
 
@@ -92,6 +42,75 @@ Most modules check if the component is installed before trying to collect data. 
 | puppet         | Configuration, logs, module list, packages and service status                                                                                            |
 | redis          | Configuration, logs, packages and service status                                                                                                         |
 | webservers     | Includes apache2, httpd and nginx. Collects configuration, logs, packages and service status                                                             |
+
+
+## Usage
+
+`$ support-collector`
+
+The CLI wizard will guide you through the possible arguments after calling the command.  
+If you prefer to skip the wizard, you can use `--disable-wizard` and use the default control values. A detailed 
+
+**Available arguments:**
+
+| Short | Long                   | Description                                               |
+|-------|------------------------|-----------------------------------------------------------|
+| -f    | --answer-file          | Provide an answer-file to control the collection          |
+|       | --disable-wizard       | Disable interactive wizard and use default control values |
+|       | --generate-answer-file | Generate an example answer-file with default values       |
+| -V    | --verbose              | Enable verbose logging                                    |
+| -v    | --version              | Print version and exit                                    |
+
+## Obfuscation
+
+> **WARNING:** Some passwords or secrets are automatically removed, but this no guarantee, so be careful what you share!
+
+With using an answer-file, you are able to add multiple custom obfuscators.  
+As these obfuscators are based on regex, you must add a valid regex pattern that meets your requirements.
+
+For example, `Secret:\s*(.*)` will find `Secret: DummyValue` and set it to `Secret: <hidden>`.
+
+In addition, files and folders that follow a specific pattern are not collected. This affects all files that correspond to the following filters:  
+`.*`, `*~`, `*.key`, `*.csr`, `*.crt`, and `*.pem`
+
+## Answer File
+
+With providing an answer-file you can customize the collection by your needs.  
+In addition to some general control values that customize the collection, further details of modules can also be collected and configured that are not included by default.
+
+The answer-file has to be in YAML format. 
+To generate a default answer-file, you can use `--generate-answer-file`.    
+
+To provide an answer-file, just use `--answer-file <file>.yml` or `-f <path>.yml`. With using this, the wizard will be skipped.
+
+You can find an example answer-file [here](doc/answer-file.yml.example).
+
+### General
+
+Inside the general section we can configure some general behavior for the support-collector.
+````yaml
+general:
+    outputFile: data.zip      # Name of the resulting zip file
+    enabledModules: []        # List of enabled modules (Can also be 'all')
+    disabledModules: []       # List of disabled modules
+    extraObfuscators: []      # Custom obfuscators that should be applied
+    detailedCollection: true  # Enable detailed collection
+    commandTimeout: []        # Command timeout for exec commands (Default 1m0s)
+````
+
+### Icinga 2
+
+For the module `icinga2` it is possible do define some API endpoints to collect data from.  
+There is no limit of endpoints that can be defined.
+
+````yaml
+icinga2:
+    endpoints:                # List of Icinga 2 API endpoint to collect data from
+        - address: 127.0.0.1  # Address of endpoint
+          port: 5665          # Icinga 2 port
+          username: icinga    # Icinga 2 API user
+          password: icinga    # Icinga 2 API password
+````
 
 ## Supported systems
 

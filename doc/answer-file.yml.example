@@ -1,18 +1,21 @@
 general:
-  outputFile: support-collector_icinga-dev_20241010-1037.zip
-  enabledModules:
-    - all
-  disabledModules: [ ]
-  extraObfuscators: [ ]
-  detailedCollection: true
-  commandTimeout: 1m0s
+    outputFile: data.zip
+    enabledModules:
+        - all
+    disabledModules:
+        - mysql
+    extraObfuscators:
+        - Secret:\s*?(.*)
+        - Pass[:|=]\s*(.+)
+    detailedCollection: true
+    commandTimeout: 1m0s
 icinga2:
-  endpoints:
-    - address: localhost
-      port: 5665
-      username: poweruser
-      password: poweruser
-    - address: 127.0.0.1
-      port: 5665
-      username: poweruser
-      password: poweruser
+    endpoints:
+        - address: 10.20.140.10
+          port: 5665
+          username: icinga
+          password: superStrong1!
+        - address: 10.20.140.11
+          port: 5665
+          username: icinga
+          password: alsoSuperStrong2!
