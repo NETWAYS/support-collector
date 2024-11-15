@@ -105,7 +105,7 @@ func (w *Wizard) AddStringSliceVar(callback *[]string, name string, defaultValue
 			var input string
 
 			w.newStringPromptWithDefault(&input, strings.Join(defaultValue, ","), usage, required)
-			*callback = strings.Split(input, ",")
+			*callback = strings.Split(strings.ReplaceAll(input, " ", ""), ",")
 		},
 		dependency: dependency,
 	})
