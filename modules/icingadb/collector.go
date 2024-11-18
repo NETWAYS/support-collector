@@ -46,7 +46,7 @@ var services = []string{
 
 var obfuscators = []*obfuscate.Obfuscator{
 	obfuscate.NewFile(`(?i)(?:password)\s*=\s*(.*)`, `conf`),
-	obfuscate.NewFile(`(?i)(?:password)\s*=\s*(.*)`, `yml`),
+	obfuscate.NewFile(`(?i)(?:password)\s*[=|:]\s*(.*)`, `yml`),
 }
 
 func Collect(c *collection.Collection) {
