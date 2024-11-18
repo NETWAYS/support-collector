@@ -16,6 +16,7 @@ var relevantPaths = []string{
 
 var files = []string{
 	"/etc/redis*",
+	"/proc/sys/vm/overcommit_memory",
 }
 
 var optionalFiles = []string{
