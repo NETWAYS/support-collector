@@ -21,6 +21,7 @@ var files = []string{
 	"/etc/icingadb",
 	"/etc/icingadb-redis",
 	"/etc/icinga2/features-enabled/icingadb.conf",
+	"/proc/sys/vm/overcommit_memory",
 }
 
 var detailedFiles = []string{
