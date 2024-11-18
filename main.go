@@ -291,8 +291,9 @@ func startConfigWizard(conf *config.Config) {
 
 	// Define arguments for interactive input via stdin
 	wizard.AddStringVar(&conf.General.OutputFile, "output", util.BuildFileName(), "Filename for resulting zip", true, nil)
-	wizard.AddStringSliceVar(&conf.General.EnabledModules, "enable", []string{"all"}, "Which modules should be enabled? (Comma separated list of modules)", false, nil)
+	wizard.AddSliceVarFromString(&conf.General.EnabledModules, "enable", []string{"all"}, "Which modules should be enabled? (Comma separated list of modules)", false, nil)
 	wizard.AddBoolVar(&detailedCollection, "detailed", true, "Enable detailed collection including logs and more (recommended)?", nil)
+	wizard.AddStringSliceVar(&conf.General.ExtraObfuscators, "obfuscators", false, "Do you want to define some custom obfuscators (passwords, secrets etc.)", "Add custom obfuscator", nil)
 
 	// Collect Icinga 2 API endpoints if module 'icinga2' is enabled
 	// Because we only add this when module 'icinga2' or 'all' is enabled, this needs to be after saving the enabled modules

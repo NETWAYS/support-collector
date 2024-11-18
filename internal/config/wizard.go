@@ -86,7 +86,7 @@ func (w *Wizard) AddStringVar(callback *string, name, defaultValue, usage string
 	})
 }
 
-// AddStringSliceVar adds argument for a string slice variable
+// AddSliceVarFromString reads a single string from stdin. This string will be separated by ',' and the resulting slice will be returned
 //
 //	callback: Variable to save the input to
 //	name: Internal name
@@ -94,7 +94,7 @@ func (w *Wizard) AddStringVar(callback *string, name, defaultValue, usage string
 //	usage: usage string
 //	required: bool
 //	dependency: Add dependency function to validate if that argument will be added or not
-func (w *Wizard) AddStringSliceVar(callback *[]string, name string, defaultValue []string, usage string, required bool, dependency func() bool) {
+func (w *Wizard) AddSliceVarFromString(callback *[]string, name string, defaultValue []string, usage string, required bool, dependency func() bool) {
 	w.Arguments = append(w.Arguments, argument{
 		name: name,
 		inputFunction: func() {
@@ -126,6 +126,47 @@ func (w *Wizard) AddBoolVar(callback *bool, name string, defaultValue bool, usag
 		},
 		dependency: dependency,
 	})
+}
+
+// AddStringSliceVar adds argument for a slice of strings.
+//
+//	callback: Variable to save the input to
+//	name: Internal name
+//	defaultValue: Should that slice be collected via default?
+//	initialPrompt: The initial stdout message to ask if you want to collect
+//	inputPrompt: The recurring stdout message for each slice
+//	dependency: Add dependency function to validate if that argument will be added or not
+func (w *Wizard) AddStringSliceVar(callback *[]string, name string, defaultValue bool, initialPrompt string, inputPrompt string, dependency func() bool) {
+	arg := argument{
+		name:       name,
+		dependency: dependency,
+	}
+
+	arg.inputFunction = func() {
+		var (
+			collect bool
+			inputs  []string
+		)
+
+		w.newBoolPrompt(&collect, defaultValue, initialPrompt)
+
+		if !collect {
+			return
+		}
+
+		for collect {
+			var input string
+
+			w.newStringPrompt(&input, inputPrompt, true)
+			inputs = append(inputs, input)
+
+			w.newBoolPrompt(&collect, false, "Collect more?")
+		}
+
+		*callback = inputs
+	}
+
+	w.Arguments = append(w.Arguments, arg)
 }
 
 func (w *Wizard) AddIcingaEndpoints(callback *[]icingaapi.Endpoint, name, usage string, dependency func() bool) {
