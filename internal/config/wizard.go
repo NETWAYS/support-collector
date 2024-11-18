@@ -73,17 +73,20 @@ func (w *Wizard) Parse(availableModules string) {
 //	required: bool
 //	dependency: Add dependency function to validate if that argument will be added or not
 func (w *Wizard) AddStringVar(callback *string, name, defaultValue, usage string, required bool, dependency func() bool) {
-	w.Arguments = append(w.Arguments, argument{
-		name: name,
-		inputFunction: func() {
-			if *callback != "" {
-				defaultValue = *callback
-			}
-
-			w.newStringPromptWithDefault(callback, defaultValue, usage, required)
-		},
+	arg := argument{
+		name:       name,
 		dependency: dependency,
-	})
+	}
+
+	arg.inputFunction = func() {
+		if *callback != "" {
+			defaultValue = *callback
+		}
+
+		w.newStringPromptWithDefault(callback, defaultValue, usage, required)
+	}
+
+	w.Arguments = append(w.Arguments, arg)
 }
 
 // AddSliceVarFromString reads a single string from stdin. This string will be separated by ',' and the resulting slice will be returned
@@ -95,20 +98,23 @@ func (w *Wizard) AddStringVar(callback *string, name, defaultValue, usage string
 //	required: bool
 //	dependency: Add dependency function to validate if that argument will be added or not
 func (w *Wizard) AddSliceVarFromString(callback *[]string, name string, defaultValue []string, usage string, required bool, dependency func() bool) {
-	w.Arguments = append(w.Arguments, argument{
-		name: name,
-		inputFunction: func() {
-			if len(*callback) > 0 {
-				defaultValue = *callback
-			}
-
-			var input string
-
-			w.newStringPromptWithDefault(&input, strings.Join(defaultValue, ","), usage, required)
-			*callback = strings.Split(strings.ReplaceAll(input, " ", ""), ",")
-		},
+	arg := argument{
+		name:       name,
 		dependency: dependency,
-	})
+	}
+
+	arg.inputFunction = func() {
+		if len(*callback) > 0 {
+			defaultValue = *callback
+		}
+
+		var input string
+
+		w.newStringPromptWithDefault(&input, strings.Join(defaultValue, ","), usage, required)
+		*callback = strings.Split(strings.ReplaceAll(input, " ", ""), ",")
+	}
+
+	w.Arguments = append(w.Arguments, arg)
 }
 
 // AddBoolVar adds argument for a boolean variable
@@ -119,13 +125,16 @@ func (w *Wizard) AddSliceVarFromString(callback *[]string, name string, defaultV
 //	usage: usage string
 //	dependency: Add dependency function to validate if that argument will be added or not
 func (w *Wizard) AddBoolVar(callback *bool, name string, defaultValue bool, usage string, dependency func() bool) {
-	w.Arguments = append(w.Arguments, argument{
-		name: name,
-		inputFunction: func() {
-			w.newBoolPrompt(callback, defaultValue, usage)
-		},
+	arg := argument{
+		name:       name,
 		dependency: dependency,
-	})
+	}
+
+	arg.inputFunction = func() {
+		w.newBoolPrompt(callback, defaultValue, usage)
+	}
+
+	w.Arguments = append(w.Arguments, arg)
 }
 
 // AddStringSliceVar adds argument for a slice of strings.
@@ -170,30 +179,34 @@ func (w *Wizard) AddStringSliceVar(callback *[]string, name string, defaultValue
 }
 
 func (w *Wizard) AddIcingaEndpoints(callback *[]icingaapi.Endpoint, name, usage string, dependency func() bool) {
-	w.Arguments = append(w.Arguments, argument{
-		name: name,
-		inputFunction: func() {
-			// Ask if endpoint should be added. If not, return
-			var collect bool
-			w.newBoolPrompt(&collect, true, usage)
-
-			if !collect {
-				return
-			}
-
-			var endpoints []icingaapi.Endpoint
-
-			for collect {
-				e := w.newIcinga2EndpointPrompt()
-				endpoints = append(endpoints, e)
-
-				w.newBoolPrompt(&collect, false, "Collect more Icinga 2 API endpoints?")
-			}
-
-			*callback = endpoints
-		},
+	arg := argument{
+		name:       name,
 		dependency: dependency,
-	})
+	}
+
+	arg.inputFunction = func() {
+		// Ask if endpoint should be added. If not, return
+		var collect bool
+
+		w.newBoolPrompt(&collect, true, usage)
+
+		if !collect {
+			return
+		}
+
+		var endpoints []icingaapi.Endpoint
+
+		for collect {
+			e := w.newIcinga2EndpointPrompt()
+			endpoints = append(endpoints, e)
+
+			w.newBoolPrompt(&collect, false, "Collect more Icinga 2 API endpoints?")
+		}
+
+		*callback = endpoints
+	}
+
+	w.Arguments = append(w.Arguments, arg)
 }
 
 // newStringPromptWithDefault creates a new stdout / stdin prompt for a string
