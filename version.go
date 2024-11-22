@@ -4,7 +4,7 @@ import "fmt"
 
 //nolint:gochecknoglobals
 var (
-	version = "main"
+	version = "1.0.0"
 	commit  = ""
 	date    = ""
 )
