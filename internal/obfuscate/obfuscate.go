@@ -95,7 +95,7 @@ func (o *Obfuscator) WithReplacement(r *regexp.Regexp) *Obfuscator {
 //
 //	Checks if the Obfuscator.Kind is matching the given kind. If not returns false.
 //	Checks if the Obfuscator.ShouldAffect is matching the given name.
-func (o Obfuscator) IsAccepting(kind Kind, name string) bool {
+func (o *Obfuscator) IsAccepting(kind Kind, name string) bool {
 	if o.Kind != KindAny && o.Kind != kind {
 		return false
 	}
