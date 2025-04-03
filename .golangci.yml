@@ -1,39 +1,56 @@
+version: "2"
 run:
-  timeout: 5m
   tests: false
 linters:
-  enable-all: true
+  default: all
   disable:
-   - err113
-   - goimports
-   - cyclop
-   - depguard
-   - exhaustruct
-   - forbidigo
-   - forcetypeassert
-   - gci
-   - gochecknoglobals
-   - gochecknoinits
-   - godox
-   - godot
-   - gofumpt
-   - gomnd
-   - lll
-   - musttag
-   - nakedret
-   - nlreturn
-   - nolintlint
-   - nonamedreturns
-   - tagalign
-   - tagliatelle
-   - varnamelen
-   - wrapcheck
-   - goconst # not needed in our case
-   - perfsprint # not needed in our case
-linters-settings:
-  funlen:
-     ignore-comments: true
-     lines: 120
-     statements: -1
-  nestif:
-    min-complexity: 5
+    - cyclop
+    - depguard
+    - err113
+    - exhaustruct
+    - forbidigo
+    - forcetypeassert
+    - gochecknoglobals
+    - gochecknoinits
+    - goconst
+    - godot
+    - godox
+    - lll
+    - mnd
+    - musttag
+    - nakedret
+    - nlreturn
+    - nolintlint
+    - nonamedreturns
+    - perfsprint
+    - tagalign
+    - tagliatelle
+    - varnamelen
+    - wrapcheck
+  settings:
+    funlen:
+      lines: 120
+      statements: -1
+      ignore-comments: true
+    nestif:
+      min-complexity: 5
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
