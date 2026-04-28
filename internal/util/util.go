@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"slices"
 	"strings"
 	"time"
 
@@ -15,13 +16,7 @@ const FilePrefix = "support-collector"
 
 // StringInSlice matches if a string is contained in a slice.
 func StringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(list, a)
 }
 
 // DistinctStringSlice returns the given slice with unique values
