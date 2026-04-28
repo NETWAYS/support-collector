@@ -54,7 +54,7 @@ func CharsToString(chars []int8) string {
 			break
 		}
 
-		s[i] = byte(chars[i])
+		s[i] = byte(chars[i]) //nolint: gosec
 	}
 
 	return string(s[0:i])

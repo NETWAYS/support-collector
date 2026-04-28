@@ -111,7 +111,8 @@ func Collect(c *collection.Collection) {
 	c.AddFilesIfFound(ModuleName, pluginFiles...)
 
 	for _, file := range optionalFiles {
-		if _, err := os.Stat(file); err != nil {
+		_, err := os.Stat(file)
+		if err != nil {
 			continue
 		}
 
@@ -162,7 +163,8 @@ func Collect(c *collection.Collection) {
 			c.Log.Debugf("New API endpoint found: '%s'. Trying...", e.Address)
 
 			// Check if endpoint is reachable
-			if err := e.IsReachable(5 * time.Second); err != nil { //nolint:mnd
+			err := e.IsReachable(5 * time.Second)
+			if err != nil { //nolint:mnd
 				c.Log.Warn(err)
 				continue
 			}

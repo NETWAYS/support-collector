@@ -12,12 +12,12 @@ import (
 )
 
 type File struct {
+	io.Writer
+
 	Name     string
 	Source   string
 	Modified time.Time
 	Data     []byte
-
-	io.Writer
 }
 
 var reIgnoreFiles = regexp.MustCompile(`(^\.|~$|\.key$|\.csr$|\.crt$|\.pem$)`)

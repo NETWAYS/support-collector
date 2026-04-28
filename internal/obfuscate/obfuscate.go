@@ -35,6 +35,7 @@ const (
 // Replacement will be iterated, so all matches or matched groups will be replaced.
 type Obfuscator struct {
 	Kind
+
 	ShouldAffect    []*regexp.Regexp
 	ReplacePattern  *regexp.Regexp
 	ObfuscatedFiles []string

@@ -31,7 +31,12 @@ func newClient() *http.Client {
 // IsReachable checks if the endpoint is reachable within 5 sec
 func (endpoint *Endpoint) IsReachable(timeout time.Duration) error {
 	// try to dial tcp connection within 5 seconds
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", endpoint.Address, endpoint.Port), timeout)
+	context, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	var dialer net.Dialer
+
+	conn, err := dialer.DialContext(context, "tcp", fmt.Sprintf("%s:%d", endpoint.Address, endpoint.Port))
 	if err != nil {
 		return fmt.Errorf("cant connect to endpoint '%s' within 5 seconds: %w", endpoint.Address, err)
 	}

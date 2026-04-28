@@ -100,7 +100,8 @@ func Collect(c *collection.Collection) {
 	// Detect PHP related packages and services
 	c.AddInstalledPackagesRaw(filepath.Join(ModuleName, "packages-php.txt"), "*php*")
 
-	if services, err := collection.FindServices("*php*-fpm"); err == nil && len(services) > 0 {
+	services, err := collection.FindServices("*php*-fpm")
+	if err == nil && len(services) > 0 {
 		for _, name := range services {
 			c.AddServiceStatusRaw(filepath.Join(ModuleName, "service-"+name+".txt"), name)
 		}
@@ -112,7 +113,8 @@ func Collect(c *collection.Collection) {
 		}
 
 		for name, element := range journalctlLogs {
-			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+			service, err := collection.FindServices(element.Service)
+			if err == nil && len(service) > 0 {
 				c.AddJournalLog(filepath.Join(ModuleName, name), element.Service)
 			}
 		}
