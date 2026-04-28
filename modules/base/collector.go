@@ -42,13 +42,15 @@ func Collect(c *collection.Collection) {
 	CollectKernelInfo(c)
 
 	// Check if apparmor is installed and get status
-	if _, err := exec.LookPath("apparmor_status"); err == nil {
+	_, err := exec.LookPath("apparmor_status")
+	if err == nil {
 		c.AddCommandOutput(filepath.Join(ModuleName, "apparmor-status.txt"), "apparmor_status")
 	}
 
 	// Check if we can detect SELinux enforcing
 	for _, cmd := range []string{"sestatus", "getenforce"} {
-		if _, err := exec.LookPath(cmd); err == nil {
+		_, err := exec.LookPath(cmd)
+		if err == nil {
 			c.AddCommandOutput(filepath.Join(ModuleName, "selinux-status.txt"), cmd)
 			break
 		}

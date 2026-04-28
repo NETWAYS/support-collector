@@ -42,7 +42,8 @@ func DetectServiceManager() string {
 	}
 
 	for command, manager := range priority {
-		if _, err := exec.LookPath(command); err == nil {
+		_, err := exec.LookPath(command)
+		if err == nil {
 			FoundServiceManager = manager
 			return manager
 		}
@@ -84,7 +85,8 @@ func FindServicesSystemd(pattern string) (map[string]string, error) {
 
 		for _, file := range files {
 			// Skip the file if it is a symlink
-			if stat, err := os.Lstat(file); err != nil || IsSymlink(stat) {
+			stat, err := os.Lstat(file)
+			if err != nil || IsSymlink(stat) {
 				continue
 			}
 

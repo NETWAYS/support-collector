@@ -225,7 +225,8 @@ func (w *Wizard) newStringPrompt(callback *string, usage string, required bool) 
 				return
 			}
 		} else {
-			if err := w.Scanner.Err(); err != nil {
+			err := w.Scanner.Err()
+			if err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, "reading standard input:", err)
 				return
 			}
@@ -252,7 +253,8 @@ func (w *Wizard) newStringPromptWithDefault(callback *string, defaultValue, usag
 				return
 			}
 		} else {
-			if err := w.Scanner.Err(); err != nil {
+			err := w.Scanner.Err()
+			if err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, "reading standard input:", err)
 				return
 			}
@@ -283,7 +285,8 @@ func (w *Wizard) newIntPromptWithDefault(callback *int, defaultValue int, usage 
 				return
 			}
 		} else {
-			if err := w.Scanner.Err(); err != nil {
+			err := w.Scanner.Err()
+			if err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, "reading standard input:", err)
 				return
 			}

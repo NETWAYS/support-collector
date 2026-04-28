@@ -59,7 +59,8 @@ func Collect(c *collection.Collection) {
 	)
 
 	for _, file := range optionalFiles {
-		if _, err := os.Stat(file); err != nil {
+		_, err := os.Stat(file)
+		if err != nil {
 			continue
 		}
 
@@ -71,7 +72,8 @@ func Collect(c *collection.Collection) {
 	}
 
 	for _, file := range possibleDaemons {
-		if _, err := os.Stat(file); err != nil {
+		_, err := os.Stat(file)
+		if err != nil {
 			continue
 		}
 

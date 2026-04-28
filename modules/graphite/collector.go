@@ -109,7 +109,8 @@ func Collect(c *collection.Collection) {
 		}
 
 		for name, element := range journalctlLogs {
-			if service, err := collection.FindServices(element.Service); err == nil && len(service) > 0 {
+			service, err := collection.FindServices(element.Service)
+			if err == nil && len(service) > 0 {
 				c.AddJournalLog(filepath.Join(ModuleName, name), element.Service)
 			}
 		}

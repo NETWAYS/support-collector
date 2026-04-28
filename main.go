@@ -98,14 +98,16 @@ func main() {
 	conf := config.GetControlDefaultObject()
 
 	// Add and parse flags
-	if err := parseFlags(); err != nil {
+	err := parseFlags()
+	if err != nil {
 		logrus.Fatal(err)
 	}
 
 	// Read input from answer-file if provided
 	// Needs to done after parsing flags to have the value for answerFile
 	if answerFile != "" {
-		if err := config.ReadAnswerFile(answerFile, &conf); err != nil {
+		err := config.ReadAnswerFile(answerFile, &conf)
+		if err != nil {
 			logrus.Fatal(err)
 		}
 
@@ -139,6 +141,7 @@ func main() {
 
 	// Initialize new metrics and defer function to save it to json
 	c.Metric = metrics.New(getVersion())
+
 	defer func() {
 		// Save metrics to file
 		body, err := json.Marshal(c.Metric)

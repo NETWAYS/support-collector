@@ -64,8 +64,15 @@ func LoadGitRepoInfo(path string) (*GitRepoInfo, error) {
 }
 
 func ExecGitCommand(dir string, command ...string) ([]byte, error) {
-	arguments := []string{"--git-dir", filepath.Join(dir, ".git"), "--work-tree", dir}
-	arguments = append(arguments, command...)
+	arguments := make([]string, 4+len(command))
+	arguments[0] = "--git-dir"
+	arguments[1] = filepath.Join(dir, ".git")
+	arguments[2] = "--work-tree"
+	arguments[3] = dir
+
+	for i := range command {
+		arguments[i+4] = command[i]
+	}
 
 	return LoadCommandOutput("git", arguments...)
 }

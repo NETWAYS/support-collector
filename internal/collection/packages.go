@@ -28,7 +28,8 @@ func DetectPackageManager() string {
 	priority := []string{PackageManagerDebian, PackageManagerRPM}
 
 	for _, name := range priority {
-		if _, err := exec.LookPath(name); err == nil {
+		_, err := exec.LookPath(name)
+		if err == nil {
 			FoundPackageManager = name
 			return name
 		}
@@ -40,13 +41,25 @@ func DetectPackageManager() string {
 func ListInstalledPackagesRaw(pattern ...string) ([]byte, error) {
 	switch DetectPackageManager() {
 	case PackageManagerRPM:
-		arguments := []string{"-qa", "--queryformat", rpmQueryFormat}
-		arguments = append(arguments, pattern...)
+		arguments := make([]string, 3+len(pattern))
+		arguments[0] = "-qa"
+		arguments[1] = "--queryformat"
+		arguments[2] = rpmQueryFormat
+
+		for i := range pattern {
+			arguments[i+3] = pattern[i]
+		}
 
 		return LoadCommandOutput("rpm", arguments...)
 	case PackageManagerDebian:
-		arguments := []string{"-W", "-f", dpkgQueryFormat}
-		arguments = append(arguments, pattern...)
+		arguments := make([]string, 3+len(pattern))
+		arguments[0] = "-W"
+		arguments[1] = "-f"
+		arguments[2] = dpkgQueryFormat
+
+		for i := range pattern {
+			arguments[i+3] = pattern[i]
+		}
 
 		return LoadCommandOutput("dpkg-query", arguments...)
 	default:
