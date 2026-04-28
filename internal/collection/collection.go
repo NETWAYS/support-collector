@@ -134,7 +134,7 @@ func (c *Collection) AddFileDataRaw(fileName string, data []byte) {
 	}
 }
 
-func (c *Collection) AddFileYAML(fileName string, data interface{}) {
+func (c *Collection) AddFileYAML(fileName string, data any) {
 	var buf bytes.Buffer
 
 	err := yaml.NewEncoder(&buf).Encode(&data)
