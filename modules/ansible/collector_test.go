@@ -6,8 +6,6 @@ import (
 
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/util"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCollect(t *testing.T) {
@@ -22,7 +20,11 @@ func TestCollect(t *testing.T) {
 	Collect(c)
 
 	err := c.Close()
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 
-	assert.NotEmpty(t, buf.Len())
+	if buf.Len() == 0 {
+		t.Error("Expected buffer to be not empty")
+	}
 }

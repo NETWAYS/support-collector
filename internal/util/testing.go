@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // AssertObfuscation is a helper function for tests where we want to validate if obfuscation.Obfuscator works correctly.
@@ -26,7 +24,11 @@ func AssertObfuscation(t *testing.T, obfuscators []*obfuscate.Obfuscator,
 			return
 		}
 
-		assert.Equal(t, expected, string(out))
+		actual := string(out)
+
+		if actual != expected {
+			t.Error("\nActual: ", actual, "\nExpected: ", expected)
+		}
 
 		return
 	}
