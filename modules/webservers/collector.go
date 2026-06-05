@@ -1,11 +1,11 @@
 package webservers
 
 import (
-	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const ModuleName = "webserver"

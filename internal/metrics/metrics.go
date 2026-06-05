@@ -1,11 +1,12 @@
 package metrics
 
 import (
-	"github.com/NETWAYS/support-collector/internal/config"
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/NETWAYS/support-collector/internal/config"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
 )
 
 type Metrics struct {

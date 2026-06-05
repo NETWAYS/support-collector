@@ -3,9 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+	"time"
+
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/config"
 	"github.com/NETWAYS/support-collector/internal/metrics"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
@@ -14,6 +22,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/graylog"
+	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadb"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
@@ -26,18 +35,10 @@ import (
 	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/modules/redis"
 	"github.com/NETWAYS/support-collector/modules/webservers"
-	flag "github.com/spf13/pflag"
-	"os"
-	"path/filepath"
-	"slices"
-	"strings"
-	"time"
 
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
-	"github.com/NETWAYS/support-collector/internal/util"
-	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"
+	flag "github.com/spf13/pflag"
 )
 
 const Product = "NETWAYS support-collector"
@@ -64,6 +65,13 @@ var (
 	startTime                                 = time.Now()
 )
 
+//nolint:gochecknoglobals
+var (
+	version = "main"
+	commit  = ""
+	date    = ""
+)
+
 var modules = map[string]func(*collection.Collection){
 	"ansible":         ansible.Collect,
 	"base":            base.Collect,
@@ -86,6 +94,20 @@ var modules = map[string]func(*collection.Collection){
 	"puppet":          puppet.Collect,
 	"redis":           redis.Collect,
 	"webservers":      webservers.Collect,
+}
+
+func getBuildInfo() string {
+	result := version
+
+	if commit != "" {
+		result = fmt.Sprintf("%s\ncommit: %s", result, commit)
+	}
+
+	if date != "" {
+		result = fmt.Sprintf("%s\ndate: %s", result, date)
+	}
+
+	return result
 }
 
 func init() {
@@ -140,7 +162,7 @@ func main() {
 	defer closeCollection()
 
 	// Initialize new metrics and defer function to save it to json
-	c.Metric = metrics.New(getVersion())
+	c.Metric = metrics.New(version)
 
 	defer func() {
 		// Save metrics to file

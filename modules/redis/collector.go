@@ -1,10 +1,11 @@
 package redis
 
 import (
+	"path/filepath"
+
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"github.com/NETWAYS/support-collector/internal/util"
-	"path/filepath"
 )
 
 const ModuleName = "redis"

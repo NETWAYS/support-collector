@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/NETWAYS/support-collector/internal/util"
-	"github.com/NETWAYS/support-collector/modules/icinga2/icingaapi"
 	"slices"
 	"time"
+
+	"github.com/NETWAYS/support-collector/internal/util"
+	"github.com/NETWAYS/support-collector/modules/icinga2/icingaapi"
 )
 
 var (

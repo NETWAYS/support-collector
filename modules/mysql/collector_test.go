@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
+
 	"github.com/stretchr/testify/assert"
 )
 

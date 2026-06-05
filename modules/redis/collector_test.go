@@ -2,11 +2,13 @@ package redis
 
 import (
 	"bytes"
+	"testing"
+
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
 	"github.com/NETWAYS/support-collector/internal/util"
+
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCollect(t *testing.T) {

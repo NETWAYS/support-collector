@@ -2,8 +2,6 @@ package icinga2
 
 import (
 	"fmt"
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
-	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,6 +9,8 @@ import (
 	"time"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const ModuleName = "icinga2"

@@ -2,10 +2,11 @@ package graphite
 
 import (
 	"bytes"
-	"github.com/NETWAYS/support-collector/internal/util"
 	"testing"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/util"
+
 	"github.com/stretchr/testify/assert"
 )
 

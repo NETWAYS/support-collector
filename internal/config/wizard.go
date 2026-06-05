@@ -3,11 +3,13 @@ package config
 import (
 	"bufio"
 	"fmt"
-	"github.com/NETWAYS/support-collector/modules/icinga2/icingaapi"
-	"github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/NETWAYS/support-collector/modules/icinga2/icingaapi"
+
+	"github.com/sirupsen/logrus"
 )
 
 const interactiveHelpText = `Welcome to the support-collector wizard!

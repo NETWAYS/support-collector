@@ -1,12 +1,12 @@
 package icingaweb2
 
 import (
-	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const (
