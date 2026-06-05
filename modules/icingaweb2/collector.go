@@ -131,7 +131,7 @@ func CollectModuleInfo(c *collection.Collection) {
 
 	modulesFiles, err := os.ReadDir(ModulesPath)
 	if err != nil {
-		c.Log.Debugf("Could not list modules in %s - %s", ModulesPath, err)
+		c.Log.Debug("Could not list modules in "+ModulesPath, "error", err.Error())
 		return
 	}
 

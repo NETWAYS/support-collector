@@ -76,17 +76,17 @@ func CollectKernelInfo(c *collection.Collection) {
 
 	info, err := GetKernelInfo()
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Error(err.Error())
 	}
 
 	err = yaml.NewEncoder(&buf).Encode(info)
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Error(err.Error())
 		return
 	}
 
 	err = c.AddFileFromReaderRaw(filepath.Join(ModuleName, "kernel.yml"), &buf)
 	if err != nil {
-		c.Log.Error(err)
+		c.Log.Error(err.Error())
 	}
 }
