@@ -1,11 +1,13 @@
 package base
 
 import (
+	"context"
 	"fmt"
+	"net"
+	"os"
+	"strings"
 	"syscall"
 	"time"
-
-	"github.com/Showmax/go-fqdn"
 )
 
 type KernelInfo struct {
@@ -17,6 +19,40 @@ type KernelInfo struct {
 	Domainname  string
 	FQDN        string
 	CurrentTime string
+}
+
+func getFQDN() (string, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+
+	defer cancel()
+
+	resolver := &net.Resolver{
+		PreferGo: true,
+	}
+
+	addrs, err := resolver.LookupHost(ctx, hostname)
+	if err != nil {
+		return hostname, nil
+	}
+
+	for _, addr := range addrs {
+		hosts, err := resolver.LookupAddr(ctx, addr)
+
+		if err != nil || len(hosts) == 0 {
+			continue
+		}
+
+		fqdn := strings.TrimSuffix(hosts[0], ".")
+
+		return fqdn, nil
+	}
+
+	return hostname, nil
 }
 
 func GetKernelInfo() (i KernelInfo, err error) {
@@ -37,7 +73,7 @@ func GetKernelInfo() (i KernelInfo, err error) {
 		Domainname: CharsToString(uname.Domainname[:]),
 	}
 
-	i.FQDN, err = fqdn.FqdnHostname()
+	i.FQDN, err = getFQDN()
 	// return err after setting info
 
 	i.CurrentTime = time.Now().String()
