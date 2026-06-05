@@ -7,8 +7,6 @@ import (
 	"slices"
 	"strings"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 // FilePrefix for the outfile file.
@@ -54,10 +52,7 @@ func CommandExists(cmd string) bool {
 
 // GetHostnameWithoutDomain returns hostname without domain.
 func GetHostnameWithoutDomain() string {
-	hostname, err := os.Hostname()
-	if err != nil {
-		logrus.Error(err)
-	}
+	hostname, _ := os.Hostname()
 
 	result, _, found := strings.Cut(hostname, ".")
 	if !found {

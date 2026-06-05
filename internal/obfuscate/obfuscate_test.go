@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const iniExample = `[default]
@@ -37,29 +35,57 @@ func ExampleObfuscator() {
 
 func TestReplacePattern(t *testing.T) {
 	replacement, count := ReplacePattern(`password = "XXX"`, regexp.MustCompile(`password\s*=\s*(.*)`))
-	assert.Equal(t, uint(1), count)
-	assert.Equal(t, `password = <HIDDEN>`, replacement)
+
+	if count != 1 {
+		t.Errorf("expected count 1, got %d", count)
+	}
+
+	if replacement != `password = <HIDDEN>` {
+		t.Errorf("expected replacement 'password = <HIDDEN>', got %q", replacement)
+	}
 
 	replacement, count = ReplacePattern(`password = "XXX"`, regexp.MustCompile(`password\s*=.*`))
-	assert.Equal(t, uint(1), count)
-	assert.Equal(t, `<HIDDEN>`, replacement)
+
+	if count != 1 {
+		t.Errorf("expected count 1, got %d", count)
+	}
+
+	if replacement != `<HIDDEN>` {
+		t.Errorf("expected replacement '<HIDDEN>', got %q", replacement)
+	}
 }
 
 func TestObfuscator_IsAccepting(t *testing.T) {
 	o := New(KindFile, NewExtensionMatch("ini"), regexp.MustCompile(`^$`))
 
-	assert.True(t, o.IsAccepting(KindFile, "test.ini"))
-	assert.False(t, o.IsAccepting(KindFile, "test.txt"))
-	assert.False(t, o.IsAccepting(KindOutput, "echo"))
+	if !o.IsAccepting(KindFile, "test.ini") {
+		t.Fatalf("expected isAccepting to be true")
+	}
+
+	if o.IsAccepting(KindFile, "test.txt") {
+		t.Fatalf("expected isAccepting to be false")
+	}
+
+	if o.IsAccepting(KindFile, "echo") {
+		t.Fatalf("expected isAccepting to be false")
+	}
 
 	o.Kind = KindAny
-	assert.True(t, o.IsAccepting(KindOutput, "test.ini"))
+
+	if !o.IsAccepting(KindFile, "test.ini") {
+		t.Fatalf("expected isAccepting to be true")
+	}
 
 	o.Kind = KindOutput
 	o.WithAffecting(regexp.MustCompile(`^icinga2 daemon -C`))
 
-	assert.True(t, o.IsAccepting(KindOutput, "icinga2 daemon -C"))
-	assert.False(t, o.IsAccepting(KindOutput, "icinga2 daemon"))
+	if !o.IsAccepting(KindOutput, "icinga2 daemon -C") {
+		t.Fatalf("expected isAccepting to be true")
+	}
+
+	if o.IsAccepting(KindOutput, "icinga2 daemon") {
+		t.Fatalf("expected isAccepting to be false")
+	}
 }
 
 func TestObfuscator_Process(t *testing.T) {
@@ -68,29 +94,70 @@ func TestObfuscator_Process(t *testing.T) {
 	}
 
 	count, out, err := o.Process([]byte("default content\r\n"), "")
-	assert.NoError(t, err)
-	assert.Equal(t, uint(0), count)
-	assert.Equal(t, "default content\r\n", string(out))
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if count != uint(0) {
+		t.Errorf("expected count to be 0")
+	}
+
+	if "default content\r\n" != string(out) {
+		t.Errorf("expected %v, got %v", "default content", string(out))
+	}
 
 	count, out, err = o.Process([]byte(iniExample), "")
-	assert.NoError(t, err)
-	assert.Equal(t, uint(1), count)
-	assert.Equal(t, iniResult, string(out))
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if count != uint(1) {
+		t.Errorf("expected count to be 1")
+	}
+
+	if iniResult != string(out) {
+		t.Errorf("expected %v, got %v", iniResult, string(out))
+	}
 }
 
 func TestNewFile(t *testing.T) {
 	o := NewFile(`^password\s*=\s*(.*)`, "conf")
-	assert.Equal(t, KindFile, o.Kind)
-	assert.Len(t, o.ShouldAffect, 1)
-	assert.NotEmpty(t, o.ShouldAffect)
+
+	if o.Kind != KindFile {
+		t.Errorf("expected Kind to be %v, got %v", KindFile, o.Kind)
+	}
+
+	if len(o.ShouldAffect) != 1 {
+		t.Errorf("expected ShouldAffect length 1, got %d", len(o.ShouldAffect))
+	}
+
+	if len(o.ShouldAffect) == 0 {
+		t.Error("expected ShouldAffect to be non-empty")
+	}
 }
 
 func TestNewOutput(t *testing.T) {
 	o := NewOutput(`^password\s*=\s*(.*)`, "icinga2", "daemon", "-C")
-	assert.Equal(t, KindOutput, o.Kind)
-	assert.Len(t, o.ShouldAffect, 1)
-	assert.NotEmpty(t, o.ReplacePattern)
 
-	assert.True(t, o.IsAccepting(KindOutput, "icinga2 daemon -C"))
-	assert.False(t, o.IsAccepting(KindOutput, "icinga2 daemon"))
+	if o.Kind != KindOutput {
+		t.Errorf("expected Kind to be %v, got %v", KindOutput, o.Kind)
+	}
+
+	if len(o.ShouldAffect) != 1 {
+		t.Errorf("expected ShouldAffect length 1, got %d", len(o.ShouldAffect))
+	}
+
+	if o.ReplacePattern == nil {
+		t.Error("expected ReplacePattern to be non-empty")
+	}
+
+	if !o.IsAccepting(KindOutput, "icinga2 daemon -C") {
+		t.Fatalf("expected isAccepting to be true")
+	}
+
+	if o.IsAccepting(KindOutput, "icinga2 daemon") {
+		t.Fatalf("expected isAccepting to be true")
+	}
 }

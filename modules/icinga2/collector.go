@@ -2,8 +2,6 @@ package icinga2
 
 import (
 	"fmt"
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
-	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,6 +9,8 @@ import (
 	"time"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const ModuleName = "icinga2"
@@ -133,7 +133,7 @@ func Collect(c *collection.Collection) {
 	if icinga2version >= "2.14.0" {
 		_, err = collection.LoadCommandOutput("icinga2", "daemon", "-C", "--dump-objects")
 		if err != nil {
-			c.Log.Warn(err)
+			c.Log.Warn(err.Error())
 		}
 	}
 
@@ -160,12 +160,12 @@ func Collect(c *collection.Collection) {
 		c.Log.Debug("Start to collect data from Icinga API endpoints")
 
 		for _, e := range c.Config.Icinga2.Endpoints {
-			c.Log.Debugf("New API endpoint found: '%s'. Trying...", e.Address)
+			c.Log.Debug("New API endpoint found: " + e.Address)
 
 			// Check if endpoint is reachable
 			err := e.IsReachable(5 * time.Second)
 			if err != nil { //nolint:mnd
-				c.Log.Warn(err)
+				c.Log.Warn(err.Error())
 				continue
 			}
 
@@ -174,14 +174,14 @@ func Collect(c *collection.Collection) {
 			// Request stats and health from endpoint
 			res, err := e.Request("v1/status", 10*time.Second) //nolint:mnd
 			if err != nil {
-				c.Log.Warn(err)
+				c.Log.Warn(err.Error())
 				continue
 			}
 
 			// Save output to file. Replace "." in address with "_" and use as filename.
 			c.AddFileJSON(filepath.Join(ModuleName, "api", "v1", "status", fmt.Sprintf("%s.json", strings.ReplaceAll(e.Address, ".", "_"))), res)
 
-			c.Log.Debugf("Successfully finished endpoint '%s'", e.Address)
+			c.Log.Debug("Successfully finished endpoint " + e.Address)
 		}
 	}
 }

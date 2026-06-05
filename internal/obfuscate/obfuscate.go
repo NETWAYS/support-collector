@@ -6,10 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"regexp"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // Replacement is the standard replacement used during obfuscation.
@@ -206,7 +205,7 @@ func ReplacePattern(line string, pattern *regexp.Regexp) (s string, count uint) 
 
 					s = strings.ReplaceAll(s, match, Replacement)
 
-					log.Debugf("replaced token for %s", pattern.String())
+					slog.Debug("replaced token for: " + pattern.String())
 				}
 			}
 
@@ -215,7 +214,7 @@ func ReplacePattern(line string, pattern *regexp.Regexp) (s string, count uint) 
 
 		count++
 
-		log.Debugf("replaced token for %s", pattern.String())
+		slog.Debug("replaced token for: " + pattern.String())
 
 		return Replacement
 	}), count

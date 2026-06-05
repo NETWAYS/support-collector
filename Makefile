@@ -1,7 +1,9 @@
 .PHONY: test coverage lint vet
 
 build:
-	go build
+	CGO_ENABLED=0 go build
+release-snapshot:
+	 goreleaser release --snapshot --clean
 lint:
 	go fmt $(go list ./... | grep -v /vendor/)
 vet:
@@ -12,4 +14,4 @@ coverage:
 	go test -v -cover -coverprofile=coverage.out ./... &&\
 	go tool cover -html=coverage.out -o coverage.html
 clean:
-	rm -f support-collector_*.zip
+	rm -f support-collector support-collector_*.zip

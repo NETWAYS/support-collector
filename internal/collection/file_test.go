@@ -1,33 +1,58 @@
 package collection
 
 import (
+	"bytes"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLoadFiles(t *testing.T) {
 	files, err := LoadFiles("test", "testdata/example.txt")
-	assert.NoError(t, err)
-	assert.Len(t, files, 1)
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if len(files) != 1 {
+		t.Error("Expected len(files) to be 1")
+	}
 
 	files, err = LoadFiles("test", "testdata")
-	assert.NoError(t, err)
-	assert.Len(t, files, 2)
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if len(files) != 2 {
+		t.Error("Expected len(files) to be 2")
+	}
 
 	files, err = LoadFiles("test", "testdata/*.txt")
-	assert.NoError(t, err)
-	assert.Len(t, files, 1)
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if len(files) != 1 {
+		t.Error("Expected len(files) to be 1")
+	}
 }
 
 func TestFile_Write(t *testing.T) {
 	f := NewFile("test.txt")
 
 	_, err := f.Write([]byte("content"))
-	assert.NoError(t, err)
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 
 	_, err = f.Write([]byte("content"))
-	assert.NoError(t, err)
 
-	assert.Equal(t, f.Data, []byte("contentcontent"))
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if !bytes.Equal(f.Data, []byte("contentcontent")) {
+		t.Errorf("expected %q, got %q", []byte("contentcontent"), f.Data)
+	}
 }

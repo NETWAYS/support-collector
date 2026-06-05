@@ -3,11 +3,12 @@ package config
 import (
 	"bufio"
 	"fmt"
-	"github.com/NETWAYS/support-collector/modules/icinga2/icingaapi"
-	"github.com/sirupsen/logrus"
+	"log/slog"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/NETWAYS/support-collector/modules/icinga2/icingaapi"
 )
 
 const interactiveHelpText = `Welcome to the support-collector wizard!
@@ -274,7 +275,8 @@ func (w *Wizard) newIntPromptWithDefault(callback *int, defaultValue int, usage 
 			case input != "":
 				converted, err := strconv.Atoi(input)
 				if err != nil {
-					logrus.Fatalf("could not convert '%s' to integer: %s", input, err)
+					slog.Error("could not convert to integer: " + input)
+					os.Exit(1)
 				}
 
 				*callback = converted

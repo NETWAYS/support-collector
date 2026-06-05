@@ -4,20 +4,22 @@ import (
 	"archive/zip"
 	"bytes"
 	"fmt"
-	"github.com/NETWAYS/support-collector/internal/config"
-	"github.com/NETWAYS/support-collector/internal/metrics"
 	"io"
+	"log/slog"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/NETWAYS/support-collector/internal/config"
+	"github.com/NETWAYS/support-collector/internal/metrics"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
-	"github.com/sirupsen/logrus"
+
 	"gopkg.in/yaml.v3"
 )
 
 type Collection struct {
 	Output                 *zip.Writer
-	Log                    *logrus.Logger
+	Log                    *slog.Logger
 	LogData                *bytes.Buffer
 	ExecTimeout            time.Duration
 	Obfuscators            []*obfuscate.Obfuscator
@@ -29,9 +31,11 @@ type Collection struct {
 
 // New initializes new collection with defaults
 func New(w io.Writer) (c *Collection) {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+
 	c = &Collection{
 		Output:                 zip.NewWriter(w),
-		Log:                    logrus.New(),
+		Log:                    logger,
 		LogData:                &bytes.Buffer{},
 		ExecTimeout:            DefaultTimeout,
 		Obfuscators:            nil,
@@ -40,8 +44,6 @@ func New(w io.Writer) (c *Collection) {
 		Config:                 config.GetControlDefaultObject(),
 		Metric:                 nil,
 	}
-
-	c.Log.Out = c.LogData
 
 	return
 }
@@ -54,12 +56,12 @@ func (c *Collection) Close() error {
 func (c *Collection) AddFileToOutput(file *File) (err error) {
 	file.Data, err = c.callObfuscators(obfuscate.KindFile, file.Name, file.Data)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Warn(err.Error())
 	}
 
 	err = c.AddFileToOutputRaw(file)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Warn(err.Error())
 	}
 
 	return
@@ -130,7 +132,7 @@ func (c *Collection) AddFileDataRaw(fileName string, data []byte) {
 
 	err := c.AddFileToOutputRaw(file)
 	if err != nil {
-		c.Log.Warn(err)
+		c.Log.Warn(err.Error())
 	}
 }
 
@@ -139,7 +141,7 @@ func (c *Collection) AddFileYAML(fileName string, data any) {
 
 	err := yaml.NewEncoder(&buf).Encode(&data)
 	if err != nil {
-		c.Log.Debugf("could not encode YAML data for '%s': %s", fileName, err)
+		c.Log.Debug("could not encode YAML data", "file", fileName, "error", err.Error())
 	}
 
 	file := NewFile(fileName)
@@ -165,11 +167,11 @@ func (c *Collection) AddFileJSONRaw(fileName string, data []byte) {
 }
 
 func (c *Collection) AddFiles(prefix, source string) {
-	c.Log.Debug("Collecting files from ", source)
+	c.Log.Debug("Collecting files from: " + source)
 
 	files, err := LoadFiles(prefix, source)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
 	for _, file := range files {
@@ -190,23 +192,23 @@ func (c *Collection) AddFilesIfFound(prefix string, sources ...string) {
 	}
 
 	if foundFiles == 0 {
-		c.Log.Debugf("Found no files under: %s", strings.Join(sources, " "))
+		c.Log.Debug(fmt.Sprintf("Found no files under: %s", strings.Join(sources, " ")))
 	}
 }
 
 func (c *Collection) AddCommandOutputWithTimeout(file string,
 	timeout time.Duration, command string, arguments ...string) {
-	c.Log.Debugf("Collecting command output: '%s %s'", command, strings.Join(arguments, " "))
+	c.Log.Debug(fmt.Sprintf("Collecting command output: '%s %s'", command, strings.Join(arguments, " ")))
 
 	output, err := LoadCommandOutputWithTimeout(timeout, command, arguments...)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
 	// obfuscate
 	output, err = c.callObfuscators(obfuscate.KindOutput, obfuscate.JoinCommand(command, arguments...), output)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
 	c.AddFileDataRaw(file, output)
@@ -217,33 +219,33 @@ func (c *Collection) AddCommandOutput(file, command string, arguments ...string)
 }
 
 func (c *Collection) AddInstalledPackagesRaw(fileName string, pattern ...string) {
-	c.Log.Debug("Collecting installed packages for pattern ", strings.Join(pattern, " "))
+	c.Log.Debug("Collecting installed packages for pattern: " + strings.Join(pattern, " "))
 
 	packages, err := ListInstalledPackagesRaw(pattern...)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
 	c.AddFileDataRaw(fileName, packages)
 }
 
 func (c *Collection) AddServiceStatusRaw(fileName, name string) {
-	c.Log.Debug("Collecting service status for ", name)
+	c.Log.Debug("Collecting service status for " + name)
 
 	output, err := GetServiceStatusRaw(name)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
 	c.AddFileDataRaw(fileName, output)
 }
 
 func (c *Collection) AddGitRepoInfo(fileName, path string) {
-	c.Log.Debug("Collecting GIT repository details for ", path)
+	c.Log.Debug("Collecting GIT repository details for " + path)
 
 	info, err := LoadGitRepoInfo(path)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
 	c.AddFileYAML(fileName, info)
@@ -287,7 +289,7 @@ func (c *Collection) callObfuscators(kind obfuscate.Kind, name string, data []by
 		}
 
 		if count > 0 {
-			c.Log.Debugf("ReplacePattern '%s' replaced %d token in %s", o.ReplacePattern, count, name)
+			c.Log.Debug(fmt.Sprintf("ReplacePattern '%s' replaced %d token in %s", o.ReplacePattern, count, name))
 			count = 0
 		}
 	}

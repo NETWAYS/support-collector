@@ -3,9 +3,18 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"os"
+	"path/filepath"
+	"slices"
+	"strings"
+	"time"
+
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/config"
 	"github.com/NETWAYS/support-collector/internal/metrics"
+	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 	"github.com/NETWAYS/support-collector/modules/ansible"
 	"github.com/NETWAYS/support-collector/modules/base"
 	"github.com/NETWAYS/support-collector/modules/corosync"
@@ -14,6 +23,7 @@ import (
 	"github.com/NETWAYS/support-collector/modules/grafana"
 	"github.com/NETWAYS/support-collector/modules/graphite"
 	"github.com/NETWAYS/support-collector/modules/graylog"
+	"github.com/NETWAYS/support-collector/modules/icinga2"
 	"github.com/NETWAYS/support-collector/modules/icingadb"
 	"github.com/NETWAYS/support-collector/modules/icingadirector"
 	"github.com/NETWAYS/support-collector/modules/icingaweb2"
@@ -26,18 +36,8 @@ import (
 	"github.com/NETWAYS/support-collector/modules/puppet"
 	"github.com/NETWAYS/support-collector/modules/redis"
 	"github.com/NETWAYS/support-collector/modules/webservers"
-	flag "github.com/spf13/pflag"
-	"os"
-	"path/filepath"
-	"slices"
-	"strings"
-	"time"
 
-	"github.com/NETWAYS/support-collector/internal/obfuscate"
-	"github.com/NETWAYS/support-collector/internal/util"
-	"github.com/NETWAYS/support-collector/modules/icinga2"
-	"github.com/mattn/go-colorable"
-	"github.com/sirupsen/logrus"
+	flag "github.com/spf13/pflag"
 )
 
 const Product = "NETWAYS support-collector"
@@ -64,6 +64,13 @@ var (
 	startTime                                 = time.Now()
 )
 
+//nolint:gochecknoglobals
+var (
+	version = "main"
+	commit  = ""
+	date    = ""
+)
+
 var modules = map[string]func(*collection.Collection){
 	"ansible":         ansible.Collect,
 	"base":            base.Collect,
@@ -88,6 +95,20 @@ var modules = map[string]func(*collection.Collection){
 	"webservers":      webservers.Collect,
 }
 
+func getBuildInfo() string {
+	result := version
+
+	if commit != "" {
+		result = fmt.Sprintf("%s\ncommit: %s", result, commit)
+	}
+
+	if date != "" {
+		result = fmt.Sprintf("%s\ndate: %s", result, date)
+	}
+
+	return result
+}
+
 func init() {
 	// Set locale to C, to avoid translations in command output
 	_ = os.Setenv("LANG", "C")
@@ -100,7 +121,8 @@ func main() {
 	// Add and parse flags
 	err := parseFlags()
 	if err != nil {
-		logrus.Fatal(err)
+		slog.Error(err.Error())
+		os.Exit(1)
 	}
 
 	// Read input from answer-file if provided
@@ -108,7 +130,8 @@ func main() {
 	if answerFile != "" {
 		err := config.ReadAnswerFile(answerFile, &conf)
 		if err != nil {
-			logrus.Fatal(err)
+			slog.Error(err.Error())
+			os.Exit(1)
 		}
 
 		conf.General.AnswerFile = answerFile
@@ -127,7 +150,7 @@ func main() {
 	// Validate conf. If errors found, print them and exit
 	if validationErrors := config.ValidateConfig(conf); len(validationErrors) > 0 {
 		for _, e := range validationErrors {
-			logrus.Error(e)
+			slog.Error(e.Error())
 		}
 
 		os.Exit(1)
@@ -140,13 +163,13 @@ func main() {
 	defer closeCollection()
 
 	// Initialize new metrics and defer function to save it to json
-	c.Metric = metrics.New(getVersion())
+	c.Metric = metrics.New(version)
 
 	defer func() {
 		// Save metrics to file
 		body, err := json.Marshal(c.Metric)
 		if err != nil {
-			c.Log.Warn("cant unmarshal metrics: %w", err)
+			c.Log.Warn("cant unmarshal metrics", "error", err.Error())
 		}
 
 		c.AddFileJSONRaw("metrics.json", body)
@@ -177,7 +200,7 @@ func main() {
 	// Save overall timing
 	c.Metric.Timings["total"] = time.Since(startTime)
 
-	c.Log.Infof("Collection complete, took us %.3f seconds", c.Metric.Timings["total"].Seconds())
+	c.Log.Info(fmt.Sprintf("Collection complete, took us %.3f seconds", c.Metric.Timings["total"].Seconds()))
 
 	// Collect obfuscation info
 	var (
@@ -192,16 +215,16 @@ func main() {
 	}
 
 	if len(affectedFiles) > 0 {
-		c.Log.Infof("Obfuscation replaced %d token in %d files (%d definitions)", count, len(util.DistinctStringSlice(affectedFiles)), len(c.Obfuscators))
+		c.Log.Info(fmt.Sprintf("Obfuscation replaced %d token in %d files (%d definitions)", count, len(util.DistinctStringSlice(affectedFiles)), len(c.Obfuscators)))
 	}
 
 	// get absolute path of outputFile
 	path, err := filepath.Abs(c.Config.General.OutputFile)
 	if err != nil {
-		c.Log.Debug(err)
+		c.Log.Debug(err.Error())
 	}
 
-	c.Log.Infof("Generated ZIP file located at %s", path)
+	c.Log.Info("Generated ZIP file located at " + path)
 }
 
 // NewCollection starts a new collection based on given controls.Config
@@ -210,28 +233,23 @@ func main() {
 func NewCollection(control config.Config) (*collection.Collection, func()) {
 	file, err := os.Create(control.General.OutputFile)
 	if err != nil {
-		logrus.Fatalf("cant create or open file for collection for given value '%s' - %s", control.General.OutputFile, err)
+		slog.Error("cant create or open file for collection for given value: "+control.General.OutputFile, "error", err.Error())
 	}
 
 	c := collection.New(file)
 	c.Config = control
 
-	consoleLevel := logrus.InfoLevel
+	consoleLevel := slog.LevelInfo
 	if verbose {
-		consoleLevel = logrus.DebugLevel
+		consoleLevel = slog.LevelDebug
 	}
 
-	c.Log.SetLevel(consoleLevel)
-
-	// Add console log output via logrus.Hook
-	c.Log.AddHook(&util.ExtraLogHook{
-		Formatter: &logrus.TextFormatter{ForceColors: true, FullTimestamp: true, TimestampFormat: "15:04:05"},
-		Writer:    colorable.NewColorableStdout(),
-		Level:     consoleLevel,
-	})
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: consoleLevel}))
+	slog.SetDefault(logger)
+	c.Log = logger
 
 	versionString := getBuildInfo()
-	c.Log.Infof("Starting %s version %s", Product, versionString)
+	c.Log.Info(fmt.Sprintf("Starting %s version %s", Product, versionString))
 
 	return c, func() {
 		// Close all open outputs in order, but only log errors
@@ -242,7 +260,7 @@ func NewCollection(control config.Config) (*collection.Collection, func()) {
 		} {
 			err = call()
 			if err != nil {
-				logrus.Error(err)
+				slog.Error(err.Error())
 			}
 		}
 	}
@@ -318,18 +336,18 @@ func collectModules(c *collection.Collection) {
 	for _, name := range config.ModulesOrder {
 		switch {
 		case util.StringInSlice(name, c.Config.General.DisabledModules):
-			c.Log.Debugf("Module %s is disabled", name)
+			c.Log.Debug("Module disabled: " + name)
 		case !util.StringInSlice(name, c.Config.General.EnabledModules):
-			c.Log.Debugf("Module %s is not enabled", name)
+			c.Log.Debug("Module is not enabled: " + name)
 		default:
 			// Save current time
 			moduleStart := time.Now()
 
-			c.Log.Debugf("Start collecting data for module %s", name)
+			c.Log.Debug("Start collecting data for module:" + name)
 
 			// Register custom obfuscators
 			for _, o := range c.Config.General.ExtraObfuscators {
-				c.Log.Debugf("Adding custom obfuscator for '%s' to module %s", o, name)
+				c.Log.Debug(fmt.Sprintf("Adding custom obfuscator for '%s' to module %s", o, name))
 				c.RegisterObfuscator(obfuscate.NewAny(o))
 			}
 
@@ -340,7 +358,7 @@ func collectModules(c *collection.Collection) {
 			// Save runtime of module
 			c.Metric.Timings[name] = time.Since(moduleStart)
 
-			c.Log.Debugf("Finished with module %s in %.3f seconds", name, c.Metric.Timings[name].Seconds())
+			c.Log.Debug(fmt.Sprintf("Finished with module %s in %.3f seconds", name, c.Metric.Timings[name].Seconds()))
 		}
 	}
 }

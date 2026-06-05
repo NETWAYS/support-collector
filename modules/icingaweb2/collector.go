@@ -1,12 +1,12 @@
 package icingaweb2
 
 import (
-	"github.com/NETWAYS/support-collector/internal/util"
 	"os"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
 	"github.com/NETWAYS/support-collector/internal/obfuscate"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const (
@@ -131,7 +131,7 @@ func CollectModuleInfo(c *collection.Collection) {
 
 	modulesFiles, err := os.ReadDir(ModulesPath)
 	if err != nil {
-		c.Log.Debugf("Could not list modules in %s - %s", ModulesPath, err)
+		c.Log.Debug("Could not list modules in "+ModulesPath, "error", err.Error())
 		return
 	}
 

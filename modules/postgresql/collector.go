@@ -1,10 +1,10 @@
 package postgresql
 
 import (
-	"github.com/NETWAYS/support-collector/internal/util"
 	"path/filepath"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 const ModuleName = "postgresql"

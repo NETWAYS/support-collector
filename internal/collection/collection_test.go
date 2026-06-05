@@ -3,8 +3,6 @@ package collection
 import (
 	"bytes"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCollection_AddFileFromReader(t *testing.T) {
@@ -12,12 +10,20 @@ func TestCollection_AddFileFromReader(t *testing.T) {
 	c := New(buf)
 
 	err := c.AddFileFromReaderRaw("test.txt", bytes.NewBufferString("content"))
-	assert.NoError(t, err)
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 
 	err = c.Close()
-	assert.NoError(t, err)
 
-	assert.Greater(t, buf.Len(), 0)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if buf.Len() == 0 {
+		t.Error("Expected buffer to be not empty")
+	}
 }
 
 func TestCollection_AddFiles(t *testing.T) {
@@ -27,7 +33,12 @@ func TestCollection_AddFiles(t *testing.T) {
 	c.AddFiles("test", "testdata/")
 
 	err := c.Close()
-	assert.NoError(t, err)
 
-	assert.Greater(t, buf.Len(), 0)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if buf.Len() == 0 {
+		t.Error("Expected buffer to be not empty")
+	}
 }

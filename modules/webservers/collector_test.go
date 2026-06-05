@@ -2,11 +2,10 @@ package webservers
 
 import (
 	"bytes"
-	"github.com/NETWAYS/support-collector/internal/util"
 	"testing"
 
 	"github.com/NETWAYS/support-collector/internal/collection"
-	"github.com/stretchr/testify/assert"
+	"github.com/NETWAYS/support-collector/internal/util"
 )
 
 func TestCollect(t *testing.T) {
@@ -20,5 +19,8 @@ func TestCollect(t *testing.T) {
 	Collect(c)
 
 	err := c.Close()
-	assert.NoError(t, err)
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 }
